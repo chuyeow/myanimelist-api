@@ -5,11 +5,13 @@ An unofficial API for the awesome http://myanimelist.net/.
 
 Why?
 ----
-There're no official plans by MyAnimeList to release an official API yet. I intend to use this API to build other apps.
+There're no official plans by MyAnimeList to release an official API yet. I
+intend to use this API to build other apps.
 
 What do I need to run this?
 ---------------------------
 * ruby 1.8.6 or later.
 * rubygems.
-* Curb. See http://curb.rubyforge.org/. You'll need libcurl to get this gem running
+* Curb. Get chuyeow's fork at http://github.com/chuyeow/curb/tree/master until
+  a bug has been patched in Curb. You'll need libcurl to get this gem installed.
 * Sintara. See http://www.sinatrarb.com/.
