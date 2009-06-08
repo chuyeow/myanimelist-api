@@ -3,58 +3,91 @@ require 'sinatra'
 require 'curb'
 
 # Sinatra settings.
-set :app_file, __FILE__
-set :reload, true
+set :sessions, true
 
 
-curl = Curl::Easy.new
-curl.enable_cookies = true
+module MyAnimeList
+  module Auth
 
-cookies = []
-
-use Rack::Auth::Basic do |username, password|
-
-  return true if cookies.length > 0
-
-  # Authenticate with MyAnimeList.net.
-  # FIXME We should store our own cookie with the user so that auth is not done unnecessarily for all requests.
-  curl.url = 'http://myanimelist.net/login.php'
-
-  authenticated = false
-  curl.on_header { |header|
-
-    # Parse cookies from the headers (yes, this is a naive implementation but it's fast).
-    if header =~ /^Set-Cookie: ([^=])=([^;]+;)/
-      cookies << "#{$1}=#{$2}"
+    def auth
+      @auth ||= Rack::Auth::Basic::Request.new(request.env)
     end
 
-    # A HTTP 302 redirection to the MAL panel indicates successful authentication.
-    authenticated = true if header =~ %r{^Location: http://myanimelist.net/panel.php\s+}
+    def unauthenticated!(realm = 'myanimelist.net')
+      headers['WWW-Authenticate'] = %(Basic realm="#{realm}")
+      throw :halt, [ 401, 'Authorization Required' ]
+    end
 
-    header.length
-  }
-  curl.http_post(
-    Curl::PostField.content('username', username),
-    Curl::PostField.content('password', password),
-    Curl::PostField.content('cookies', '1')
-  )
+    def bad_request!
+      throw :halt, [ 400, 'Bad Request' ]
+    end
 
-  # Reset the on_header handler.
-  curl.on_header
+    def authenticated?
+      request.env['REMOTE_USER']
+    end
 
-  authenticated
+    # Authenticate with MyAnimeList.net.
+    def authenticate_with_mal(username, password)
+
+      curl = Curl::Easy.new('http://myanimelist.net/login.php')
+
+      authenticated = false
+      cookies = []
+      curl.on_header { |header|
+
+        # Parse cookies from the headers (yes, this is a naive implementation but it's fast).
+        cookies << "#{$1}=#{$2}" if header =~ /^Set-Cookie: ([^=])=([^;]+;)/
+
+        # A HTTP 302 redirection to the MAL panel indicates successful authentication.
+        authenticated = true if header =~ %r{^Location: http://myanimelist.net/panel.php\s+}
+
+        header.length
+      }
+      curl.http_post(
+        Curl::PostField.content('username', username),
+        Curl::PostField.content('password', password),
+        Curl::PostField.content('cookies', '1')
+      )
+
+      # Reset the on_header handler.
+      curl.on_header
+
+      # Save cookie string into session.
+      session['cookie_string'] = cookies.join(' ') if authenticated
+
+      authenticated
+    end
+
+    def authenticate
+      return if authenticated?
+      authenticated! unless auth.provided?
+      bad_request! unless auth.basic?
+      authenticated! unless authenticate_with_mal(*auth.credentials)
+      request.env['REMOTE_USER'] = auth.username
+    end
+  end
 end
 
+helpers do
+  include MyAnimeList::Auth
+end
+
+before do
+
+  # Authenticate with MyAnimeList if we don't have a cookie string.
+  authenticate unless session['cookie_string']
+
+end
 
 get '/anime' do
 
-  curl.cookies = cookies.join(' ')
+  curl = Curl::Easy.new('http://myanimelist.net/panel.php?go=export')
+  curl.cookies = session['cookie_string']
 
-  curl.url = 'http://myanimelist.net/panel.php?go=export'
   curl.http_post(
     Curl::PostField.content('type', '1'),
     Curl::PostField.content('subexport', 'Export My List')
   )
-  
+
   curl.body_str
 end
