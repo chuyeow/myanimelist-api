@@ -1,10 +1,12 @@
 require 'rubygems'
 require 'sinatra'
 require 'curb'
+require 'nokogiri'
+require 'json'
 
 # Sinatra settings.
 set :sessions, true
-
+mime :json, 'text/javascript'
 
 module MyAnimeList
   module Auth
@@ -80,14 +82,30 @@ before do
 end
 
 get '/anime' do
+  content_type :json
 
   curl = Curl::Easy.new('http://myanimelist.net/panel.php?go=export')
   curl.cookies = session['cookie_string']
-
   curl.http_post(
     Curl::PostField.content('type', '1'),
     Curl::PostField.content('subexport', 'Export My List')
   )
 
-  curl.body_str
+  html_doc = Nokogiri::HTML(curl.body_str)
+  xml_url = html_doc.at('div.goodresult a')['href']
+
+  curl.url = xml_url
+  curl.perform
+
+  require 'zlib'
+  require 'stringio'
+
+  response = Zlib::GzipReader.new(StringIO.new(curl.body_str)).read
+  xml_doc = Nokogiri::XML.parse(response)
+
+  anime_list = xml_doc.search('anime').map do |anime|
+    anime.at('series_title').text
+  end
+
+  anime_list.to_json
 end
