@@ -62,9 +62,9 @@ module MyAnimeList
 
     def authenticate
       return if authenticated?
-      authenticated! unless auth.provided?
+      unauthenticated! unless auth.provided?
       bad_request! unless auth.basic?
-      authenticated! unless authenticate_with_mal(*auth.credentials)
+      unauthenticated! unless authenticate_with_mal(*auth.credentials)
       request.env['REMOTE_USER'] = auth.username
     end
   end
