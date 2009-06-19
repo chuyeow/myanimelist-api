@@ -38,8 +38,8 @@ post '/anime/update/:id' do
 
   MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
     :status => params[:status],
-    :episodes => params[:episodes] || 0,
-    :score => params[:score] || 0
+    :episodes => params[:episodes],
+    :score => params[:score]
   })
 
   true.to_json

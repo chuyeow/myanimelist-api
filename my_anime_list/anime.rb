@@ -295,10 +295,12 @@ module MyAnimeList
     def self.update(id, cookie_string, options)
 
       # Convert status to the number values that MyAnimeList uses.
-      # 1 = Watching, 3 = On-hold, 4 = Dropped, 6 = Plan to Watch
+      # 1 = Watching, 2 = Completed, 3 = On-hold, 4 = Dropped, 6 = Plan to Watch
       status = case options[:status]
       when 'Watching', 'watching', 1
         1
+      when 'Completed', 'completed', 2
+        2
       when 'On-hold', 'on-hold', 3
         3
       when 'Dropped', 'dropped', 4
@@ -313,12 +315,13 @@ module MyAnimeList
       # TODO Deal with options hash better.
       curl = Curl::Easy.new('http://myanimelist.net/includes/ajax.inc.php?t=62')
       curl.cookies = cookie_string
-      curl.http_post(
+      params = [
         Curl::PostField.content('aid', id),
-        Curl::PostField.content('epsseen', options[:episodes]),
-        Curl::PostField.content('score', options[:score]),
         Curl::PostField.content('status', status)
-      )
+      ]
+      params << Curl::PostField.content('epsseen', options[:episodes]) if options[:episodes] && status != 2
+      params << Curl::PostField.content('score', options[:score]) if options[:score]
+      curl.http_post(*params)
     end
 
     def other_titles
