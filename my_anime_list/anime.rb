@@ -67,7 +67,8 @@ module MyAnimeList
 
 
   class Anime
-    attr_accessor :id, :title, :rank, :image_url, :type, :episodes, :status, :classification
+    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
+                  :members_score, :members_count, :favorited_count
     attr_writer :other_titles, :genres
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
@@ -156,6 +157,30 @@ module MyAnimeList
         anime.classification = node.next.text.strip
       end
 
+      # Statistics
+      # Example:
+      # <h2>Statistics</h2>
+      # <div>
+      #   <span class="dark_text">Score:</span> 8.41<sup><small>1</small></sup>
+      #   <small>(scored by 22601 users)</small>
+      # </div>
+      # <div class="spaceit"><span class="dark_text">Ranked:</span> #96<sup><small>2</small></sup></div>
+      # <div><span class="dark_text">Popularity:</span> #15</div>
+      # <div class="spaceit"><span class="dark_text">Members:</span> 36,961</div>
+      # <div><span class="dark_text">Favorites:</span> 2,874</div>
+      if (node = right_column_nodeset.at('//span[text()="Score:"]')) && node.next
+        anime.members_score = node.next.text.strip.to_f
+      end
+      if (node = right_column_nodeset.at('//span[text()="Popularity:"]')) && node.next
+        anime.popularity_rank = node.next.text.strip.sub('#', '')
+      end
+      if (node = right_column_nodeset.at('//span[text()="Members:"]')) && node.next
+        anime.members_count = node.next.text.strip
+      end
+      if (node = right_column_nodeset.at('//span[text()="Favorites:"]')) && node.next
+        anime.favorited_count = node.next.text.strip
+      end
+
       anime
     end
 
@@ -173,10 +198,15 @@ module MyAnimeList
         :title => title,
         :other_titles => other_titles,
         :type => type,
+        :rank => rank,
+        :popularity_rank => popularity_rank,
         :episodes => episodes,
         :status => status,
         :genres => genres,
         :classification => classification,
+        :members_score => members_score,
+        :members_count => members_count,
+        :favorited_count => favorited_count,
         :watched_episodes => watched_episodes,
         :score => score,
         :watched_status => watched_status,
