@@ -69,7 +69,7 @@ module MyAnimeList
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
                   :members_score, :members_count, :favorited_count
-    attr_writer :other_titles, :genres
+    attr_writer :other_titles, :genres, :tags
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score, :watched_status
@@ -182,6 +182,21 @@ module MyAnimeList
         anime.favorited_count = node.next.text.strip.gsub(',', '').to_i
       end
 
+      # Popular Tags
+      # Example:
+      # <h2>Popular Tags</h2>
+      # <span style="font-size: 11px;">
+      #   <a href="http://myanimelist.net/anime.php?tag=comedy" style="font-size: 24px" title="1059 people tagged with comedy">comedy</a>
+      #   <a href="http://myanimelist.net/anime.php?tag=parody" style="font-size: 11px" title="493 people tagged with parody">parody</a>
+      #   <a href="http://myanimelist.net/anime.php?tag=school" style="font-size: 12px" title="546 people tagged with school">school</a>
+      #   <a href="http://myanimelist.net/anime.php?tag=slice of life" style="font-size: 18px" title="799 people tagged with slice of life">slice of life</a>
+      # </span>
+      if (node = right_column_nodeset.at('//span[preceding-sibling::h2[text()="Popular Tags"]]'))
+        node.search('a').each do |a|
+          anime.tags << a.text
+        end
+      end
+
       anime
     end
 
@@ -191,6 +206,10 @@ module MyAnimeList
 
     def genres
       @genres ||= []
+    end
+
+    def tags
+      @tags ||= []
     end
 
     def to_json
@@ -204,6 +223,7 @@ module MyAnimeList
         :episodes => episodes,
         :status => status,
         :genres => genres,
+        :tags => tags,
         :classification => classification,
         :members_score => members_score,
         :members_count => members_count,
