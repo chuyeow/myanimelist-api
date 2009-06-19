@@ -67,8 +67,8 @@ module MyAnimeList
 
 
   class Anime
-    attr_accessor :id, :title, :rank, :image_url, :type, :episodes
-    attr_writer :other_titles
+    attr_accessor :id, :title, :rank, :image_url, :type, :episodes, :status, :classification
+    attr_writer :other_titles, :genres
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score, :watched_status
@@ -95,69 +95,76 @@ module MyAnimeList
         anime.image_url = image_node['src']
       end
 
-      # The sections on the right column with the Alternative Titles, Information, Statistics, Popular Tags.
-      doc.css('div#rightcontent table tr td.borderClass > h2').each do |header|
-        case header.text
-        when 'Alternative Titles'
+      # Extract from sections on the right column: Alternative Titles, Information, Statistics, Popular Tags.
 
-          # Example:
-          # <h2>Alternative Titles</h2>
-          # <div class="spaceit_pad"><span class="dark_text">English:</span> Lucky Star/div>
-          # <div class="spaceit_pad"><span class="dark_text">Synonyms:</span> Lucky Star, Raki ☆ Suta</div>
-          # <div class="spaceit_pad"><span class="dark_text">Japanese:</span> らき すた</div>
-          sibling = header.next
-          while sibling && sibling.name == 'div'
-            span_node = sibling.at(:span)
-            case span_node.text
-            when 'English:'
-              anime.other_titles[:english] = span_node.next.text.strip
-            when 'Synonyms:'
-              anime.other_titles[:synonyms] = span_node.next.text.strip
-            when 'Japanese:'
-              anime.other_titles[:japanese] = span_node.next.text.strip
-            end
+      # Alternative Titles section.
+      # Example:
+      # <h2>Alternative Titles</h2>
+      # <div class="spaceit_pad"><span class="dark_text">English:</span> Lucky Star/div>
+      # <div class="spaceit_pad"><span class="dark_text">Synonyms:</span> Lucky Star, Raki ☆ Suta</div>
+      # <div class="spaceit_pad"><span class="dark_text">Japanese:</span> らき すた</div>
+      right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
 
-            sibling = sibling.next
-          end
-
-        when 'Information'
-
-          # Example:
-          # <h2>Information</h2>
-          # <div><span class="dark_text">Type:</span> TV</div>
-          # <div class="spaceit"><span class="dark_text">Episodes:</span> 24</div>
-          # <div><span class="dark_text">Status:</span> Finished Airing</div>
-          # <div class="spaceit"><span class="dark_text">Aired:</span> Apr  9, 2007 to Sep  17, 2007</div>
-          # <div>
-          #   <span class="dark_text">Producers:</span>
-          #   <a href="http://myanimelist.net/anime.php?p=2">Kyoto Animation</a>,
-          #   <a href="http://myanimelist.net/anime.php?p=104">Lantis</a>,
-          #   <a href="http://myanimelist.net/anime.php?p=262">Kadokawa Pictures USA</a><sup><small>L</small></sup>,
-          #   <a href="http://myanimelist.net/anime.php?p=286">Bang Zoom! Entertainment</a>
-          # </div>
-          # <div class="spaceit">
-          #   <span class="dark_text">Genres:</span>
-          #   <a href="http://myanimelist.net/anime.php?genre[]=4">Comedy</a>,
-          #   <a href="http://myanimelist.net/anime.php?genre[]=20">Parody</a>,
-          #   <a href="http://myanimelist.net/anime.php?genre[]=23">School</a>,
-          #   <a href="http://myanimelist.net/anime.php?genre[]=36">Slice of Life</a>
-          #  </div>
-          #  <div><span class="dark_text">Duration:</span> 24 min. per episode</div>
-          #  <div class="spaceit"><span class="dark_text">Rating:</span> PG-13 - Teens 13 or older</div>
-
-        when 'Statistics'
-        when 'My Info'
-        when 'Popular Tags'
-        end
+      if (node = right_column_nodeset.at('//span[text()="English:"]')) && node.next
+        anime.other_titles[:english] = node.next.text.strip
+      end
+      if (node = right_column_nodeset.at('//span[text()="Synonyms:"]')) && node.next
+        anime.other_titles[:synonyms] = node.next.text.strip
+      end
+      if (node = right_column_nodeset.at('//span[text()="Japanese:"]')) && node.next
+        anime.other_titles[:japanese] = node.next.text.strip
       end
 
-
+      # Information section.
+      # Example:
+      # <h2>Information</h2>
+      # <div><span class="dark_text">Type:</span> TV</div>
+      # <div class="spaceit"><span class="dark_text">Episodes:</span> 24</div>
+      # <div><span class="dark_text">Status:</span> Finished Airing</div>
+      # <div class="spaceit"><span class="dark_text">Aired:</span> Apr  9, 2007 to Sep  17, 2007</div>
+      # <div>
+      #   <span class="dark_text">Producers:</span>
+      #   <a href="http://myanimelist.net/anime.php?p=2">Kyoto Animation</a>,
+      #   <a href="http://myanimelist.net/anime.php?p=104">Lantis</a>,
+      #   <a href="http://myanimelist.net/anime.php?p=262">Kadokawa Pictures USA</a><sup><small>L</small></sup>,
+      #   <a href="http://myanimelist.net/anime.php?p=286">Bang Zoom! Entertainment</a>
+      # </div>
+      # <div class="spaceit">
+      #   <span class="dark_text">Genres:</span>
+      #   <a href="http://myanimelist.net/anime.php?genre[]=4">Comedy</a>,
+      #   <a href="http://myanimelist.net/anime.php?genre[]=20">Parody</a>,
+      #   <a href="http://myanimelist.net/anime.php?genre[]=23">School</a>,
+      #   <a href="http://myanimelist.net/anime.php?genre[]=36">Slice of Life</a>
+      # </div>
+      # <div><span class="dark_text">Duration:</span> 24 min. per episode</div>
+      # <div class="spaceit"><span class="dark_text">Rating:</span> PG-13 - Teens 13 or older</div>
+      if (node = right_column_nodeset.at('//span[text()="Type:"]')) && node.next
+        anime.type = node.next.text.strip
+      end
+      if (node = right_column_nodeset.at('//span[text()="Episodes:"]')) && node.next
+        anime.episodes = node.next.text.strip.to_i
+      end
+      if (node = right_column_nodeset.at('//span[text()="Status:"]')) && node.next
+        anime.status = node.next.text.strip
+      end
+      if node = right_column_nodeset.at('//span[text()="Genres:"]')
+        node.parent.search('a').each do |a|
+          anime.genres << a.text.strip
+        end
+      end
+      if (node = right_column_nodeset.at('//span[text()="Rating:"]')) && node.next
+        anime.classification = node.next.text.strip
+      end
 
       anime
     end
 
     def other_titles
       @other_titles ||= {}
+    end
+
+    def genres
+      @genres ||= []
     end
 
     def to_json
@@ -167,6 +174,9 @@ module MyAnimeList
         :other_titles => other_titles,
         :type => type,
         :episodes => episodes,
+        :status => status,
+        :genres => genres,
+        :classification => classification,
         :watched_episodes => watched_episodes,
         :score => score,
         :watched_status => watched_status,
