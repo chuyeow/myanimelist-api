@@ -69,7 +69,7 @@ module MyAnimeList
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
-    attr_writer :other_titles, :genres, :tags
+    attr_writer :other_titles, :genres, :tags, :manga_adaptations, :prequels, :sequels, :side_stories
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score, :watched_status
@@ -227,6 +227,52 @@ module MyAnimeList
         end
       end
 
+      # Related Anime
+      # Example:
+      # <td>
+      #   <br>
+      #   <h2>Related Anime</h2>
+      #   Adaptation: <a href="http://myanimelist.net/manga/9548/Higurashi_no_Naku_Koro_ni_Kai_Minagoroshi-hen">Higurashi no Naku Koro ni Kai Minagoroshi-hen</a>,
+      #   <a href="http://myanimelist.net/manga/9738/Higurashi_no_Naku_Koro_ni_Matsuribayashi-hen">Higurashi no Naku Koro ni Matsuribayashi-hen</a><br>
+      #   Prequel: <a href="http://myanimelist.net/anime/934/Higurashi_no_Naku_Koro_ni">Higurashi no Naku Koro ni</a><br>
+      #   Sequel: <a href="http://myanimelist.net/anime/3652/Higurashi_no_Naku_Koro_ni_Rei">Higurashi no Naku Koro ni Rei</a><br>
+      #   Side story: <a href="http://myanimelist.net/anime/6064/Higurashi_no_Naku_Koro_ni_Kai_DVD_Specials">Higurashi no Naku Koro ni Kai DVD Specials</a><br>
+      related_anime_h2 = right_column_nodeset.at('//h2[text()="Related Anime"]')
+      if related_anime_h2
+
+        # Get all text between <h2>Related Anime</h2> and the next <h2> tag.
+        match_data = related_anime_h2.parent.to_s.match(%r{<h2>Related Anime</h2>(.+?)<h2>}m)
+
+        if match_data
+          related_anime_text = match_data[1]
+
+          if related_anime_text.match %r{Adaptation: ?(<a .+?)<br}
+            $1.scan(%r{<a .+?</a>}) do |a|
+              anime.manga_adaptations << a
+            end
+          end
+
+          if related_anime_text.match %r{Prequel: ?(<a .+?)<br}
+            $1.scan(%r{<a .+?</a>}) do |a|
+              anime.prequels << a
+            end
+          end
+
+          if related_anime_text.match %r{Sequel: ?(<a .+?)<br}
+            $1.scan(%r{<a .+?</a>}) do |a|
+              anime.sequels << a
+            end
+          end
+
+          if related_anime_text.match %r{Side story: ?(<a .+?)<br}
+            $1.scan(%r{<a .+?</a>}) do |a|
+              anime.side_stories << a
+            end
+          end
+        end
+
+      end
+
       anime
     end
 
@@ -240,6 +286,22 @@ module MyAnimeList
 
     def tags
       @tags ||= []
+    end
+
+    def manga_adaptations
+      @manga_adaptations ||= []
+    end
+
+    def prequels
+      @prequels ||= []
+    end
+
+    def sequels
+      @sequels ||= []
+    end
+
+    def side_stories
+      @side_stories ||= []
     end
 
     def to_json
@@ -259,9 +321,13 @@ module MyAnimeList
         :members_score => members_score,
         :members_count => members_count,
         :favorited_count => favorited_count,
+        :manga_adaptations => manga_adaptations,
+        :prequels => prequels,
+        :sequels => sequels,
+        :side_stories => side_stories,
         :watched_episodes => watched_episodes,
         :score => score,
-        :watched_status => watched_status,
+        :watched_status => watched_status
       }.to_json
     end
   end # END class Anime
