@@ -12,6 +12,5 @@ What do I need to run this?
 ---------------------------
 * ruby 1.8.6 or later.
 * rubygems.
-* Curb. Get chuyeow's fork at http://github.com/chuyeow/curb/tree/master until
-  a bug has been patched in Curb. You'll need libcurl to get this gem installed.
+* Curb 0.3.7 or later. You'll need libcurl to get this gem installed.
 * Sintara. See http://www.sinatrarb.com/.
