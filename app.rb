@@ -82,6 +82,23 @@ before do
 
 end
 
+# Get an anime's details.
+get '/anime/:id' do
+  pass unless params[:id] =~ /^\d+$/
+
+  content_type :json
+
+  # FIXME This should catch any exceptions, such as 404 or network/HTTP errors.
+  anime = Anime.scrape_anime(params[:id], session['cookie_string'])
+
+  anime.to_json
+end
+
+# Edit an anime.
+post 'anime/:id' do
+end
+
+# Get a user's anime list.
 get '/anime' do
   content_type :json
 
@@ -118,4 +135,8 @@ get '/anime' do
   end
 
   anime_list.to_json
+end
+
+# Search for anime.
+get 'anime/search' do
 end
