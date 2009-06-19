@@ -30,8 +30,28 @@ get '/anime/:id' do
   anime.to_json
 end
 
-# Edit an anime.
-post 'anime/:id' do
+# Updates a user's anime info.
+post '/anime/update/:id' do
+  pass unless params[:id] =~ /^\d+$/
+
+  content_type :json
+
+  # TODO
+  # Accept params:
+  # * anime_id
+  # * status
+  # * episodes
+  # * score
+  # * user ID/animelist ID?
+  #
+  # Make a POST to http://myanimelist.net/includes/ajax.inc.php?t=62 with:
+  # * aid - anime ID
+  # * alistid - not sure yet
+  # * epsseen - episodes seen
+  # * score - your score
+  # * status - 1 = Watching, 3 = On-hold, 4 = Dropped, 6 = Plan to Watch
+
+  true.to_json
 end
 
 # Get a user's anime list.
