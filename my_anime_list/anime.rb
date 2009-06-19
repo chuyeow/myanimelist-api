@@ -97,7 +97,9 @@ module MyAnimeList
         anime.image_url = image_node['src']
       end
 
-      # Extract from sections on the right column: Alternative Titles, Information, Statistics, Popular Tags.
+      # -
+      # Extract from sections on the left column: Alternative Titles, Information, Statistics, Popular Tags.
+      # -
 
       # Alternative Titles section.
       # Example:
@@ -105,17 +107,18 @@ module MyAnimeList
       # <div class="spaceit_pad"><span class="dark_text">English:</span> Lucky Star/div>
       # <div class="spaceit_pad"><span class="dark_text">Synonyms:</span> Lucky Star, Raki ☆ Suta</div>
       # <div class="spaceit_pad"><span class="dark_text">Japanese:</span> らき すた</div>
-      right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
+      left_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
 
-      if (node = right_column_nodeset.at('//span[text()="English:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="English:"]')) && node.next
         anime.other_titles[:english] = node.next.text.strip
       end
-      if (node = right_column_nodeset.at('//span[text()="Synonyms:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Synonyms:"]')) && node.next
         anime.other_titles[:synonyms] = node.next.text.strip
       end
-      if (node = right_column_nodeset.at('//span[text()="Japanese:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Japanese:"]')) && node.next
         anime.other_titles[:japanese] = node.next.text.strip
       end
+
 
       # Information section.
       # Example:
@@ -140,21 +143,21 @@ module MyAnimeList
       # </div>
       # <div><span class="dark_text">Duration:</span> 24 min. per episode</div>
       # <div class="spaceit"><span class="dark_text">Rating:</span> PG-13 - Teens 13 or older</div>
-      if (node = right_column_nodeset.at('//span[text()="Type:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Type:"]')) && node.next
         anime.type = node.next.text.strip
       end
-      if (node = right_column_nodeset.at('//span[text()="Episodes:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Episodes:"]')) && node.next
         anime.episodes = node.next.text.strip.gsub(',', '').to_i
       end
-      if (node = right_column_nodeset.at('//span[text()="Status:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Status:"]')) && node.next
         anime.status = node.next.text.strip
       end
-      if node = right_column_nodeset.at('//span[text()="Genres:"]')
+      if node = left_column_nodeset.at('//span[text()="Genres:"]')
         node.parent.search('a').each do |a|
           anime.genres << a.text.strip
         end
       end
-      if (node = right_column_nodeset.at('//span[text()="Rating:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Rating:"]')) && node.next
         anime.classification = node.next.text.strip
       end
 
@@ -169,16 +172,16 @@ module MyAnimeList
       # <div><span class="dark_text">Popularity:</span> #15</div>
       # <div class="spaceit"><span class="dark_text">Members:</span> 36,961</div>
       # <div><span class="dark_text">Favorites:</span> 2,874</div>
-      if (node = right_column_nodeset.at('//span[text()="Score:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Score:"]')) && node.next
         anime.members_score = node.next.text.strip.to_f
       end
-      if (node = right_column_nodeset.at('//span[text()="Popularity:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Popularity:"]')) && node.next
         anime.popularity_rank = node.next.text.strip.sub('#', '').gsub(',', '').to_i
       end
-      if (node = right_column_nodeset.at('//span[text()="Members:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Members:"]')) && node.next
         anime.members_count = node.next.text.strip.gsub(',', '').to_i
       end
-      if (node = right_column_nodeset.at('//span[text()="Favorites:"]')) && node.next
+      if (node = left_column_nodeset.at('//span[text()="Favorites:"]')) && node.next
         anime.favorited_count = node.next.text.strip.gsub(',', '').to_i
       end
 
@@ -191,11 +194,18 @@ module MyAnimeList
       #   <a href="http://myanimelist.net/anime.php?tag=school" style="font-size: 12px" title="546 people tagged with school">school</a>
       #   <a href="http://myanimelist.net/anime.php?tag=slice of life" style="font-size: 18px" title="799 people tagged with slice of life">slice of life</a>
       # </span>
-      if (node = right_column_nodeset.at('//span[preceding-sibling::h2[text()="Popular Tags"]]'))
+      if (node = left_column_nodeset.at('//span[preceding-sibling::h2[text()="Popular Tags"]]'))
         node.search('a').each do |a|
           anime.tags << a.text
         end
       end
+
+
+      # -
+      # Extract from sections on the right column: Synopsis, Related Anime, Characters & Voice Actors, Reviews
+      # Recommendations.
+      # -
+
 
       anime
     end
