@@ -68,7 +68,7 @@ module MyAnimeList
 
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
-                  :members_score, :members_count, :favorited_count
+                  :members_score, :members_count, :favorited_count, :synopsis
     attr_writer :other_titles, :genres, :tags
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
@@ -205,7 +205,27 @@ module MyAnimeList
       # Extract from sections on the right column: Synopsis, Related Anime, Characters & Voice Actors, Reviews
       # Recommendations.
       # -
+      right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td/div/table')
 
+      # Synopsis
+      # Example:
+      # <td>
+      # <h2>Synopsis</h2>
+      # Having fun in school, doing homework together, cooking and eating, playing videogames, watching anime. All those little things make up the daily life of the anime- and chocolate-loving Izumi Konata and her friends. Sometimes relaxing but more than often simply funny! <br />
+      # -From AniDB
+      synopsis_h2 = right_column_nodeset.at('//h2[text()="Synopsis"]')
+      if synopsis_h2
+        node = synopsis_h2.next
+        while node
+          if anime.synopsis
+            anime.synopsis << node.to_s 
+          else
+            anime.synopsis = node.to_s
+          end
+
+          node = node.next
+        end
+      end
 
       anime
     end
@@ -227,6 +247,7 @@ module MyAnimeList
         :id => id,
         :title => title,
         :other_titles => other_titles,
+        :synopsis => synopsis,
         :type => type,
         :rank => rank,
         :popularity_rank => popularity_rank,
