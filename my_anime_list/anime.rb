@@ -7,7 +7,7 @@ module MyAnimeList
     module Auth
 
       def auth
-        @auth ||= Rack::Auth::Basic::Request.new(request.env)
+        @auth ||= ::Rack::Auth::Basic::Request.new(request.env)
       end
 
       def unauthenticated!(realm = 'myanimelist.net')
