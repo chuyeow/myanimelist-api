@@ -8,7 +8,6 @@ require 'anime'
 
 # Sinatra settings.
 set :sessions, true
-mime :json, 'text/javascript'
 
 module MyAnimeList
   module Auth
