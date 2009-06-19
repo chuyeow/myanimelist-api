@@ -10,7 +10,7 @@ require 'my_anime_list/anime'
 set :sessions, true
 
 helpers do
-  include MyAnimeList::Auth
+  include MyAnimeList::Rack::Auth
 end
 
 before do
