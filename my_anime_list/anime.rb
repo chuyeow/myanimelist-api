@@ -87,10 +87,11 @@ module MyAnimeList
       anime = Anime.new
       anime.id = id
 
+      # Title and rank.
       # Example:
       # <h1><div style="float: right; font-size: 13px;">Ranked #96</div>Lucky ☆ Star</h1>
       anime.title = doc.at(:h1).children.find { |o| o.text? }.to_s
-      anime.rank = doc.at('h1 > div').text.gsub(/\D/, '')
+      anime.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
 
       if image_node = doc.at('div#rightcontent a img')
         anime.image_url = image_node['src']
@@ -143,7 +144,7 @@ module MyAnimeList
         anime.type = node.next.text.strip
       end
       if (node = right_column_nodeset.at('//span[text()="Episodes:"]')) && node.next
-        anime.episodes = node.next.text.strip.to_i
+        anime.episodes = node.next.text.strip.gsub(',', '').to_i
       end
       if (node = right_column_nodeset.at('//span[text()="Status:"]')) && node.next
         anime.status = node.next.text.strip
@@ -172,13 +173,13 @@ module MyAnimeList
         anime.members_score = node.next.text.strip.to_f
       end
       if (node = right_column_nodeset.at('//span[text()="Popularity:"]')) && node.next
-        anime.popularity_rank = node.next.text.strip.sub('#', '')
+        anime.popularity_rank = node.next.text.strip.sub('#', '').gsub(',', '').to_i
       end
       if (node = right_column_nodeset.at('//span[text()="Members:"]')) && node.next
-        anime.members_count = node.next.text.strip
+        anime.members_count = node.next.text.strip.gsub(',', '').to_i
       end
       if (node = right_column_nodeset.at('//span[text()="Favorites:"]')) && node.next
-        anime.favorited_count = node.next.text.strip
+        anime.favorited_count = node.next.text.strip.gsub(',', '').to_i
       end
 
       anime
