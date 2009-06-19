@@ -36,20 +36,11 @@ post '/anime/update/:id' do
 
   content_type :json
 
-  # TODO
-  # Accept params:
-  # * anime_id
-  # * status
-  # * episodes
-  # * score
-  # * user ID/animelist ID?
-  #
-  # Make a POST to http://myanimelist.net/includes/ajax.inc.php?t=62 with:
-  # * aid - anime ID
-  # * alistid - not sure yet
-  # * epsseen - episodes seen
-  # * score - your score
-  # * status - 1 = Watching, 3 = On-hold, 4 = Dropped, 6 = Plan to Watch
+  MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
+    :status => params[:status],
+    :episodes => params[:episodes] || 0,
+    :score => params[:score] || 0
+  })
 
   true.to_json
 end
