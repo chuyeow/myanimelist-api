@@ -14,10 +14,8 @@ helpers do
 end
 
 before do
-
   # Authenticate with MyAnimeList if we don't have a cookie string.
   authenticate unless session['cookie_string']
-
 end
 
 # Get an anime's details.
