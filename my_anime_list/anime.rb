@@ -311,15 +311,13 @@ module MyAnimeList
         1
       end
 
-      # TODO What is the alistid param for?
-      # TODO Deal with options hash better.
       curl = Curl::Easy.new('http://myanimelist.net/includes/ajax.inc.php?t=62')
       curl.cookies = cookie_string
       params = [
         Curl::PostField.content('aid', id),
         Curl::PostField.content('status', status)
       ]
-      params << Curl::PostField.content('epsseen', options[:episodes]) if options[:episodes] && status != 2
+      params << Curl::PostField.content('epsseen', options[:episodes]) if options[:episodes]
       params << Curl::PostField.content('score', options[:score]) if options[:score]
       curl.http_post(*params)
     end
