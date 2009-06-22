@@ -109,7 +109,8 @@ module MyAnimeList
     attr_writer :other_titles, :genres, :tags, :manga_adaptations, :prequels, :sequels, :side_stories
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
-    attr_accessor :watched_episodes, :score, :watched_status
+    attr_accessor :watched_episodes, :score
+    attr_reader :watched_status
 
     # Scrape anime details page on MyAnimeList.net. Very fragile!
     def self.scrape_anime(id, cookie_string = nil)
@@ -330,6 +331,43 @@ module MyAnimeList
 
       end
 
+      # <h2>My Info</h2>
+      # <a name="addtolistanchor"></a>
+      # <div id="addtolist" style="display: block;">
+      #   <input type="hidden" id="myinfo_anime_id" value="934">
+      #   <input type="hidden" id="myinfo_curstatus" value="2">
+      #
+      #   <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      #     <tr>
+      #       <td class="spaceit">Status:</td>
+      #       <td class="spaceit"><select id="myinfo_status" name="myinfo_status" onchange="checkEps(this);" class="inputtext"><option value="1" selected>Watching</option><option value="2" >Completed</option><option value="3" >On-Hold</option><option value="4" >Dropped</option><option value="6" >Plan to Watch</option></select></td>
+      #     </tr>
+      #     <tr>
+      #       <td class="spaceit">Eps Seen:</td>
+      #       <td class="spaceit"><input type="text" id="myinfo_watchedeps" name="myinfo_watchedeps" size="3" class="inputtext" value="26"> / <span id="curEps">26</span></td>
+      #     </tr>
+      #     <tr>
+      #       <td class="spaceit">Your Score:</td>
+      #         <td class="spaceit"><select id="myinfo_score" name="myinfo_score" class="inputtext"><option value="0">Select</option><option value="10" >(10) Masterpiece</option><option value="9" >(9) Great</option><option value="8" >(8) Very Good</option><option value="7" >(7) Good</option><option value="6" >(6) Fine</option><option value="5" >(5) Average</option><option value="4" >(4) Bad</option><option value="3" >(3) Very Bad</option><option value="2" >(2) Horrible</option><option value="1" >(1) Unwatchable</option></select></td>
+      #     </tr>
+      #     <tr>
+      #       <td>&nbsp;</td>
+      #       <td><input type="button" name="myinfo_submit" value="Update" onclick="myinfo_updateInfo(1100070);" class="inputButton"> <small><a href="http://www.myanimelist.net/panel.php?go=edit&id=1100070">Edit Details</a></small></td>
+      #     </tr>
+      #   </table>
+      watched_status_select_node = doc.at('select#myinfo_status')
+      if watched_status_select_node && (selected_option = watched_status_select_node.at('option[selected="selected"]'))
+        anime.watched_status = selected_option['value']
+      end
+      episodes_input_node = doc.at('input#myinfo_watchedeps')
+      if episodes_input_node
+        anime.watched_episodes = episodes_input_node['value'].to_i
+      end
+      score_select_node = doc.at('select#myinfo_score')
+      if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
+        anime.score = selected_option['value']
+      end
+
       anime
     rescue Exception => e
       raise UnknownError("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
@@ -371,6 +409,23 @@ module MyAnimeList
 
       # Update is successful for a HTTP 200 response with this string.
       curl.response_code == 200 && curl.body_str == 'Successfully Updated'
+    end
+
+    def watched_status=(value)
+      @watched_status = case value
+      when 'Watching', 'watching', '1'
+        :watching
+      when 'Completed', 'completed', '2'
+        :completed
+      when 'On-hold', 'on-hold', '3'
+        :on_hold
+      when 'Dropped', 'dropped', '4'
+        :dropped
+      when 'Plan to Watch', 'plan to watch', '6'
+        :plan_to_watched
+      else
+        :watching
+      end
     end
 
     def other_titles
