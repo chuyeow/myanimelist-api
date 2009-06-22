@@ -13,6 +13,14 @@ helpers do
   include MyAnimeList::Rack::Auth
 end
 
+error MyAnimeList::NetworkError do
+  { :error => "A network error has occurred. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+end
+
+error MyAnimeList::UpdateError do
+  { :error => "Error updating anime. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+end
+
 before do
   # Authenticate with MyAnimeList if we don't have a cookie string.
   authenticate unless session['cookie_string']
@@ -36,13 +44,13 @@ post '/anime/update/:id' do
 
   content_type :json
 
-  MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
+  successful = MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
     :status => params[:status],
     :episodes => params[:episodes],
     :score => params[:score]
   })
 
-  true.to_json
+  successful ? true.to_json : false.to_json
 end
 
 # Get a user's anime list.

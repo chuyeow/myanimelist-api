@@ -66,6 +66,31 @@ module MyAnimeList
   end # END module Rack
 
 
+  # Raised when there're any network errors.
+  class NetworkError < StandardError
+    attr_accessor :original_exception
+
+    def initialize(message, original_exception = nil)
+      @message = message
+      @original_exception = original_exception
+      super(message)
+    end
+    def to_s; @message; end
+  end
+
+  # Raised when there's an error updating an anime.
+  class UpdateError < StandardError
+    attr_accessor :original_exception
+
+    def initialize(message, original_exception = nil)
+      @message = message
+      @original_exception = original_exception
+      super(message)
+    end
+    def to_s; @message; end
+  end
+
+
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
@@ -218,7 +243,7 @@ module MyAnimeList
         node = synopsis_h2.next
         while node
           if anime.synopsis
-            anime.synopsis << node.to_s 
+            anime.synopsis << node.to_s
           else
             anime.synopsis = node.to_s
           end
@@ -319,7 +344,15 @@ module MyAnimeList
       ]
       params << Curl::PostField.content('epsseen', options[:episodes]) if options[:episodes]
       params << Curl::PostField.content('score', options[:score]) if options[:score]
-      curl.http_post(*params)
+
+      begin
+        curl.http_post(*params)
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error updating anime with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      # Update is successful for a HTTP 200 response with this string.
+      curl.response_code == 200 && curl.body_str == 'Successfully Updated'
     end
 
     def other_titles
