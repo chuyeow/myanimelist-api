@@ -90,6 +90,18 @@ module MyAnimeList
     def to_s; @message; end
   end
 
+  # Raised when an error we didn't expect occurs.
+  class UnknownError < StandardError
+    attr_accessor :original_exception
+
+    def initialize(message, original_exception = nil)
+      @message = message
+      @original_exception = original_exception
+      super(message)
+    end
+    def to_s; @message; end
+  end
+
 
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
@@ -103,7 +115,11 @@ module MyAnimeList
     def self.scrape_anime(id, cookie_string = nil)
       curl = Curl::Easy.new("http://myanimelist.net/anime/#{id}")
       curl.cookies = cookie_string if cookie_string
-      curl.perform
+      begin
+        curl.perform
+      rescue Exception => e
+        raise NetworkError("Network error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+      end
 
       response = curl.body_str
 
@@ -315,6 +331,8 @@ module MyAnimeList
       end
 
       anime
+    rescue Exception => e
+      raise UnknownError("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
     def self.update(id, cookie_string, options)
