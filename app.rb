@@ -32,7 +32,6 @@ get '/anime/:id' do
 
   content_type :json
 
-  # FIXME This should catch any exceptions, such as 404 or network/HTTP errors.
   anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
 
   anime.to_json
