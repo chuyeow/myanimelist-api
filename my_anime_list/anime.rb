@@ -422,7 +422,7 @@ module MyAnimeList
       when 'Dropped', 'dropped', '4'
         :dropped
       when 'Plan to Watch', 'plan to watch', '6'
-        :plan_to_watched
+        :plan_to_watch
       else
         :watching
       end
