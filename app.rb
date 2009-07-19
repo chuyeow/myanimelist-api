@@ -95,11 +95,9 @@ end
 get '/anime/search' do
 end
 
-# Check whether authentication credentials are OK.
+# Verify that authentication credentials are valid.
+# Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
 get '/auth' do
-  content_type :json
-
   # Do nothing because the "authenticate" before filter will ensure anyone who reaches this point is already
   # authenticated.
-  'true'.to_json
 end
