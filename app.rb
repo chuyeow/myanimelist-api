@@ -92,5 +92,14 @@ get '/anime' do
 end
 
 # Search for anime.
-get 'anime/search' do
+get '/anime/search' do
+end
+
+# Check whether authentication credentials are OK.
+get '/auth' do
+  content_type :json
+
+  # Do nothing because the "authenticate" before filter will ensure anyone who reaches this point is already
+  # authenticated.
+  'true'.to_json
 end
