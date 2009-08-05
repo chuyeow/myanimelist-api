@@ -1,8 +1,9 @@
 require 'rubygems'
 require 'sinatra'
+require 'rewindable_input'
 
 set :environment, :development
-set :port, 4567
+set :port, 80
 
 require 'app'
 
