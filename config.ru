@@ -7,4 +7,6 @@ set :port, 80
 
 require 'app'
 
+use RewindableInput
+
 run Sinatra::Application
