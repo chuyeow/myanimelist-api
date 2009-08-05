@@ -370,7 +370,7 @@ module MyAnimeList
 
       anime
     rescue Exception => e
-      raise UnknownError("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+      raise UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
     def self.update(id, cookie_string, options)
