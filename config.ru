@@ -1,8 +1,5 @@
 require 'rubygems'
-require 'sinatra'
-
-set :environment, :development
-set :port, 80
+require 'vendor/sinatra/lib/sinatra.rb'
 
 require 'app'
 

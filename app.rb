@@ -1,5 +1,3 @@
-require 'rubygems'
-require 'sinatra'
 require 'curb'
 require 'nokogiri'
 require 'json'
