@@ -6,6 +6,7 @@ require 'my_anime_list/anime'
 
 # Sinatra settings.
 set :sessions, true
+mime :json, 'text/javascript'
 
 helpers do
   include MyAnimeList::Rack::Auth
