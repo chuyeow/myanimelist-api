@@ -1,0 +1,28 @@
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 14px;
+}
+
+h1, h2, h3, h4, h5, h6, strong, th, label {
+  font-weight: bold;
+}
+
+h1 {
+  font-size: 20px;
+  margin: 0 0 10px;
+}
+
+p {
+  margin: 0 0 15px;
+}
+
+#container {
+  margin: auto;
+  max-width: 960px;
+  padding: 10px 20px;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 3px 5px;
+}
