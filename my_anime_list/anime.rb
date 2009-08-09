@@ -27,6 +27,7 @@ module MyAnimeList
       def authenticate_with_mal(username, password)
 
         curl = Curl::Easy.new('http://myanimelist.net/login.php')
+        curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
 
         authenticated = false
         cookies = []
@@ -115,6 +116,7 @@ module MyAnimeList
     # Scrape anime details page on MyAnimeList.net. Very fragile!
     def self.scrape_anime(id, cookie_string = nil)
       curl = Curl::Easy.new("http://myanimelist.net/anime/#{id}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       curl.cookies = cookie_string if cookie_string
       begin
         curl.perform
@@ -393,6 +395,7 @@ module MyAnimeList
       end
 
       curl = Curl::Easy.new('http://myanimelist.net/includes/ajax.inc.php?t=62')
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       curl.cookies = cookie_string
       params = [
         Curl::PostField.content('aid', id),
