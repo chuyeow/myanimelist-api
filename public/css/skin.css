@@ -3,12 +3,11 @@ html {
 }
 
 body {
-  background-color: #f9f9f9;
+  background-color: #fff;
   color: #333;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
   height: 100%;
-  text-shadow: 0 1px 0 #fff;
 }
 
 h1, h2, h3, h4, h5, h6, strong, th, label {
