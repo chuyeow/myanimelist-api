@@ -127,7 +127,28 @@
 
 
   <h3 id="data_formats">Data formats</h3>
+
+  <p>The MyAnimeList Unofficial API supports only JSON output format at the moment. XML will come later - bug <a href="http://twitter.com/chuyeow">@chuyeow</a> on Twitter. When the XML output format is ready, you can specify the output format using the <code>format</code> parameter (JSON is the default):</p>
+
+  <blockquote>
+    <p>
+      <a href="http://mal-api.com/anime/1887?format=json">http://mal-api.com/anime/1887?format=json</a><br />
+      <a href="http://mal-api.com/anime/1887?format=xml">http://mal-api.com/anime/1887?format=xml (not yet supported)</a>
+    </p>
+  </blockquote>
+
+
   <h3 id="authentication">Authentication</h3>
+
+  <p>Authentication is required for certain API requests. The MyAnimeList Unofficial API only supports <a href="http://en.wikipedia.org/wiki/Basic_access_authentication">HTTP Basic Authentication</a> because of the limitations of the MyAnimeList site.</p>
+
+  <h4>Is my password secure?</h4>
+
+  <p>The MyAnimeList Unofficial API takes your username and password and authenticates it with <a href="http://myanimelist.net/">MyAnimeList</a> directly - no passwords are saved or logged.</p>
+
+  <p>However, it is clearly inferior to secure solutions like <a href="http://oauth.net/">OAuth</a> and requires you to trust an unofficial API with your MyAnimeList password. It bothers us too. You can help us bug the MyAnimeList developers at the <a href="http://myanimelist.net/clubs.php?cid=13727">MAL API club</a>.</p>
+
+
   <h3 id="errors">Errors</h3>
 
 
@@ -148,7 +169,7 @@
 
   <h3 id="read_anime">/anime - Read an anime's details</h3>
 
-  <p>Fetch an anime with the given anime id. If the request is an <a href="#authentication">authenticated</a> request, the the authenticated user's anime details are also returned in the <a href="#type_anime">anime</a> response.</p>
+  <p>Fetch an anime with the given anime id.</p>
 
   <blockquote>
     <p><code>http://mal-api.com/anime/<strong>anime_id</strong></code></p>
@@ -157,6 +178,11 @@
   </blockquote>
 
   <p>The response is an <a href="#type_anime">anime</a>.</p>
+
+  <p>The following optional arguments are supported:</p>
+  <ul>
+    <li><code>mine=1</code> - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched episodes). Requires <a href="#authenticated">authentication</a>. See <a href="#type_anime">anime response type</a>.</li>
+  </ul>
 
 
   <h2 id="write_methods">Writing data to MyAnimeList</h2>
