@@ -46,6 +46,7 @@ get '/anime/:id' do
     authenticate unless session['cookie_string']
     anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
   else
+    # FIXME Cache this.
     anime = MyAnimeList::Anime.scrape_anime(params[:id])
   end
 
