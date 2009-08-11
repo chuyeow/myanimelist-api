@@ -21,12 +21,17 @@ h1 {
 
 h2 {
   font-size: 18px;
-  margin: 20px 0 10px;
+  margin: 24px 0 10px;
 }
 
 h3 {
   font-size: 16px;
-  margin: 0 0 4px;
+  margin: 16px 0 4px;
+}
+
+h4 {
+  font-size: 14px;
+  margin: 8px 0 4px;
 }
 
 p {
@@ -89,22 +94,30 @@ h3.logo {
   visibility: hidden;
 }
 
-ul.toc {
+ul {
   padding: 0 0 0 30px;
 }
 
-ul.toc li {
+ul li {
   list-style-type: disc;
   padding: 2px 0;
 }
 
-ul.toc li ul {
+ul li ul {
   padding: 0 0 0 30px;
 }
 
-ul.toc li ul li {
+ul li ul li {
   list-style-type: circle;
 /*  padding: 0 0 0 30px;*/
+}
+
+pre, blockquote {
+  margin: 14px 28px;
+}
+
+code {
+  color: #060;
 }
 
 .args {
