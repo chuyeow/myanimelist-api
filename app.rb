@@ -1,8 +1,8 @@
 require 'curb'
 require 'nokogiri'
 require 'json'
+require 'my_anime_list'
 
-require 'my_anime_list/anime'
 
 # Sinatra settings.
 set :sessions, true
