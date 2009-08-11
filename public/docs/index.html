@@ -14,94 +14,95 @@
 </head>
 
 <body>
-  <div id="container">
 
-    <h3 class="logo"><a href="/">MyAnimeList Unofficial API</a></h3>
+<div id="container">
 
-    <ul id="nav_main">
-      <li><a href="/">Home</a></li>
-      <li><a href="/docs/">API documentation</a></li>
-    </ul>
+  <h3 class="logo"><a href="/">MyAnimeList Unofficial API</a></h3>
 
-    <h1>MyAnimeList Unofficial API Documentation</h1>
+  <ul id="nav_main">
+    <li><a href="/">Home</a></li>
+    <li><a href="/docs/">API documentation</a></li>
+  </ul>
 
-    <p>The API is still evolving so there's this documentation is <strong>incomplete</strong>. Once I've locked down the API, full documentation will soon follow.</p>
+  <h1>MyAnimeList Unofficial API Documentation</h1>
 
-
-    <h2>Table of Contents</h2>
-
-    <ul class="toc">
-      <li><a href="#summary">Summary</a></li>
-      <li>
-        <a href="#core_concepts">Core Concepts</a>
-        <ul>
-          <li><a href="#data_formats">Data formats</a></li>
-          <li><a href="#authentication">Authentication</a></li>
-          <li><a href="#errors">Errors</a></li>
-        </ul>
-      </li>
-      <li><a href="#anime_list">Getting anime lists</a></li>
-      <li><a href="#anime_info">Getting anime information</a></li>
-      <li><a href="#FIXME">Updating anime</a></li>
-    </ul>
+  <p>The API is still evolving so there's this documentation is <strong>incomplete</strong>. Once I've locked down the API, full documentation will soon follow.</p>
 
 
-    <h2 id="summary">Summary</h2>
+  <h2>Table of Contents</h2>
 
-    <p>The MyAnimeList Unofficial API allows developers to interact with the <a href="http://myanimelist.net/">MyAnimeList</a> site programmatically via HTTP requests.</p>
-
-    <h3>Read methods</h3>
-
-    <p>All read methods are HTTP GET requests. Some requests require <a href="#authentication">authentication</a>. The response <a href="#data_formats">data format</a> is JSON by default (see <a href="#data_formats">data formats</a> for XML responses).</p>
-
-    <table>
-      <thead>
-        <th>Request</th>
-        <th>Description</th>
-        <th>Example</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>/anime</td>
-          <td>Fetch your anime list</td>
-          <td><a href="http://mal-api.com/anime">http://mal-api.com/anime</a></td>
-        </tr>
-
-        <tr>
-          <td>/anime/<strong>anime_id</strong></td>
-          <td>Fetch the given anime's details</td>
-          <td><a href="http://mal-api.com/anime/20">http://mal-api.com/anime/20</a></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>Check out the <a href="#read_methods">full documentation</a> for these read methods <a href="#read_methods">below</a>.</p>
-
-    <h3>Write methods</h3>
-
-    <p>All write methods are HTTP POST requests. <a href="#authentication">Authentication</a> is required.</p>
-
-    <table>
-      <thead>
-        <th>Request</th>
-        <th>Description</th>
-        <th>Arguments</th>
-      </thead>
-      <tbody>
-        <tr>
-          <td>/anime/update/<strong>anime_id</strong></td>
-          <td>Updates an anime</td>
-          <td class="args"><code>status?</code>, <code>episodes?</code>, <code>score?</code></td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>Check out the <a href="#write_methods">full documentation</a> for these write methods <a href="#write_methods">below</a>.</p>
+  <ul class="toc">
+    <li><a href="#summary">Summary</a></li>
+    <li>
+      <a href="#core_concepts">Core Concepts</a>
+      <ul>
+        <li><a href="#data_formats">Data formats</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#errors">Errors</a></li>
+      </ul>
+    </li>
+    <li><a href="#anime_list">Getting anime lists</a></li>
+    <li><a href="#anime_info">Getting anime information</a></li>
+    <li><a href="#FIXME">Updating anime</a></li>
+  </ul>
 
 
-    <h2 id="core_concepts">Core Concepts</h2>
+  <h2 id="summary">Summary</h2>
 
-  </div>
+  <p>The MyAnimeList Unofficial API allows developers to interact with the <a href="http://myanimelist.net/">MyAnimeList</a> site programmatically via HTTP requests.</p>
+
+  <h3>Read methods</h3>
+
+  <p>All read methods are HTTP GET requests. Some requests require <a href="#authentication">authentication</a>. The response <a href="#data_formats">data format</a> is JSON by default (see <a href="#data_formats">data formats</a> for XML responses).</p>
+
+  <table>
+    <thead>
+      <th>Request</th>
+      <th>Description</th>
+      <th>Example</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>/anime</td>
+        <td>Fetch your anime list</td>
+        <td><a href="http://mal-api.com/anime">http://mal-api.com/anime</a></td>
+      </tr>
+
+      <tr>
+        <td>/anime/<strong>anime_id</strong></td>
+        <td>Fetch the given anime's details</td>
+        <td><a href="http://mal-api.com/anime/20">http://mal-api.com/anime/20</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Check out the <a href="#read_methods">full documentation</a> for these read methods <a href="#read_methods">below</a>.</p>
+
+  <h3>Write methods</h3>
+
+  <p>All write methods are HTTP POST requests. <a href="#authentication">Authentication</a> is required.</p>
+
+  <table>
+    <thead>
+      <th>Request</th>
+      <th>Description</th>
+      <th>Arguments</th>
+    </thead>
+    <tbody>
+      <tr>
+        <td>/anime/update/<strong>anime_id</strong></td>
+        <td>Updates an anime</td>
+        <td class="args"><code>status?</code>, <code>episodes?</code>, <code>score?</code></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p>Check out the <a href="#write_methods">full documentation</a> for these write methods <a href="#write_methods">below</a>.</p>
+
+
+  <h2 id="core_concepts">Core Concepts</h2>
+
+</div>
 
 <script type="text/javascript">
 var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
