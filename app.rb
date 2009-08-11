@@ -75,43 +75,9 @@ end
 get '/animelist/:username' do
   content_type :json
 
-  curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{params[:username]}&status=all")
-  curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
-  begin
-    curl.perform
-  rescue Exception => e
-    raise NetworkError("Network error getting anime list for '#{params[:username]}'. Original exception: #{e.message}.", e)
-  end
+  anime_list = MyAnimeList::AnimeList.anime_list_of(params[:username])
 
-  case curl.response_code
-  when 200
-
-    response = curl.body_str
-
-    # Check for usernames that don't exist. malappinfo.php returns a simple "Invalid username" string (but doesn't
-    # return a 404 status code).
-    throw :halt, [404, 'User not found'] if response =~ /^invalid username/i
-
-    xml_doc = Nokogiri::XML.parse(response)
-
-    anime_list = xml_doc.search('anime').map do |anime_node|
-      anime = MyAnimeList::Anime.new
-      anime.id                = anime_node.at('series_animedb_id').text.to_i
-      anime.title             = anime_node.at('series_title').text
-      anime.type              = anime_node.at('series_type').text
-      anime.episodes          = anime_node.at('series_episodes').text.to_i
-      anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
-      anime.score             = anime_node.at('my_score').text
-      anime.watched_status    = anime_node.at('my_status').text
-
-      anime
-    end
-
-    return anime_list.to_json
-
-  else
-    raise NetworkError("Network error getting anime list for '#{params[:username]}'. MyAnimeList returned HTTP status code #{curl.response_code}.", e)
-  end
+  anime_list.to_json
 end
 
 # Search for anime.
