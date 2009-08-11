@@ -6,12 +6,17 @@ require 'my_anime_list/anime'
 
 # Sinatra settings.
 set :sessions, true
-mime :json, 'text/javascript'
+JSON_RESPONSE_MIME_TYPE = 'text/javascript'
+mime :json, JSON_RESPONSE_MIME_TYPE
 
 helpers do
   include MyAnimeList::Rack::Auth
 end
 
+
+#
+# Error handling.
+#
 error MyAnimeList::NetworkError do
   { :error => "A network error has occurred. Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
@@ -20,10 +25,13 @@ error MyAnimeList::UpdateError do
   { :error => "Error updating anime. Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
 
-before do
-  # Authenticate with MyAnimeList if we don't have a cookie string.
-  authenticate unless session['cookie_string']
+not_found do
+  if response.content_type == JSON_RESPONSE_MIME_TYPE
+    { :error => response.body }.to_json
+  end
 end
+
+
 
 # Get an anime's details.
 get '/anime/:id' do
@@ -40,6 +48,9 @@ end
 post '/anime/update/:id' do
   pass unless params[:id] =~ /^\d+$/
 
+  # Authenticate with MyAnimeList if we don't have a cookie string.
+  authenticate unless session['cookie_string']
+
   content_type :json
 
   successful = MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
@@ -52,43 +63,46 @@ post '/anime/update/:id' do
 end
 
 # Get a user's anime list.
-# FIXME This should also allow for unauthenticated requests so that we can get any user's list.
-get '/anime' do
+get '/animelist/:username' do
   content_type :json
 
-  curl = Curl::Easy.new('http://myanimelist.net/panel.php?go=export')
-  curl.cookies = session['cookie_string']
-  curl.http_post(
-    Curl::PostField.content('type', '1'),
-    Curl::PostField.content('subexport', 'Export My List')
-  )
-
-  html_doc = Nokogiri::HTML(curl.body_str)
-  xml_url = html_doc.at('div.goodresult a')['href']
-
-  curl.url = xml_url
-  curl.perform
-
-  require 'zlib'
-  require 'stringio'
-
-  response = Zlib::GzipReader.new(StringIO.new(curl.body_str)).read
-  xml_doc = Nokogiri::XML.parse(response)
-
-  anime_list = xml_doc.search('anime').map do |anime_node|
-    anime = MyAnimeList::Anime.new
-    anime.id                = anime_node.at('series_animedb_id').text.to_i
-    anime.title             = anime_node.at('series_title').text
-    anime.type              = anime_node.at('series_type').text
-    anime.episodes          = anime_node.at('series_episodes').text.to_i
-    anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
-    anime.score             = anime_node.at('my_score').text
-    anime.watched_status    = anime_node.at('my_status').text
-
-    anime
+  curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{params[:username]}&status=all")
+  curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+  begin
+    curl.perform
+  rescue Exception => e
+    raise NetworkError("Network error getting anime list for '#{params[:username]}'. Original exception: #{e.message}.", e)
   end
 
-  anime_list.to_json
+  case curl.response_code
+  when 200
+
+    response = curl.body_str
+
+    # Check for usernames that don't exist. malappinfo.php returns a simple "Invalid username" string (but doesn't
+    # return a 404 status code).
+    throw :halt, [404, 'User not found'] if response =~ /^invalid username/i
+
+    xml_doc = Nokogiri::XML.parse(response)
+
+    anime_list = xml_doc.search('anime').map do |anime_node|
+      anime = MyAnimeList::Anime.new
+      anime.id                = anime_node.at('series_animedb_id').text.to_i
+      anime.title             = anime_node.at('series_title').text
+      anime.type              = anime_node.at('series_type').text
+      anime.episodes          = anime_node.at('series_episodes').text.to_i
+      anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
+      anime.score             = anime_node.at('my_score').text
+      anime.watched_status    = anime_node.at('my_status').text
+
+      anime
+    end
+
+    return anime_list.to_json
+
+  else
+    raise NetworkError("Network error getting anime list for '#{params[:username]}'. MyAnimeList returned HTTP status code #{curl.response_code}.", e)
+  end
 end
 
 # Search for anime.
@@ -98,6 +112,6 @@ end
 # Verify that authentication credentials are valid.
 # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
 get '/auth' do
-  # Do nothing because the "authenticate" before filter will ensure anyone who reaches this point is already
-  # authenticated.
+  # Authenticate with MyAnimeList if we don't have a cookie string.
+  authenticate unless session['cookie_string']
 end
