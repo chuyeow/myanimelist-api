@@ -79,10 +79,12 @@ h3.logo {
 #nav_main {
   font-size: 18px;
   margin: 0 0 20px;
+  padding: 0;
 }
 
 #nav_main li {
   float: left;
+  list-style-type: none;
   padding: 0 16px 0 0;
 }
 
