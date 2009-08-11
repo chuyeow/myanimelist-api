@@ -6,7 +6,7 @@ require 'my_anime_list'
 
 # Sinatra settings.
 set :sessions, true
-JSON_RESPONSE_MIME_TYPE = 'text/javascript'
+JSON_RESPONSE_MIME_TYPE = 'application/json'
 mime :json, JSON_RESPONSE_MIME_TYPE
 
 helpers do
@@ -34,12 +34,20 @@ end
 
 
 # Get an anime's details.
+# Optional parameters:
+#  * mine=1 - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched
+#             episodes). Requires authentication.
 get '/anime/:id' do
   pass unless params[:id] =~ /^\d+$/
 
   content_type :json
 
-  anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
+  if params[:mine] == '1'
+    authenticate unless session['cookie_string']
+    anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
+  else
+    anime = MyAnimeList::Anime.scrape_anime(params[:id])
+  end
 
   anime.to_json
 end
