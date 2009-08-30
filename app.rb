@@ -33,6 +33,7 @@ end
 
 
 
+# GET /anime/#{anime_id}
 # Get an anime's details.
 # Optional parameters:
 #  * mine=1 - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched
@@ -53,23 +54,34 @@ get '/anime/:id' do
   anime.to_json
 end
 
-# Updates a user's anime info.
-post '/anime/update/:id' do
-  pass unless params[:id] =~ /^\d+$/
 
-  # Authenticate with MyAnimeList if we don't have a cookie string.
-  authenticate unless session['cookie_string']
-
+# POST /animelist/anime
+# Adds an anime to a user's anime list.
+post '/animelist/anime' do
   content_type :json
 
-  successful = MyAnimeList::Anime.update(params[:id], session['cookie_string'], {
+  authenticate unless session['cookie_string']
+
+  # Ensure "anime_id" param is given.
+  if params[:anime_id] !~ /\S/
+    status 400
+    return { :error => 'anime_id-required' }.to_json
+  end
+
+  successful = MyAnimeList::Anime.add(params[:anime_id], session['cookie_string'], {
     :status => params[:status],
     :episodes => params[:episodes],
     :score => params[:score]
   })
 
-  successful ? true.to_json : false.to_json
+  if successful
+    nil # Return HTTP 200 OK and empty response body if successful.
+  else
+    status 400
+    { :error => 'unknown-error' }.to_json
+  end
 end
+
 
 # Get a user's anime list.
 get '/animelist/:username' do
@@ -80,9 +92,11 @@ get '/animelist/:username' do
   anime_list.to_json
 end
 
+
 # Search for anime.
 get '/anime/search' do
 end
+
 
 # Verify that authentication credentials are valid.
 # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.

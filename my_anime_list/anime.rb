@@ -272,6 +272,17 @@ module MyAnimeList
       raise UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
+    def self.add(id, cookie_string, options)
+      # This is the same as self.update except that the "status" param is required and the URL is
+      # http://myanimelist.net/includes/ajax.inc.php?t=61.
+
+      # Default watched_status to 1/watching if not given.
+      options[:status] = 1 if options[:status] !~ /\S/
+      options[:new] = true
+
+      update(id, cookie_string, options)
+    end
+
     def self.update(id, cookie_string, options)
 
       # Convert status to the number values that MyAnimeList uses.
@@ -291,7 +302,10 @@ module MyAnimeList
         1
       end
 
-      curl = Curl::Easy.new('http://myanimelist.net/includes/ajax.inc.php?t=62')
+      # There're different URLs to POST to for adding and updating an anime.
+      url = options[:new] ? 'http://myanimelist.net/includes/ajax.inc.php?t=61' : 'http://myanimelist.net/includes/ajax.inc.php?t=62'
+
+      curl = Curl::Easy.new(url)
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       curl.cookies = cookie_string
       params = [
@@ -307,8 +321,19 @@ module MyAnimeList
         raise MyAnimeList::UpdateError.new("Error updating anime with ID=#{id}. Original exception: #{e.message}", e)
       end
 
-      # Update is successful for a HTTP 200 response with this string.
-      curl.response_code == 200 && curl.body_str == 'Successfully Updated'
+      if options[:new]
+        # An add is successful for a HTTP 200 response containing "successful".
+        # The MyAnimeList site is actually pretty bad and seems to respond with 200 OK for all requests.
+        # It's also oblivious to IDs for non-existent anime and responds wrongly with a "successful" message.
+        # It responds with an empty response body for bad adds or if you try to add an anime that's already on the
+        # anime list.
+        # Due to these limitations, we will return false if the response body doesn't match "successful" and assume that
+        # anything else is a failure.
+        return curl.response_code == 200 && curl.body_str =~ /successful/i
+      else
+        # Update is successful for a HTTP 200 response with this string.
+        curl.response_code == 200 && curl.body_str =~ /successful/i
+      end
     end
 
     def watched_status=(value)
