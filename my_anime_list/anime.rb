@@ -3,6 +3,7 @@ module MyAnimeList
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
+    attr_accessor :listed_anime_id
     attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories
 
@@ -266,6 +267,10 @@ module MyAnimeList
       if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
         anime.score = selected_option['value']
       end
+      listed_anime_id_node = doc.at('//a[text()="Edit Details"]')
+      if listed_anime_id_node
+        anime.listed_anime_id = listed_anime_id_node['href'].match('id=(\d+)')[1].to_i
+      end
 
       anime
     rescue Exception => e
@@ -322,7 +327,7 @@ module MyAnimeList
       end
 
       if options[:new]
-        # An add is successful for a HTTP 200 response containing "successful".
+        # An add is successful for an HTTP 200 response containing "successful".
         # The MyAnimeList site is actually pretty bad and seems to respond with 200 OK for all requests.
         # It's also oblivious to IDs for non-existent anime and responds wrongly with a "successful" message.
         # It responds with an empty response body for bad adds or if you try to add an anime that's already on the
@@ -331,8 +336,32 @@ module MyAnimeList
         # anything else is a failure.
         return curl.response_code == 200 && curl.body_str =~ /successful/i
       else
-        # Update is successful for a HTTP 200 response with this string.
+        # Update is successful for an HTTP 200 response with this string.
         curl.response_code == 200 && curl.body_str =~ /successful/i
+      end
+    end
+
+    def self.delete(id, cookie_string)
+      anime = scrape_anime(id, cookie_string)
+
+      curl = Curl::Easy.new("http://myanimelist.net/panel.php?go=edit&id=#{anime.listed_anime_id}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.cookies = cookie_string
+
+      begin
+        curl.http_post(
+          Curl::PostField.content('series_id', anime.listed_anime_id),
+          Curl::PostField.content('submitIt', '3')
+        )
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error deleting anime with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      # Deletion is successful for an HTTP 200 response with this string.
+      if curl.response_code == 200 && curl.body_str =~ /Entry Successfully Deleted/i
+        anime # Return the original anime if successful.
+      else
+        false
       end
     end
 
@@ -434,6 +463,7 @@ module MyAnimeList
         :prequels => prequels,
         :sequels => sequels,
         :side_stories => side_stories,
+        :listed_anime_id => listed_anime_id,
         :watched_episodes => watched_episodes,
         :score => score,
         :watched_status => watched_status

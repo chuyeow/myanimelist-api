@@ -32,6 +32,7 @@ module MyAnimeList
         anime.type              = anime_node.at('series_type').text
         anime.status            = anime_node.at('series_status').text
         anime.episodes          = anime_node.at('series_episodes').text.to_i
+        anime.listed_anime_id   = anime_node.at('my_id').text.to_i
         anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
         anime.score             = anime_node.at('my_score').text
         anime.watched_status    = anime_node.at('my_status').text

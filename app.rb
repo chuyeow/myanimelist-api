@@ -105,6 +105,25 @@ put '/animelist/anime/:anime_id' do
 end
 
 
+# DELETE /animelist/anime/#{anime_id}
+# Delete an anime from user's anime list.
+delete '/animelist/anime/:anime_id' do
+  content_type :json
+
+  authenticate unless session['cookie_string']
+
+  anime = MyAnimeList::Anime.delete(params[:anime_id], session['cookie_string'])
+
+  if anime
+    anime.to_json # Return HTTP 200 OK and the original anime if successful.
+  else
+    status 400
+    { :error => 'unknown-error' }.to_json
+  end
+end
+
+
+
 # Get a user's anime list.
 get '/animelist/:username' do
   content_type :json
