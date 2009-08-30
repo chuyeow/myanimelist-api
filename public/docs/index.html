@@ -48,6 +48,7 @@
       <ul>
         <li><a href="#read_anime_list">/animelist - Read an anime list</a></li>
         <li><a href="#read_anime">/anime - Read an anime's details</a></li>
+        <li><a href="#read_history">/history - Read a user's history</a></li>
       </ul>
     </li>
     <li>
@@ -84,6 +85,12 @@
         <td><a href="#read_anime">/anime/<strong>anime_id</strong></a></td>
         <td>Fetch an anime's details</td>
         <td><a href="http://mal-api.com/anime/1887">http://mal-api.com/anime/1887</a></td>
+      </tr>
+
+      <tr>
+        <td><a href="#read_history">/history/<strong>username</strong></a></td>
+        <td>Fetch a user's history</td>
+        <td><a href="http://mal-api.com/history/xinil">http://mal-api.com/history/xinil</a></td>
       </tr>
     </tbody>
   </table>
@@ -198,7 +205,7 @@
 
   <h3 id="read_anime">/anime - Read an anime's details</h3>
 
-  <p>Fetch an anime with the given anime id.</p>
+  <p>Fetch an anime with the given anime id:</p>
 
   <blockquote>
     <p><code>http://mal-api.com/anime/<strong>anime_id</strong></code></p>
@@ -212,6 +219,28 @@
   <ul>
     <li><code>mine=1</code> - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched episodes). Requires <a href="#authenticated">authentication</a>. See <a href="#type_anime">anime response type</a>.</li>
   </ul>
+
+
+  <h3 id="read_history">/history - Read a user's history</h3>
+
+  <p><strong>NOT YET IMPLEMENTED</strong></p>
+
+  <p>Fetch the history of a user with the given username:</p>
+
+  <blockquote>
+    <p><code>http://mal-api.com/history/<strong>username</strong></code></p>
+
+    <p>Example: <a href="http://mal-api.com/history/xinil">http://mal-api.com/history/xinil</a></p>
+  </blockquote>
+
+  <p>The response is a list of anime and/or manga IDs together with the episode/chapter watched or read, and the time it was watched or read.</p>
+
+  <p>TODO Give an example of the response format.</p>
+
+  <h4>Anime-only and manga-only history</h4>
+  <p>To get <em>only</em> the user's <strong>anime</strong> history, use the <code>http://mal-api.com/history/<strong>username</strong>/anime</code></p>
+
+  <p>To get <em>only</em> the user's <strong>manga</strong> history, use the <code>http://mal-api.com/history/<strong>username</strong>/manga</code></p>
 
 
   <h2 id="write_methods">Writing data to MyAnimeList</h2>
