@@ -3,7 +3,7 @@ module MyAnimeList
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
-    attr_writer :other_titles, :genres, :tags, :manga_adaptations, :prequels, :sequels, :side_stories
+    attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score

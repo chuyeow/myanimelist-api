@@ -145,13 +145,89 @@
   <h3 id="response_types">Response types</h3>
 
   <h4 id="type_anime_list">Anime list</h4>
+
+  <p>An anime list is a user's personal list of anime. It also includes statistics on a user based on her list, such as her average score given to anime and number of days spent watching anime.</p>
+
+  <p>Format:</p>
   <ul>
-    <li>FIXME Describe anime list properties.</li>
+    <li>
+      <code>anime</code> - A list of <a href="#type_anime">anime</a>.
+    </li>
+    <li>
+      <code>statistics</code> - A hash/dictionary containing statistics.
+      <ul>
+        <li><code>days</code> - Number of days spent watching anime.</li>
+      </ul>
+    </li>
   </ul>
 
   <h4 id="type_anime">Anime</h4>
+
+  <p>Note that not all these properties are available in <code>/animelist</code> requests and will be indicated below.</p>
+
   <ul>
-    <li>FIXME Describe anime properties.</li>
+    <li><code>id</code> - The anime ID.</li>
+    <li><code>title</code> - The anime title.</li>
+    <li>
+      <code>other_titles</code> - A hash/dictionary containing other titles this anime has.
+      <ul>
+        <li><code>synonyms</code> - Synonym(s) of the anime's title.</li>
+        <li><code>english</code> - English title(s). <em>Not available in <code>/animelist</code> requests.</em></li>
+        <li><code>japanese</code> - Japanese title(s). <em>Not available in <code>/animelist</code> requests.</em></li>
+      </ul>
+    </li>
+    <li><code>rank</code> - Global rank of this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>popularity_rank</code> - Rank of this anime based on its popularity, i.e. number of users that have added this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>image_url</code> - URL to an image for this anime.</li>
+    <li><code>type</code> - Type of anime. Possible values: <code>TV</code>, <code>Movie</code>, <code>OVA</code>, <code>ONA</code>, <code>Special</code>, <code>Music</code>.</li>
+    <li><code>episodes</code> - Number of episodes.</li>
+    <li><code>status</code> - Airing status of this anime. Possible values: <code>Finished airing</code>, <code>Currently airing</code>, <code>Not yet aired</code>.</li>
+    <li><code>classification</code> - Classification or rating of this anime. This is a freeform text field, with possible values like: <code>R - 17+ (violence &amp; profanity)</code>, <code>PG - Children</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>members_score</code> - Weighted score members of MyAnimeList have given to this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>members_count</code> - Number of members who have this anime on their list. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>favorited_count</code> - Number of members who have this anime marked as one of their favorites. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>synopsis</code> - Text describing the anime. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>genres</code> - A list of genres for this anime, e.g. <code>["Action", "Comedy", "Shounen"]</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li><code>tags</code> - A list of popular tags for this anime, e.g. <code>["supernatural", "comedy"]</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
+    <li>
+      <code>manga_adaptations</code> - A list of manga adaptations of this anime (or conversely, manga from which this anime is adapted). <em>Not available in <code>/animelist</code> requests.</em>
+      <ul>
+        <li><code>manga_id</code> - ID of the manga.</li>
+        <li><code>title</code> - Title of the manga.</li>
+        <li><code>url</code> - URL to the manga on the MyAnimeList website.</li>
+      </ul>
+    </li>
+    <li>
+      <code>prequels</code> - A list of anime prequels of this anime. <em>Not available in <code>/animelist</code> requests.</em>
+      <ul>
+        <li><code>anime_id</code> - ID of the anime.</li>
+        <li><code>title</code> - Title of the anime.</li>
+        <li><code>url</code> - URL to the anime on the MyAnimeList website.</li>
+      </ul>
+    </li>
+    <li>
+      <code>sequels</code> - A list of anime sequels of this anime. <em>Not available in <code>/animelist</code> requests.</em>
+      <ul>
+        <li><code>anime_id</code> - ID of the anime.</li>
+        <li><code>title</code> - Title of the anime.</li>
+        <li><code>url</code> - URL to the anime on the MyAnimeList website.</li>
+      </ul>
+    </li>
+    <li>
+      <code>side_stories</code> - A list of anime side stories of this anime. <em>Not available in <code>/animelist</code> requests.</em>
+      <ul>
+        <li><code>anime_id</code> - ID of the anime.</li>
+        <li><code>title</code> - Title of the anime.</li>
+        <li><code>url</code> - URL to the anime on the MyAnimeList website.</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>These additional properties are available for authenticated users who have the requested anime on their anime list:</p>
+  <ul>
+    <li><code>watched_status</code> - User's watched status of the anime. This is a string that is one of: <code>watching</code>, <code>completed</code>, <code>on-hold</code>, <code>dropped</code>, <code>plan to watch</code>.</li>
+    <li><code>watched_episodes</code> - Number of episodes already watched by the user.</li>
+    <li><code>score</code> - User's score for the anime, from 1 to 10.</li>
   </ul>
 
 

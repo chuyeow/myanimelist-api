@@ -25,7 +25,8 @@ module MyAnimeList
         anime = MyAnimeList::Anime.new
         anime.id                = anime_node.at('series_animedb_id').text.to_i
         anime.title             = anime_node.at('series_title').text
-        anime.type              = anime_node.at('series_type').text
+        anime.type              = anime_node.at('series_type').text # FIXME This should return a string, not a number.
+        anime.status            = anime_node.at('series_status').text # FIXME This should return a string, not a number.
         anime.episodes          = anime_node.at('series_episodes').text.to_i
         anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
         anime.score             = anime_node.at('my_score').text
