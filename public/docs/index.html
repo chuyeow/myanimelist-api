@@ -36,6 +36,7 @@
     <li>
       <a href="#core_concepts">Core Concepts</a>
       <ul>
+        <li><a href="#api_requests">Making API requests</a></li>
         <li><a href="#response_types">Response types</a></li>
         <li><a href="#data_formats">Data formats</a></li>
         <li><a href="#authentication">Authentication</a></li>
@@ -113,6 +114,21 @@
 
   <h2 id="core_concepts">Core Concepts</h2>
 
+  <h3 id="api_requests">Making API requests</h3>
+
+  <p>All API methods are HTTP requests and support the full set of HTTP verbs - GET, POST, HEAD, PUT, DELETE. If your client doesn't support the full set of HTTP verbs and is capable of only GET and POST requests, <a href="#http_verb_emulation">HTTP verb emulation</a> is also supported.</p>
+
+  <h4 id="http_verb_emulation">HTTP verb emulation</h4>
+
+  <p>If you're using a client that only supports GET and POST requests, or making API requests from a web browser via AJAX, you'll need to fake PUT, DELETE and HEAD requests. Simply send along a <code>_method</code> parameter as part of your request body with the HTTP verb (case-insensitive).</p>
+
+  <p>For example, to emulate a HTTP DELETE to <code>/animelist/anime/1</code>:</p>
+
+  <blockquote>
+    <p><code>POST /animelist/anime/1</code></p>
+    <pre>Request body:<br /><code>_method=delete</code></pre>
+  </blockquote>
+
   <h3 id="response_types">Response types</h3>
 
   <h4 id="type_anime_list">Anime list</h4>
@@ -150,6 +166,19 @@
 
 
   <h3 id="errors">Errors</h3>
+
+  <p>The API returns appropriate <a href="http://en.wikipedia.org/wiki/List_of_HTTP_status_codes">HTTP status codes</a>. In addition, the API also includes error information in the response body. Error responses have a single <code>error</code> property that is a string describing the error, e.g.:</p>
+
+  <blockquote>
+    <p><code>{"error":"forbidden"}</code></p>
+  </blockquote>
+
+  <p>Possible error codes are:</p>
+  <ul>
+    <li><code>anime-not-found</code> - Unrecognized anime ID.</li>
+    <li><code>unauthorized</code> - The request requires <a href="#authentication">authentication</a>.</li>
+    <li><code>forbidden</code> - User does not have access.</li>
+  </ul>
 
 
   <h2 id="read_methods">Reading data from MyAnimeList</h2>
