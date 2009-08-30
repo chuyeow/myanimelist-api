@@ -1,9 +1,9 @@
 module MyAnimeList
 
   class Anime
-    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :status, :classification,
+    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
-    attr_reader :type
+    attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
@@ -344,6 +344,19 @@ module MyAnimeList
         :Music
       else
         :TV
+      end
+    end
+
+    def status=(value)
+      @status = case value
+      when '2', 2, /finished airing/i
+        :finished
+      when '1', 1, /currently airing/i
+        :airing
+      when '3', 3, /not yet aired/i
+        :not_yet_aired
+      else
+        :finished
       end
     end
 
