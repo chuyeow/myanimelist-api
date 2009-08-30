@@ -469,9 +469,7 @@ score=10</code></pre>
 
   <p><strong>Parameters</strong>: none.</p>
 
-  <p><strong>Returns</strong>: HTTP 200 OK if the anime was successfully deleted from animelist. Otherwise, returns appropriate HTTP response code and an <a href="#errors">error message</a>.</p>
-
-  <p>FIXME Should this return the original anime record so that the deletion can be undone?</p>
+  <p><strong>Returns</strong>: HTTP 200 OK and the original <a href="#type_anime">anime</a> (this is useful for undoing a delete) if the anime was successfully deleted from animelist. Otherwise, returns appropriate HTTP response code and an <a href="#errors">error message</a>.</p>
 
   <p>Example:</p>
   <blockquote>
