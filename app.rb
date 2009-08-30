@@ -86,7 +86,10 @@ end
 
 # Verify that authentication credentials are valid.
 # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
-get '/auth' do
+# FIXME This should be rate-limited to avoid brute-force attacks.
+get '/account/verify_credentials' do
   # Authenticate with MyAnimeList if we don't have a cookie string.
   authenticate unless session['cookie_string']
+
+  nil # Reponse body is empy.
 end

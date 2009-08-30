@@ -57,6 +57,12 @@
         <li><a href="#update_anime">Updating anime</a></li>
       </ul>
     </li>
+    <li>
+      <a href="#utility_methods">Utility methods</a>
+      <ul>
+        <li><a href="#verify_credentials">/account/verify_credentials - Test if user credentials are valid</a></li>
+      </ul>
+    </li>
   </ul>
 
 
@@ -246,6 +252,21 @@
   <h2 id="write_methods">Writing data to MyAnimeList</h2>
 
   <h3 id="update_anime">Updating anime</h3>
+
+
+
+  <h2 id="utility_methods">Utility methods</h2>
+
+  <h3 id="verify_credentials">/account/verify_credentials - Test if user credentials are valid</h3>
+
+  <p>Test whether supplied user credentials are valid. This method is rate-limited.</p>
+
+  <blockquote>
+    <p><code>http://mal-api.com/account/verify_credentials</code></p>
+  </blockquote>
+
+  <p>The response is an HTTP 200 OK status code if authentication was successful. Otherwise, an HTTP 401 Unauthorized status code is returned.</p>
+
 
 </div>
 
