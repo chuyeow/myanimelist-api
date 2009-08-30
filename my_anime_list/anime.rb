@@ -1,8 +1,9 @@
 module MyAnimeList
 
   class Anime
-    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :type, :episodes, :status, :classification,
+    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :status, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
+    attr_reader :type
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
@@ -324,6 +325,25 @@ module MyAnimeList
         :plan_to_watch
       else
         :watching
+      end
+    end
+
+    def type=(value)
+      @type = case value
+      when /TV/i, '1', 1
+        :TV
+      when /OVA/i, '2', 2
+        :OVA
+      when /Movie/i, '3', 3
+        :Movie
+      when /Special/i, '4', 4
+        :Special
+      when /ONA/i, '5', 5
+        :ONA
+      when /Music/i, '6', 6
+        :Music
+      else
+        :TV
       end
     end
 
