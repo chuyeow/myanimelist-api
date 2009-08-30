@@ -318,11 +318,11 @@ module MyAnimeList
       when /completed/i, '2', 2
         :completed
       when /on-hold/i, /onhold/i, '3', 3
-        :on_hold
+        :"on hold"
       when /dropped/i, '4', 3
         :dropped
       when /plan to watch/i, /plantowatch/i, '6', 6
-        :plan_to_watch
+        :"plan to watch"
       else
         :watching
       end
@@ -350,13 +350,13 @@ module MyAnimeList
     def status=(value)
       @status = case value
       when '2', 2, /finished airing/i
-        :finished
+        :"finished airing"
       when '1', 1, /currently airing/i
-        :airing
+        :"currently airing"
       when '3', 3, /not yet aired/i
-        :not_yet_aired
+        :"not yet aired"
       else
-        :finished
+        :"finished airing"
       end
     end
 
