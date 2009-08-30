@@ -313,15 +313,15 @@ module MyAnimeList
 
     def watched_status=(value)
       @watched_status = case value
-      when /watching/i, '1'
+      when /watching/i, '1', 1
         :watching
-      when /completed/i, '2'
+      when /completed/i, '2', 2
         :completed
-      when /on-hold/i, /onhold/i, '3'
+      when /on-hold/i, /onhold/i, '3', 3
         :on_hold
-      when /dropped/i, '4'
+      when /dropped/i, '4', 3
         :dropped
-      when /plan to watch/i, /plantowatch/i, '6'
+      when /plan to watch/i, /plantowatch/i, '6', 6
         :plan_to_watch
       else
         :watching
