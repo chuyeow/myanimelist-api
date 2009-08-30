@@ -100,6 +100,10 @@ h3.logo {
   visibility: hidden;
 }
 
+div.section {
+  margin: 0 0 30px;
+}
+
 ul {
   margin: 0 0 12px;
   padding: 0 0 0 30px;
@@ -117,7 +121,6 @@ ul li ul {
 
 ul li ul li {
   list-style-type: circle;
-/*  padding: 0 0 0 30px;*/
 }
 
 pre, blockquote {
