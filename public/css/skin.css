@@ -131,3 +131,7 @@ code {
 .args {
   color: #060;
 }
+
+.warn {
+  color: red;
+}
