@@ -451,6 +451,7 @@ module MyAnimeList
         :type => type,
         :rank => rank,
         :popularity_rank => popularity_rank,
+        :image_url => image_url,
         :episodes => episodes,
         :status => status,
         :genres => genres,
