@@ -32,7 +32,13 @@
   <h2>Table of Contents</h2>
 
   <ul class="toc">
-    <li><a href="#summary">Summary</a></li>
+    <li>
+      <a href="#summary">Summary</a>
+      <ul>
+        <li><a href="#read_methods_summary">Read methods summary</a></li>
+        <li><a href="#write_methods_summary">Write methods summary</a></li>
+      </ul>
+    </li>
     <li>
       <a href="#core_concepts">Core Concepts</a>
       <ul>
@@ -54,7 +60,9 @@
     <li>
       <a href="#write_methods">Writing data to MyAnimeList</a>
       <ul>
-        <li><a href="#update_anime">Updating anime</a></li>
+        <li><a href="#write_add_anime">Add anime to anime list</a></li>
+        <li><a href="#write_update_anime">Update an anime on user's anime list</a></li>
+        <li><a href="#write_delete_anime">Delete an anime from user's anime list</a></li>
       </ul>
     </li>
     <li>
@@ -70,7 +78,7 @@
 
   <p>The MyAnimeList Unofficial API allows developers to interact with the <a href="http://myanimelist.net/">MyAnimeList</a> site programmatically via HTTP requests.</p>
 
-  <h3>Read methods</h3>
+  <h3 id="read_methods_summary">Read methods</h3>
 
   <p>All read methods are HTTP GET requests. Some requests require <a href="#authentication">authentication</a>. The response <a href="#data_formats">data format</a> is JSON by default (see <a href="#data_formats">data formats</a> for XML responses).</p>
 
@@ -103,21 +111,37 @@
 
   <p>Check out the <a href="#read_methods">full documentation</a> for these read methods <a href="#read_methods">below</a>.</p>
 
-  <h3>Write methods</h3>
+  <h3 id="write_methods_summary">Write methods</h3>
 
-  <p>All write methods are HTTP POST requests. <a href="#authentication">Authentication</a> is required.</p>
+  <p>All write methods are HTTP POST, PUT or DELETE requests. Read the section on <a href="#http_verb_emulation">HTTP verb emulation</a> if you have difficulties performing PUT or DELETE requests. <a href="#authentication">Authentication</a> is required.</p>
 
   <table>
     <thead>
       <th>Request</th>
+      <th>Method</th>
       <th>Description</th>
       <th>Arguments</th>
     </thead>
     <tbody>
       <tr>
-        <td>/anime/update/<strong>anime_id</strong></td>
-        <td>Updates an anime</td>
+        <td nowrap="nowrap"><a href="#write_add_anime">/animelist/anime</a></td>
+        <td><code>POST</code></td>
+        <td>Add an anime to user's anime list</td>
+        <td class="args"><code>anime_id</code>, <code>status?</code>, <code>episodes?</code>, <code>score?</code></td>
+      </tr>
+
+      <tr>
+        <td nowrap="nowrap"><a href="#write_update_anime">/animelist/anime/<strong>anime_id</strong></a></td>
+        <td><code>PUT</code></td>
+        <td>Update an anime already on user's anime list</td>
         <td class="args"><code>status?</code>, <code>episodes?</code>, <code>score?</code></td>
+      </tr>
+
+      <tr>
+        <td nowrap="nowrap"><a href="#write_delete_anime">/animelist/anime/<strong>anime_id</strong></a></td>
+        <td><code>DELETE</code></td>
+        <td>Delete an anime from user's anime list</td>
+        <td class="args">-</td>
       </tr>
     </tbody>
   </table>
@@ -325,10 +349,83 @@
   <p>To get <em>only</em> the user's <strong>manga</strong> history, use the <code>http://mal-api.com/history/<strong>username</strong>/manga</code></p>
 
 
+
   <h2 id="write_methods">Writing data to MyAnimeList</h2>
 
-  <h3 id="update_anime">Updating anime</h3>
+  <h3 id="write_add_anime">/animelist/anime - Add anime to anime list</h3>
 
+  <p>Adds an anime to a user's anime list:</p>
+
+  <blockquote>
+    <p><code>POST http://mal-api.com/animelist/anime</code></p>
+  </blockquote>
+
+  <p><strong>Parameters</strong>:</p>
+  <ul>
+    <li><code>anime_id</code> - <strong>required</strong> - ID of anime to add to user's animelist.</li>
+    <li><code>status</code> - Integer or string representing user's watched status of the anime. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+    <li><code>episodes</code> - Number of episodes watched. Default: 0</li>
+    <li><code>score</code> - User's score for an anime. An integer from 1 to 10.</li>
+  </ul>
+
+  <p><strong>Returns</strong>: FIXME Should this return anything in the response body?</p>
+
+  <p>Example:</p>
+  <blockquote>
+    <p><code>POST http://mal-api.com/animelist/anime</code></p>
+    <pre>Request body:
+<code>anime_id=1887
+status=watching
+episodes=1
+score=9</code></pre>
+  </blockquote>
+
+
+  <h3 id="write_update_anime">/animelist/anime/<strong>anime_id</strong> - Update an anime on user's anime list</h3>
+
+  <p>Updates an anime already on a user's anime list:</p>
+
+  <blockquote>
+    <p><code>PUT http://mal-api.com/animelist/anime/<strong>anime_id</strong></code></p>
+  </blockquote>
+
+  <p><strong>Parameters</strong>:</p>
+  <ul>
+    <li><code>status</code> - Integer or string representing user's watched status of the anime. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+    <li><code>episodes</code> - Number of episodes watched. Default: 0</li>
+    <li><code>score</code> - User's score for an anime. An integer from 1 to 10.</li>
+  </ul>
+
+  <p><strong>Returns</strong>: FIXME Should this return anything in the response body?</p>
+
+  <p>Example:</p>
+  <blockquote>
+    <p><code>PUT http://mal-api.com/animelist/anime/1887</code></p>
+    <pre>Request body:
+<code>status=completed
+episodes=24
+score=10</code></pre>
+  </blockquote>
+
+
+  <h3 id="write_delete_anime">/animelist/anime/<strong>anime_id</strong> - Delete an anime from user's anime list</h3>
+
+  <p>Delete an anime from a user's anime list. This removes any record of the anime from a user's anime list and cannot be undone.</p>
+
+  <blockquote>
+    <code>DELETE http://mal-api.com/animelist/anime/<strong>anime_id</strong></code>
+  </blockquote>
+
+  <p><strong>Parameters</strong>: none.</p>
+
+  <p><strong>Returns</strong>: HTTP 200 OK if the anime was successfully deleted from animelist. Otherwise, returns appropriate HTTP response code and an <a href="#errors">error message</a>.</p>
+
+  <p>FIXME Should this return the original anime record so that the deletion can be undone?</p>
+
+  <p>Example:</p>
+  <blockquote>
+    <p><code>DELETE http://mal-api.com/animelist/anime/1887</code></p>
+  </blockquote>
 
 
   <h2 id="utility_methods">Utility methods</h2>
