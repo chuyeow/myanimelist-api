@@ -316,11 +316,11 @@ module MyAnimeList
         :watching
       when /completed/i, '2'
         :completed
-      when /on-hold/i, '3'
+      when /on-hold/i, /onhold/i, '3'
         :on_hold
       when /dropped/i, '4'
         :dropped
-      when /plan to watch/i, '6'
+      when /plan to watch/i, /plantowatch/i, '6'
         :plan_to_watch
       else
         :watching
