@@ -1,5 +1,6 @@
 module MyAnimeList
   class AnimeList
+    attr_writer :anime
 
     # FIXME This should return an AnimeList instance.
     def self.anime_list_of(username)
@@ -21,7 +22,9 @@ module MyAnimeList
 
       xml_doc = Nokogiri::XML.parse(response)
 
-      anime_list = xml_doc.search('anime').map do |anime_node|
+      anime_list = AnimeList.new
+
+      anime_list.anime = xml_doc.search('anime').map do |anime_node|
         anime = MyAnimeList::Anime.new
         anime.id                = anime_node.at('series_animedb_id').text.to_i
         anime.title             = anime_node.at('series_title').text
@@ -36,6 +39,21 @@ module MyAnimeList
       end
 
       anime_list
+    end
+
+    def anime
+      @anime ||= []
+    end
+
+    def statistics
+      @statistics ||= {}
+    end
+
+    def to_json
+      {
+        :anime => anime,
+        :statistics => statistics
+      }.to_json
     end
   end
 end
