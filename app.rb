@@ -83,6 +83,28 @@ post '/animelist/anime' do
 end
 
 
+# PUT /animelist/anime/#{anime_id}
+# Updates an anime already on a user's anime list.
+put '/animelist/anime/:anime_id' do
+  content_type :json
+
+  authenticate unless session['cookie_string']
+
+  successful = MyAnimeList::Anime.update(params[:anime_id], session['cookie_string'], {
+    :status => params[:status],
+    :episodes => params[:episodes],
+    :score => params[:score]
+  })
+
+  if successful
+    nil # Return HTTP 200 OK and empty response body if successful.
+  else
+    status 400
+    { :error => 'unknown-error' }.to_json
+  end
+end
+
+
 # Get a user's anime list.
 get '/animelist/:username' do
   content_type :json
