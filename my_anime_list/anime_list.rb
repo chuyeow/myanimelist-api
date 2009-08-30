@@ -24,6 +24,7 @@ module MyAnimeList
 
       anime_list = AnimeList.new
 
+      # Parse anime.
       anime_list.anime = xml_doc.search('anime').map do |anime_node|
         anime = MyAnimeList::Anime.new
         anime.id                = anime_node.at('series_animedb_id').text.to_i
@@ -37,6 +38,9 @@ module MyAnimeList
 
         anime
       end
+
+      # Parse statistics.
+      anime_list.statistics[:days] = xml_doc.at('myinfo user_days_spent_watching').text.to_f
 
       anime_list
     end
