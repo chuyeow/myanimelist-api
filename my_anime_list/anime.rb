@@ -403,6 +403,16 @@ module MyAnimeList
       results
     end
 
+    # Returns top Anime.
+    # Options:
+    #  * type - Type of anime to return. Possible values: TV, Movie, OVA, Special. Defaults to nothing, which returns
+    #           top anime of any type.
+    #  * page - Page of top anime to return. Defaults to 1.
+    #  * per_page - Number of anime to return per page. Defaults to 30.
+    def self.top(options = {})
+      []
+    end
+
     def watched_status=(value)
       @watched_status = case value
       when /watching/i, '1', 1

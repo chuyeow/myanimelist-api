@@ -153,6 +153,21 @@ get '/anime/search' do
 end
 
 
+# GET /anime/top
+# Get the top anime.
+get '/anime/top' do
+  content_type :json
+
+  anime = MyAnimeList::Anime.top(
+    :type     => params[:type],
+    :page     => params[:page],
+    :per_page => params[:per_page]
+  )
+
+  anime.to_json
+end
+
+
 # Verify that authentication credentials are valid.
 # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
 # FIXME This should be rate-limited to avoid brute-force attacks.
