@@ -365,6 +365,22 @@ module MyAnimeList
       end
     end
 
+    def self.search(query, credentials)
+      curl = Curl::Easy.new("http://myanimelist.net/api/anime/search.xml?q=#{query}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.userpwd = "#{credentials[:username]}:#{credentials[:password]}"
+
+      begin
+        curl.perform
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
+      end
+
+      response = curl.body_str
+
+      []
+    end
+
     def watched_status=(value)
       @watched_status = case value
       when /watching/i, '1', 1

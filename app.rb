@@ -134,8 +134,22 @@ get '/animelist/:username' do
 end
 
 
+# GET /anime/search
 # Search for anime.
 get '/anime/search' do
+  content_type :json
+
+  # Ensure "q" param is given.
+  if params[:q] !~ /\S/
+    status 400
+    return { :error => 'q-required' }.to_json
+  end
+
+  authenticate
+
+  results = MyAnimeList::Anime.search(params[:q], :username => auth.username, :password => auth.credentials[1])
+
+  results.to_json
 end
 
 
