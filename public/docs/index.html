@@ -147,7 +147,7 @@
         </tr>
 
         <tr>
-          <td><a href="#read_top_anime">/anime/just_added</a></td>
+          <td><a href="#read_just_added_anime">/anime/just_added</a></td>
           <td>Fetch the just added anime.</td>
           <td><a href="http://mal-api.com/anime/top">http://mal-api.com/anime/just_added</a></td>
         </tr>
@@ -383,7 +383,7 @@
 
     <p>The response is an <a href="#type_anime">anime</a>.</p>
 
-    <p>The following optional arguments are supported:</p>
+    <p>The following optional parameters are supported:</p>
     <ul>
       <li><code>mine=1</code> - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched episodes). Requires <a href="#authentication">authentication</a>. See <a href="#type_anime">anime response type</a>.</li>
     </ul>
@@ -442,6 +442,33 @@
     <h3 id="read_top_anime">/anime/top - Read the top anime</h3>
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Fetch the top ranking anime.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/anime/top</code></p>
+
+      <p>Example: <a href="http://mal-api.com/anime/top?page=1&amp;per_page=30">http://mal-api.com/anime/top?page=1&amp;per_page=30</a></p>
+    </blockquote>
+
+    <p>The following optional parameters are supported:</p>
+    <ul>
+      <li><code>type</code> - Type of anime to return. Possible values: <code>TV</code>, <code>Movie</code>, <code>OVA</code>, <code>Special</code>. Defaults to nothing, which returns top anime of any type.</li>
+      <li><code>page</code> - Page of top anime to return. Defaults to 1, i.e. the 1st page.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 30.</li>
+    </ul>
+
+    <h4>How are the top anime determined?</h4>
+
+    <p>To quote <a href="http://myanimelist.net/info.php?go=topanime">MyAnimeList</a>:</p>
+    <blockquote>
+      <p><code>Weighted Rank (WR) = (v / (v + m)) * S + (m / (v + m)) * C</code></p>
+      <p><code>S</code> = Average score for the Anime (mean).<br />
+      <code>v</code> = Number of votes for the Anime = (Number of people scoring the Anime).<br />
+      <code>m</code> = Minimum votes/scores required to get a calculated score (currently 50 scores required).<br />
+      <code>C</code> = The mean score across the entire Anime DB.</p>
+    </blockquote>
+
   </div>
 
 
@@ -449,6 +476,20 @@
     <h3 id="read_popular_anime">/anime/popular - Read the popular anime</h3>
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Fetch the most popular anime. The popularity of an anime is determined by the number of MyAnimeList members watching it.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/anime/popular</code></p>
+
+      <p>Example: <a href="http://mal-api.com/anime/popular?page=1&amp;per_page=30">http://mal-api.com/anime/popular?page=1&amp;per_page=30</a></p>
+    </blockquote>
+
+    <p>The following optional parameters are supported:</p>
+    <ul>
+      <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 30.</li>
+    </ul>
   </div>
 
 
@@ -456,6 +497,21 @@
     <h3 id="read_upcoming_anime">/anime/upcoming - Read the upcoming anime</h3>
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Fetch the upcoming anime. This is a list of anime sorted by airing date.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/anime/upcoming</code></p>
+
+      <p>Example: <a href="http://mal-api.com/anime/upcoming?start_date=20090815">http://mal-api.com/anime/upcoming?start_date=20090815</a></p>
+    </blockquote>
+
+    <p>The following optional parameters are supported:</p>
+    <ul>
+      <li><code>start_date</code> - Only anime which air after this date (in <code>YYYYMMDD</code> format) are returned. Defaults to the current date in UTC.</li>
+      <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20.</li>
+    </ul>
   </div>
 
 
@@ -463,6 +519,20 @@
     <h3 id="read_just_added_anime">/anime/just_added - Read the anime that have just been added to MyAnimeList</h3>
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Fetch anime that have just been added to the MyAnimeList database. The anime are sorted with the most recently added ones in front.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/anime/just_added</code></p>
+
+      <p>Example: <a href="http://mal-api.com/anime/just_added?page=1&amp;per_page=30">http://mal-api.com/anime/just_added?page=1&amp;per_page=30</a></p>
+    </blockquote>
+
+    <p>The following optional parameters are supported:</p>
+    <ul>
+      <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20.</li>
+    </ul>
   </div>
 
 
