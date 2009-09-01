@@ -123,9 +123,9 @@
         </tr>
 
         <tr>
-          <td><a href="#read_search_anime">/anime/search/<strong>query</strong></a></td>
+          <td><a href="#read_search_anime">/anime/search</a></td>
           <td>Search for anime matching a query.</td>
-          <td><a href="http://mal-api.com/anime/search/haruhi">http://mal-api.com/anime/search/haruhi</a></td>
+          <td><a href="http://mal-api.com/anime/search?q=haruhi">http://mal-api.com/anime/search?q=haruhi</a></td>
         </tr>
 
         <tr>
@@ -385,7 +385,7 @@
 
     <p>The following optional arguments are supported:</p>
     <ul>
-      <li><code>mine=1</code> - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched episodes). Requires <a href="#authenticated">authentication</a>. See <a href="#type_anime">anime response type</a>.</li>
+      <li><code>mine=1</code> - If specified, include the authenticated user's anime details (e.g. user's score, watched status, watched episodes). Requires <a href="#authentication">authentication</a>. See <a href="#type_anime">anime response type</a>.</li>
     </ul>
   </div>
 
@@ -395,7 +395,7 @@
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
 
-    <p>Fetch the history of a user with the given username. Requires <a href="#authenticated">authentication</a>.</p>
+    <p>Fetch the history of a user with the given username. Requires <a href="#authentication">authentication</a>.</p>
 
     <blockquote>
       <p><code>http://mal-api.com/history/<strong>username</strong></code></p>
@@ -417,7 +417,24 @@
   <div class="section">
     <h3 id="read_search_anime">/anime/search - Search anime</h3>
 
-    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+    <p>Search for anime matching a query. Requires <a href="#authentication">authentication</a>.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/anime/search?q=<strong>query</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/anime/search?q=haruhi">http://mal-api.com/anime/search?q=haruhi</a></p>
+    </blockquote>
+
+    <p>Only 1 required parameter is supported:</p>
+    <ul>
+      <li><code>q</code> - The query (URL encoded).</li>
+    </ul>
+
+    <p>The response is a list of <a href="#type_anime">anime</a>. Not all anime properties are available.</p>
+
+
+    FIXME provide an example response
+
   </div>
 
 
