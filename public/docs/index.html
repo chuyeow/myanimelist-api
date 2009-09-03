@@ -620,7 +620,7 @@
   <div class="section">
     <h3 id="verify_credentials">/account/verify_credentials - Test if user credentials are valid</h3>
 
-    <p>Test whether supplied user credentials are valid. This method is rate-limited.</p>
+    <p>Test whether supplied user credentials are valid. The authentication mechanism is HTTP Basic Authentication. This method is rate-limited because it can be a vector for brute force attacks.</p>
 
     <blockquote>
       <p><code>http://mal-api.com/account/verify_credentials</code></p>
