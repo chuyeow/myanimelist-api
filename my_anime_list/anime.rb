@@ -387,15 +387,15 @@ module MyAnimeList
         anime.image_url = anime_node.at('image').text
         anime.episodes = anime_node.at('episodes').text.to_i
         anime.members_score = anime_node.at('score').text.to_f
-        anime.synopsis = anime_node.at('synopsis').text
+        # anime.synopsis = anime_node.at('synopsis').text
         anime.type = anime_node.at('type').text
         anime.status = anime_node.at('status').text
 
         english_titles = anime_node.at('english').text
         anime.other_titles[:english] = english_titles if english_titles =~ /\S/
 
-        synonyms = anime_node.at('synonyms').text
-        anime.other_titles[:synonyms] = synonyms.split(/;\s?/) if synonyms =~ /\S/
+        # synonyms = anime_node.at('synonyms').text
+        # anime.other_titles[:synonyms] = synonyms.split(/;\s?/) if synonyms =~ /\S/
 
         anime
       end
