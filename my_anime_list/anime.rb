@@ -400,6 +400,49 @@ module MyAnimeList
         anime
       end
 
+      
+      # Perform an additional scraping of the search results pages to fill out the anime synopsis and synonyms.
+      if results.size > 0
+        # FIXME Only perform this step if there are any synopsis or synonyms that are invalid JSON.
+        curl = Curl::Easy.new("http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{query}")
+
+        begin
+          curl.perform
+        rescue Exception => e
+          raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
+        end
+
+        response = curl.body_str
+
+        doc = Nokogiri::HTML(response)
+
+        results_table = doc.xpath('//div[@id="rightbody"]/div/div/table')
+
+
+        # FIXME Check for 1 record returned, which would redirect to the anime's page.
+
+        results_table.xpath('//tr').each do |results_row|
+
+          anime_title_node = results_row.at('td a strong')
+          next unless anime_title_node
+          url = anime_title_node.parent['href']
+          next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
+          anime = results.find { |o| o.id == $1.to_i }
+          next unless anime
+
+          synopsis_node = results_row.at('div.spaceit')
+          if synopsis_node
+            synopsis_node.search('a').remove
+            anime.synopsis = synopsis_node.text.strip
+          end
+
+          table_cell_nodes = results_row.search('td')
+          anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+
+          results << anime
+        end
+      end
+
       results
     end
 
