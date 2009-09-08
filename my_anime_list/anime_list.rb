@@ -2,7 +2,6 @@ module MyAnimeList
   class AnimeList
     attr_writer :anime
 
-    # FIXME This should return an AnimeList instance.
     def self.anime_list_of(username)
       curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{username}&status=all")
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
