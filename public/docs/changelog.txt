@@ -1,0 +1,10 @@
+8 September 2009
+----------------
+* Fix /anime/search return 500 errors with some queries. Supplemented official
+  API's search method (which was returning badly encoded Japanese characters)
+  with scraping MyAnimeList for synopsis.
+
+
+1 September 2009
+----------------
+* Developer preview release via http://myanimelist.net/clubs.php?cid=14973.
