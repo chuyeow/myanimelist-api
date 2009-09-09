@@ -366,7 +366,8 @@ module MyAnimeList
     end
 
     def self.search(query, credentials)
-      curl = Curl::Easy.new("http://myanimelist.net/api/anime/search.xml?q=#{query}")
+      curl = Curl::Easy.new
+      curl.url = "http://myanimelist.net/api/anime/search.xml?q=#{curl.escape(query)}"
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       curl.userpwd = "#{credentials[:username]}:#{credentials[:password]}"
 
@@ -404,7 +405,7 @@ module MyAnimeList
       # Perform an additional scraping of the search results pages to fill out the anime synopsis and synonyms.
       if results.size > 0
         # FIXME Only perform this step if there are any synopsis or synonyms that are invalid JSON.
-        curl = Curl::Easy.new("http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{query}")
+        curl.url = "http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{curl.escape(query)}"
 
         begin
           curl.perform
