@@ -25,6 +25,10 @@ error MyAnimeList::UpdateError do
   { :error => "Error updating anime. Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
 
+error Exception do
+  { :error => "An unknown error has occurred. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+end
+
 not_found do
   if response.content_type == JSON_RESPONSE_MIME_TYPE
     { :error => response.body }.to_json
