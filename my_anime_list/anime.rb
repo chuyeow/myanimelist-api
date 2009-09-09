@@ -438,8 +438,6 @@ module MyAnimeList
 
           table_cell_nodes = results_row.search('td')
           anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
-
-          results << anime
         end
       end
 
