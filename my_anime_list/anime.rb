@@ -19,7 +19,7 @@ module MyAnimeList
       begin
         curl.perform
       rescue Exception => e
-        raise NetworkError("Network error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+        raise MyAnimeList::NetworkError.new("Network error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
       end
 
       response = curl.body_str
@@ -28,7 +28,7 @@ module MyAnimeList
 
       anime
     rescue Exception => e
-      raise UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+      raise MyAnimeList::UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
     def self.add(id, cookie_string, options)
