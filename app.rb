@@ -1,7 +1,7 @@
 require 'curb'
 require 'nokogiri'
-require 'json'
 require 'activesupport'
+require 'json'
 require 'my_anime_list'
 
 
