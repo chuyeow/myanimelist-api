@@ -1,6 +1,7 @@
 require 'curb'
 require 'nokogiri'
 require 'json'
+require 'activesupport'
 require 'my_anime_list'
 
 
@@ -49,8 +50,6 @@ end
 get '/anime/:id' do
   pass unless params[:id] =~ /^\d+$/
 
-  content_type :json
-
   if params[:mine] == '1'
     authenticate unless session['cookie_string']
     anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
@@ -59,7 +58,17 @@ get '/anime/:id' do
     anime = MyAnimeList::Anime.scrape_anime(params[:id])
   end
 
-  anime.to_json
+  case params[:format]
+  when 'xml'
+    content_type(:xml)
+
+    anime.to_xml
+
+  else
+    content_type(:json)
+
+    anime.to_json
+  end
 end
 
 

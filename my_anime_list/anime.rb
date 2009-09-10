@@ -299,7 +299,7 @@ module MyAnimeList
       @side_stories ||= []
     end
 
-    def to_json
+    def attributes
       {
         :id => id,
         :title => title,
@@ -325,7 +325,15 @@ module MyAnimeList
         :watched_episodes => watched_episodes,
         :score => score,
         :watched_status => watched_status
-      }.to_json
+      }
+    end
+
+    def to_json
+      attributes.to_json
+    end
+
+    def to_xml
+      attributes.to_xml
     end
 
     private
