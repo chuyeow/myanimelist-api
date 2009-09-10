@@ -377,13 +377,13 @@ module MyAnimeList
         left_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
 
         if (node = left_column_nodeset.at('//span[text()="English:"]')) && node.next
-          anime.other_titles[:english] = node.next.text.strip
+          anime.other_titles[:english] = node.next.text.strip.split(/,\s?/)
         end
         if (node = left_column_nodeset.at('//span[text()="Synonyms:"]')) && node.next
-          anime.other_titles[:synonyms] = node.next.text.strip
+          anime.other_titles[:synonyms] = node.next.text.strip.split(/,\s?/)
         end
         if (node = left_column_nodeset.at('//span[text()="Japanese:"]')) && node.next
-          anime.other_titles[:japanese] = node.next.text.strip
+          anime.other_titles[:japanese] = node.next.text.strip.split(/,\s?/)
         end
 
 
