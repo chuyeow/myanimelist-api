@@ -18,15 +18,15 @@ end
 # Error handling.
 #
 error MyAnimeList::NetworkError do
-  { :error => "A network error has occurred. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  { :error => 'network-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
 
 error MyAnimeList::UpdateError do
-  { :error => "Error updating anime. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  { :error => 'anime-update-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
 
 error Exception do
-  { :error => "An unknown error has occurred. Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  { :error => 'unknown-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
 end
 
 not_found do
