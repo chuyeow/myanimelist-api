@@ -1,3 +1,7 @@
+13 September 2009
+-----------------
+* Added support for XML output. Send along the "format=xml" parameter in your requests.
+
 8 September 2009
 ----------------
 * Fix /anime/search return 500 errors with some queries. Supplemented official
