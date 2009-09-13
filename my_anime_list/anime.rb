@@ -332,9 +332,9 @@ module MyAnimeList
       attributes.to_json
     end
 
-    def to_xml
+    def to_xml(options = {})
       xml = Builder::XmlMarkup.new(:indent => 2)
-      xml.instruct!
+      xml.instruct! unless options[:skip_instruct]
       xml.anime do |xml|
         xml.id id
         xml.title title

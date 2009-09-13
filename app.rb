@@ -143,7 +143,12 @@ end
 get '/animelist/:username' do
   anime_list = MyAnimeList::AnimeList.anime_list_of(params[:username])
 
-  anime_list.to_json
+  case params[:format]
+  when 'xml'
+    anime_list.to_xml
+  else
+    anime_list.to_json
+  end
 end
 
 

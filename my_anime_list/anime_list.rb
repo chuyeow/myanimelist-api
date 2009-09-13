@@ -60,5 +60,20 @@ module MyAnimeList
         :statistics => statistics
       }.to_json
     end
+
+    def to_xml
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct!
+
+      xml.animelist do |xml|
+        anime.each do |a|
+          xml << a.to_xml(:skip_instruct => true)
+        end
+
+        xml.statistics do |xml|
+          xml.days statistics[:days]
+        end
+      end
+    end
   end
 end
