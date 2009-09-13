@@ -19,24 +19,49 @@ end
 # Error handling.
 #
 error MyAnimeList::NetworkError do
-  { :error => 'network-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  details = "Exception message: #{request.env['sinatra.error'].message}"
+  case params[:format]
+  when 'xml'
+    "<error><code>network-error</code><details>#{details}</details></error>"
+  else
+    { :error => 'network-error', :details => details }.to_json
+  end
 end
 
 error MyAnimeList::UpdateError do
-  { :error => 'anime-update-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  details = "Exception message: #{request.env['sinatra.error'].message}"
+  case params[:format]
+  when 'xml'
+    "<error><code>anime-update-error</code><details>#{details}</details></error>"
+  else
+    { :error => 'anime-update-error', :details => details }.to_json
+  end
 end
 
 error MyAnimeList::UnknownError do
-  { :error => 'unknown-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  details = "Exception message: #{request.env['sinatra.error'].message}"
+  case params[:format]
+  when 'xml'
+    "<error><code>unknown-error</code><details>#{details}</details></error>"
+  else
+    { :error => 'unknown-error', :details => details }.to_json
+  end
 end
 
 error do
-  { :error => 'unknown-error', :details => "Exception message: #{request.env['sinatra.error'].message}" }.to_json
+  details = "Exception message: #{request.env['sinatra.error'].message}"
+  case params[:format]
+  when 'xml'
+    "<error><code>unknown-error</code><details>#{details}</details></error>"
+  else
+    { :error => 'unknown-error', :details => details }.to_json
+  end
 end
 
 not_found do
   if response.content_type == JSON_RESPONSE_MIME_TYPE
     { :error => response.body }.to_json
+  else "<error><code>#{response.body}</code></error>"
   end
 end
 
@@ -84,7 +109,13 @@ post '/animelist/anime' do
   # Ensure "anime_id" param is given.
   if params[:anime_id] !~ /\S/
     status 400
-    return { :error => 'anime_id-required' }.to_json
+
+    case params[:format]
+    when 'xml'
+      return '<error><code>anime_id-required</code></error>'
+    else
+      return { :error => 'anime_id-required' }.to_json
+    end
   end
 
   successful = MyAnimeList::Anime.add(params[:anime_id], session['cookie_string'], {
@@ -97,7 +128,13 @@ post '/animelist/anime' do
     nil # Return HTTP 200 OK and empty response body if successful.
   else
     status 400
-    { :error => 'unknown-error' }.to_json
+
+    case params[:format]
+    when 'xml'
+      '<error><code>unknown-error</code></error>'
+    else
+      { :error => 'unknown-error' }.to_json
+    end
   end
 end
 
@@ -117,7 +154,13 @@ put '/animelist/anime/:anime_id' do
     nil # Return HTTP 200 OK and empty response body if successful.
   else
     status 400
-    { :error => 'unknown-error' }.to_json
+
+    case params[:format]
+    when 'xml'
+      '<error><code>unknown-error</code></error>'
+    else
+      { :error => 'unknown-error' }.to_json
+    end
   end
 end
 
@@ -130,10 +173,21 @@ delete '/animelist/anime/:anime_id' do
   anime = MyAnimeList::Anime.delete(params[:anime_id], session['cookie_string'])
 
   if anime
-    anime.to_json # Return HTTP 200 OK and the original anime if successful.
+    case params[:format]
+    when 'xml'
+      anime.to_xml
+    else
+      anime.to_json # Return HTTP 200 OK and the original anime if successful.
+    end
   else
     status 400
-    { :error => 'unknown-error' }.to_json
+
+    case params[:format]
+    when 'xml'
+      '<error><code>unknown-error</code></error>'
+    else
+      { :error => 'unknown-error' }.to_json
+    end
   end
 end
 
@@ -158,14 +212,37 @@ get '/anime/search' do
   # Ensure "q" param is given.
   if params[:q] !~ /\S/
     status 400
-    return { :error => 'q-required' }.to_json
+
+    case params[:format]
+    when 'xml'
+      return '<error><code>q-required</code></error>'
+    else
+      return { :error => 'q-required' }.to_json
+    end
   end
 
   authenticate
 
   results = MyAnimeList::Anime.search(params[:q], :username => auth.username, :password => auth.credentials[1])
 
-  results.to_json
+  case params[:format]
+  when 'xml'
+    xml = Builder::XmlMarkup.new(:indent => 2)
+    xml.instruct!
+
+    xml.results do |xml|
+      xml.query params[:q]
+      xml.count results.count
+
+      results.each do |a|
+        xml << a.to_xml(:skip_instruct => true)
+      end
+    end
+
+    xml.target!
+  else
+    results.to_json
+  end
 end
 
 
@@ -178,7 +255,12 @@ get '/anime/top' do
     :per_page => params[:per_page]
   )
 
-  anime.to_json
+  case params[:format]
+  when 'xml'
+    anime.to_xml
+  else
+    anime.to_json
+  end
 end
 
 
