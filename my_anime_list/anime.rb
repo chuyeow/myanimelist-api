@@ -333,7 +333,78 @@ module MyAnimeList
     end
 
     def to_xml
-      attributes.to_xml
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct!
+      xml.anime do |xml|
+        xml.id id
+        xml.title title
+        xml.synopsis synopsis
+        xml.type type.to_s
+        xml.rank rank
+        xml.popularity_rank popularity_rank
+        xml.image_url image_url
+        xml.episodes episodes
+        xml.status status.to_s
+        xml.classification classification
+        xml.members_score members_score
+        xml.members_count members_count
+        xml.favorited_count favorited_count
+        xml.listed_anime_id listed_anime_id
+        xml.watched_episodes watched_episodes
+        xml.score score
+        xml.watched_status watched_status.to_s
+
+        other_titles[:synonyms].each do |title|
+          xml.synonym title
+        end if other_titles[:synonyms]
+        other_titles[:english].each do |title|
+          xml.english_title title
+        end if other_titles[:english]
+        other_titles[:japanese].each do |title|
+          xml.japanese_title title
+        end if other_titles[:japanese]
+
+        genres.each do |genre|
+          xml.genre genre
+        end
+        tags.each do |tag|
+          xml.tag tag
+        end
+
+        manga_adaptations.each do |manga|
+          xml.manga_adaptation do |xml|
+            xml.manga_id  manga[:manga_id]
+            xml.title     manga[:title]
+            xml.url       manga[:url]
+          end
+        end
+
+        prequels.each do |prequel|
+          xml.prequel do |xml|
+            xml.anime_id  prequel[:anime_id]
+            xml.title     prequel[:title]
+            xml.url       prequel[:url]
+          end
+        end
+
+        sequels.each do |sequel|
+          xml.sequel do |xml|
+            xml.anime_id  sequel[:anime_id]
+            xml.title     sequel[:title]
+            xml.url       sequel[:url]
+          end
+        end
+
+        side_stories.each do |side_story|
+          xml.side_story do |xml|
+            xml.anime_id  side_story[:anime_id]
+            xml.title     side_story[:title]
+            xml.url       side_story[:url]
+          end
+        end
+      end
+
+      xml.target!
     end
 
     private
