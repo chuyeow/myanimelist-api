@@ -661,7 +661,7 @@ module MyAnimeList
         end
         score_select_node = doc.at('select#myinfo_score')
         if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
-          anime.score = selected_option['value']
+          anime.score = selected_option['value'].to_i
         end
         listed_anime_id_node = doc.at('//a[text()="Edit Details"]')
         if listed_anime_id_node

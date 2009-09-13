@@ -34,7 +34,7 @@ module MyAnimeList
         anime.image_url         = anime_node.at('series_image').text
         anime.listed_anime_id   = anime_node.at('my_id').text.to_i
         anime.watched_episodes  = anime_node.at('my_watched_episodes').text.to_i
-        anime.score             = anime_node.at('my_score').text
+        anime.score             = anime_node.at('my_score').text.to_i
         anime.watched_status    = anime_node.at('my_status').text
 
         anime
