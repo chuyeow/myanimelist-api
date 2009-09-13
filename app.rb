@@ -40,6 +40,15 @@ not_found do
   end
 end
 
+before do
+  case params[:format]
+  when 'xml'
+    content_type(:xml)
+  else
+    content_type(:json)
+  end
+end
+
 
 
 # GET /anime/#{anime_id}
@@ -60,13 +69,8 @@ get '/anime/:id' do
 
   case params[:format]
   when 'xml'
-    content_type(:xml)
-
     anime.to_xml
-
   else
-    content_type(:json)
-
     anime.to_json
   end
 end
@@ -75,8 +79,6 @@ end
 # POST /animelist/anime
 # Adds an anime to a user's anime list.
 post '/animelist/anime' do
-  content_type :json
-
   authenticate unless session['cookie_string']
 
   # Ensure "anime_id" param is given.
@@ -103,8 +105,6 @@ end
 # PUT /animelist/anime/#{anime_id}
 # Updates an anime already on a user's anime list.
 put '/animelist/anime/:anime_id' do
-  content_type :json
-
   authenticate unless session['cookie_string']
 
   successful = MyAnimeList::Anime.update(params[:anime_id], session['cookie_string'], {
@@ -125,8 +125,6 @@ end
 # DELETE /animelist/anime/#{anime_id}
 # Delete an anime from user's anime list.
 delete '/animelist/anime/:anime_id' do
-  content_type :json
-
   authenticate unless session['cookie_string']
 
   anime = MyAnimeList::Anime.delete(params[:anime_id], session['cookie_string'])
@@ -143,8 +141,6 @@ end
 
 # Get a user's anime list.
 get '/animelist/:username' do
-  content_type :json
-
   anime_list = MyAnimeList::AnimeList.anime_list_of(params[:username])
 
   anime_list.to_json
@@ -154,8 +150,6 @@ end
 # GET /anime/search
 # Search for anime.
 get '/anime/search' do
-  content_type :json
-
   # Ensure "q" param is given.
   if params[:q] !~ /\S/
     status 400
@@ -173,8 +167,6 @@ end
 # GET /anime/top
 # Get the top anime.
 get '/anime/top' do
-  content_type :json
-
   anime = MyAnimeList::Anime.top(
     :type     => params[:type],
     :page     => params[:page],
