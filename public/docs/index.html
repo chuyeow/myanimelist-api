@@ -398,7 +398,7 @@
 
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
 
-    <p>Fetch the history of a user with the given username. Requires <a href="#authentication">authentication</a>.</p>
+    <p>Fetch the history of a user with the given username.</p>
 
     <blockquote>
       <p><code>http://mal-api.com/history/<strong>username</strong></code></p>
@@ -623,7 +623,7 @@
   <div class="section">
     <h3 id="verify_credentials">/account/verify_credentials - Test if user credentials are valid</h3>
 
-    <p>Test whether supplied user credentials are valid. The authentication mechanism is HTTP Basic Authentication. This method is rate-limited because it can be a vector for brute force attacks.</p>
+    <p>Test whether supplied user credentials are valid. The authentication mechanism is HTTP Basic Authentication. This method is rate-limited (the response status code will be HTTP 503 Service Temporarily Unavailable) because it can be a vector for brute force attacks.</p>
 
     <blockquote>
       <p><code>http://mal-api.com/account/verify_credentials</code></p>
