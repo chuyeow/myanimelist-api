@@ -2,6 +2,7 @@ require 'curb'
 require 'nokogiri'
 
 require 'my_anime_list/rack'
+require 'my_anime_list/user'
 require 'my_anime_list/anime'
 require 'my_anime_list/anime_list'
 

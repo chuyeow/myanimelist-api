@@ -192,7 +192,7 @@ delete '/animelist/anime/:anime_id' do
 end
 
 
-
+# GET /animelist/#{username}
 # Get a user's anime list.
 get '/animelist/:username' do
   anime_list = MyAnimeList::AnimeList.anime_list_of(params[:username])
@@ -260,6 +260,24 @@ get '/anime/top' do
     anime.to_xml
   else
     anime.to_json
+  end
+end
+
+
+# GET /history/#{username}
+# Get user's history.
+# FIXME implement /history/:username/anime and /history/:username/manga - use regex for routing?
+get '/history/:username' do
+  user = MyAnimeList::User.new
+  user.username = params[:username]
+
+  history = user.history
+
+  case params[:format]
+  when 'xml'
+    history.to_xml
+  else
+    history.to_json
   end
 end
 
