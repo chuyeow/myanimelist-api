@@ -1,3 +1,5 @@
+require 'chronic'
+
 module MyAnimeList
   class User
     attr_accessor :username
@@ -42,7 +44,16 @@ module MyAnimeList
 
         title = link.text.strip
         episode = cells[0].at('strong').text.to_i
-        time = cells[1].text.strip
+        time_string = cells[1].text.strip
+
+        begin
+          # FIXME The datetime is in the user's timezone set in his profile http://myanimelist.net/editprofile.php.
+          datetime = DateTime.strptime(time_string, '%m-%d-%y, %H:%M %p')
+          time = Time.utc(datetime.year, datetime.month, datetime.day, datetime.hour, datetime.min, datetime.sec)
+        rescue ArgumentError
+          time = Chronic.parse(time_string)
+        end
+
 
         results << {
           :anime_id => anime_id,
