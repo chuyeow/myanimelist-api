@@ -232,7 +232,7 @@ get '/anime/search' do
 
     xml.results do |xml|
       xml.query params[:q]
-      xml.count results.count
+      xml.count results.size
 
       results.each do |a|
         xml << a.to_xml(:skip_instruct => true)
