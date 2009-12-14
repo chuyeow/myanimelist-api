@@ -1,4 +1,5 @@
 require 'curb'
+require 'net/http'
 require 'nokogiri'
 require 'builder'
 require 'json'

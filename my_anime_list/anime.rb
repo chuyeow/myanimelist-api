@@ -120,32 +120,36 @@ module MyAnimeList
     end
 
     def self.search(query)
-      curl = Curl::Easy.new
-      curl.url = "http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{curl.escape(query)}"
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
-      curl.follow_location = true
-      curl.max_redirects = 1
 
       begin
-        curl.perform
+        response = Net::HTTP.start('myanimelist.net', 80) do |http|
+          http.get("/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}")
+        end
+
+        case response
+        when Net::HTTPRedirection
+          redirected = true
+          response = Net::HTTP.start('myanimelist.net', 80) do |http|
+            http.get(response['location'])
+          end
+        end
+
       rescue Exception => e
         raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
       end
 
       results = []
-      response = curl.body_str
-
-      if curl.redirect_count == 1
+      if redirected
         # If there's a single redirect, it means there's only 1 match and MAL is redirecting to the anime's details
         # page.
 
-        anime = parse_anime_response(response)
+        anime = parse_anime_response(response.body)
         results << anime
 
       else
         # Otherwise, parse the table of search results.
 
-        doc = Nokogiri::HTML(response)
+        doc = Nokogiri::HTML(response.body)
         results_table = doc.xpath('//div[@id="rightbody"]/div/div/table')
 
         results_table.xpath('//tr').each do |results_row|
