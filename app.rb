@@ -180,8 +180,6 @@ get '/anime/search' do
     end
   end
 
-  authenticate
-
   results = MyAnimeList::Anime.search(params[:q])
 
   case params[:format]
