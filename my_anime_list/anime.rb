@@ -121,9 +121,11 @@ module MyAnimeList
 
     def self.search(query, credentials)
       curl = Curl::Easy.new
-      curl.url = "http://myanimelist.net/api/anime/search.xml?q=#{curl.escape(query)}"
+      curl.url = "http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{curl.escape(query)}"
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       curl.userpwd = "#{credentials[:username]}:#{credentials[:password]}"
+      curl.follow_location = true
+      curl.max_redirects = 1
 
       begin
         curl.perform
@@ -131,81 +133,49 @@ module MyAnimeList
         raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
       end
 
+      results = []
       response = curl.body_str
 
-      xml_doc = Nokogiri::XML.parse(response)
+      if curl.redirect_count == 1
+        # If there's a single redirect, it means there's only 1 match and MAL is redirecting to the anime's details
+        # page.
 
-      results = xml_doc.xpath('//anime/entry').map do |anime_node|
-        anime = Anime.new
-        anime.id = anime_node.at('id').text.to_i
-        anime.title = anime_node.at('title').text
-        anime.image_url = anime_node.at('image').text
-        anime.episodes = anime_node.at('episodes').text.to_i
-        anime.members_score = anime_node.at('score').text.to_f
-        # anime.synopsis = anime_node.at('synopsis').text
-        anime.type = anime_node.at('type').text
-        anime.status = anime_node.at('status').text
+        anime = parse_anime_response(response)
+        results << anime
 
-        english_titles = anime_node.at('english').text
-        anime.other_titles[:english] = english_titles if english_titles =~ /\S/
-
-        # synonyms = anime_node.at('synonyms').text
-        # anime.other_titles[:synonyms] = synonyms.split(/;\s?/) if synonyms =~ /\S/
-
-        anime
-      end
-
-
-      # Perform an additional scraping of the search results pages to fill out the anime synopsis and synonyms.
-      if results.size > 0
-        # FIXME Only perform this step if there are any synopsis or synonyms that are invalid JSON.
-        curl.url = "http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{curl.escape(query)}"
-        curl.follow_location = true
-        curl.max_redirects = 1
-
-        begin
-          curl.perform
-        rescue Exception => e
-          raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
-        end
-
-        response = curl.body_str
+      else
+        # Otherwise, parse the table of search results.
 
         doc = Nokogiri::HTML(response)
+        results_table = doc.xpath('//div[@id="rightbody"]/div/div/table')
 
-        if curl.redirect_count == 1
-          # If there's a single redirect, it means there's only 1 match and MAL is redirecting to the anime's details
-          # page.
+        results_table.xpath('//tr').each do |results_row|
 
-          anime = parse_anime_response(response)
+          anime_title_node = results_row.at('td a strong')
+          next unless anime_title_node
+          url = anime_title_node.parent['href']
+          next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
 
-          # Replace anime in resultset with this one because it has more details.
-          results.reject! { |o| o.id == anime.id }
-          results << anime
-
-        else
-          # Otherwise, parse the table of search results.
-
-          results_table = doc.xpath('//div[@id="rightbody"]/div/div/table')
-
-          results_table.xpath('//tr').each do |results_row|
-
-            anime_title_node = results_row.at('td a strong')
-            next unless anime_title_node
-            url = anime_title_node.parent['href']
-            next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
-            anime = results.find { |o| o.id == $1.to_i }
-            next unless anime
-
-            synopsis_node = results_row.at('div.spaceit')
-            if synopsis_node
-              synopsis_node.search('a').remove
-              anime.synopsis = synopsis_node.text.strip
-            end
-
-            table_cell_nodes = results_row.search('td')
-            anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+          anime = Anime.new
+          anime.id = $1.to_i
+          anime.title = anime_title_node.text
+          if image_node = results_row.at('td a img')
+            anime.image_url = image_node['src']
           end
+
+          table_cell_nodes = results_row.search('td')
+
+          anime.episodes = table_cell_nodes[3].text.to_i
+          anime.members_score = table_cell_nodes[4].text.to_f
+          synopsis_node = results_row.at('div.spaceit')
+          if synopsis_node
+            synopsis_node.search('a').remove
+            anime.synopsis = synopsis_node.text.strip
+          end
+          anime.type = table_cell_nodes[2].text
+          anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+
+          results << anime
         end
       end
 
