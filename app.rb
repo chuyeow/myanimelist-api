@@ -7,7 +7,10 @@ require 'my_anime_list'
 
 
 # Sinatra settings.
-set :sessions, true
+configure do
+  set :sessions, true
+end
+
 JSON_RESPONSE_MIME_TYPE = 'application/json'
 mime :json, JSON_RESPONSE_MIME_TYPE
 
