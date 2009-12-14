@@ -10,6 +10,11 @@ require 'my_anime_list'
 configure do
   set :sessions, true
 end
+configure :production
+  log = File.new('log/production.log', 'w+')
+  STDOUT.reopen(log)
+  STDERR.reopen(log)
+end
 
 JSON_RESPONSE_MIME_TYPE = 'application/json'
 mime :json, JSON_RESPONSE_MIME_TYPE
