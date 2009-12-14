@@ -67,13 +67,11 @@ post '/animelist/anime' do
 
   # Ensure "anime_id" param is given.
   if params[:anime_id] !~ /\S/
-    status 400
-
     case params[:format]
     when 'xml'
-      return '<error><code>anime_id-required</code></error>'
+      halt 400, '<error><code>anime_id-required</code></error>'
     else
-      return { :error => 'anime_id-required' }.to_json
+      halt 400, { :error => 'anime_id-required' }.to_json
     end
   end
 
@@ -86,13 +84,11 @@ post '/animelist/anime' do
   if successful
     nil # Return HTTP 200 OK and empty response body if successful.
   else
-    status 400
-
     case params[:format]
     when 'xml'
-      '<error><code>unknown-error</code></error>'
+      halt 400, '<error><code>unknown-error</code></error>'
     else
-      { :error => 'unknown-error' }.to_json
+      halt 400, { :error => 'unknown-error' }.to_json
     end
   end
 end
@@ -112,13 +108,11 @@ put '/animelist/anime/:anime_id' do
   if successful
     nil # Return HTTP 200 OK and empty response body if successful.
   else
-    status 400
-
     case params[:format]
     when 'xml'
-      '<error><code>unknown-error</code></error>'
+      halt 400, '<error><code>unknown-error</code></error>'
     else
-      { :error => 'unknown-error' }.to_json
+      halt 400, { :error => 'unknown-error' }.to_json
     end
   end
 end
@@ -139,13 +133,11 @@ delete '/animelist/anime/:anime_id' do
       anime.to_json # Return HTTP 200 OK and the original anime if successful.
     end
   else
-    status 400
-
     case params[:format]
     when 'xml'
-      '<error><code>unknown-error</code></error>'
+      halt 400, '<error><code>unknown-error</code></error>'
     else
-      { :error => 'unknown-error' }.to_json
+      halt 400, { :error => 'unknown-error' }.to_json
     end
   end
 end
