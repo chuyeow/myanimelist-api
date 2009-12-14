@@ -170,13 +170,11 @@ end
 get '/anime/search' do
   # Ensure "q" param is given.
   if params[:q] !~ /\S/
-    status 400
-
     case params[:format]
     when 'xml'
-      return '<error><code>q-required</code></error>'
+      halt 400, '<error><code>q-required</code></error>'
     else
-      return { :error => 'q-required' }.to_json
+      halt 400, { :error => 'q-required' }.to_json
     end
   end
 
