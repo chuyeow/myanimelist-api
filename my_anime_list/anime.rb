@@ -119,11 +119,10 @@ module MyAnimeList
       end
     end
 
-    def self.search(query, credentials)
+    def self.search(query)
       curl = Curl::Easy.new
       curl.url = "http://myanimelist.net/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{curl.escape(query)}"
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
-      curl.userpwd = "#{credentials[:username]}:#{credentials[:password]}"
       curl.follow_location = true
       curl.max_redirects = 1
 

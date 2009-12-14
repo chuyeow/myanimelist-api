@@ -178,7 +178,7 @@ get '/anime/search' do
 
   authenticate
 
-  results = MyAnimeList::Anime.search(params[:q], :username => auth.username, :password => auth.credentials[1])
+  results = MyAnimeList::Anime.search(params[:q])
 
   case params[:format]
   when 'xml'
