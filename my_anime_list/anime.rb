@@ -155,7 +155,7 @@ module MyAnimeList
         anime
       end
 
-      
+
       # Perform an additional scraping of the search results pages to fill out the anime synopsis and synonyms.
       if results.size > 0
         # FIXME Only perform this step if there are any synopsis or synonyms that are invalid JSON.
@@ -408,7 +408,7 @@ module MyAnimeList
     end
 
     private
-      
+
       def self.parse_anime_response(response)
         doc = Nokogiri::HTML(response)
 
