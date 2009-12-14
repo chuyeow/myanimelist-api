@@ -10,7 +10,7 @@ require 'my_anime_list'
 configure do
   set :sessions, true
 end
-configure :production
+configure :production do
   log = File.new('log/production.log', 'w+')
   STDOUT.reopen(log)
   STDERR.reopen(log)
