@@ -11,7 +11,8 @@ configure do
   set :sessions, true
 end
 configure :production do
-  log = File.new('log/production.log', 'w+')
+  set :raise_errors, true
+  log = File.new('log/production.log', 'a')
   STDOUT.reopen(log)
   STDERR.reopen(log)
 end
