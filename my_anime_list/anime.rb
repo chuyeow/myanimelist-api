@@ -129,8 +129,13 @@ module MyAnimeList
         case response
         when Net::HTTPRedirection
           redirected = true
+
+          # Strip everything after the anime ID - in cases where there is a non-ASCII character in the URL,
+          # MyAnimeList.net will return a page that says "Access has been restricted for this account".
+          redirect_url = response['location'].sub(%r{(http://myanimelist.net/anime/\d+)/?.*}, '\1')
+
           response = Net::HTTP.start('myanimelist.net', 80) do |http|
-            http.get(response['location'])
+            http.get(redirect_url)
           end
         end
 
