@@ -17,6 +17,7 @@ class App < Sinatra::Base
   end
 
   JSON_RESPONSE_MIME_TYPE = 'application/json'
+  mime_type :json, JSON_RESPONSE_MIME_TYPE
 
   # Error handlers.
   error MyAnimeList::NetworkError do
