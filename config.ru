@@ -1,4 +1,4 @@
-require 'rubygems' # Needed for Chonic, unfortunately.
+require 'rubygems'
 
 # Add vendored gems' lib/ directories to the load path.
 %w(sinatra redis redis-store).each do |gem_name|
