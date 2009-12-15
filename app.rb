@@ -1,6 +1,7 @@
 require 'sinatra/base'
 require 'redis-store'
 
+require 'rubygems'
 require 'curb'
 require 'net/http'
 require 'nokogiri'
@@ -10,6 +11,7 @@ require 'my_anime_list'
 
 
 class App < Sinatra::Base
+
   configure do
     set :sessions, true
   end
