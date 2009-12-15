@@ -17,19 +17,12 @@ module Sinatra
         op.on('-e env')    { |val| set :environment, val.to_sym }
         op.on('-s server') { |val| set :server, val }
         op.on('-p port')   { |val| set :port, val.to_i }
+        op.on('-h addr')   { |val| set :host, val }
       }.parse!(ARGV.dup)
     end
   end
+
+  at_exit { Application.run! if $!.nil? && Application.run? }
 end
 
 include Sinatra::Delegator
-
-def mime(ext, type)
-  ext = ".#{ext}" unless ext.to_s[0] == ?.
-  Rack::Mime::MIME_TYPES[ext.to_s] = type
-end
-
-at_exit do
-  raise $! if $!
-  Sinatra::Application.run! if Sinatra::Application.run?
-end

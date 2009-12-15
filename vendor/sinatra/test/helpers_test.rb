@@ -188,39 +188,59 @@ class HelpersTest < Test::Unit::TestCase
 
     it 'creates a new session when none provided' do
       mock_app {
+        enable :sessions
+
         get '/' do
           assert session.empty?
           session[:foo] = 'bar'
-          'Hi'
+          redirect '/hi'
+        end
+
+        get '/hi' do
+          "hi #{session[:foo]}"
         end
       }
 
       get '/'
-      assert_equal 'Hi', body
+      follow_redirect!
+      assert_equal 'hi bar', body
     end
   end
 
-  describe 'media_type' do
+  describe 'mime_type' do
     include Sinatra::Helpers
 
-    it "looks up media types in Rack's MIME registry" do
+    it "looks up mime types in Rack's MIME registry" do
       Rack::Mime::MIME_TYPES['.foo'] = 'application/foo'
-      assert_equal 'application/foo', media_type('foo')
-      assert_equal 'application/foo', media_type('.foo')
-      assert_equal 'application/foo', media_type(:foo)
+      assert_equal 'application/foo', mime_type('foo')
+      assert_equal 'application/foo', mime_type('.foo')
+      assert_equal 'application/foo', mime_type(:foo)
     end
 
     it 'returns nil when given nil' do
-      assert media_type(nil).nil?
+      assert mime_type(nil).nil?
     end
 
     it 'returns nil when media type not registered' do
-      assert media_type(:bizzle).nil?
+      assert mime_type(:bizzle).nil?
     end
 
     it 'returns the argument when given a media type string' do
-      assert_equal 'text/plain', media_type('text/plain')
+      assert_equal 'text/plain', mime_type('text/plain')
     end
+  end
+
+  test 'Base.mime_type registers mime type' do
+    mock_app {
+      mime_type :foo, 'application/foo'
+
+      get '/' do
+        "foo is #{mime_type(:foo)}"
+      end
+    }
+
+    get '/'
+    assert_equal 'foo is application/foo', body
   end
 
   describe 'content_type' do
@@ -349,6 +369,43 @@ class HelpersTest < Test::Unit::TestCase
       send_file_app :filename => 'foo.txt'
       get '/file.txt'
       assert_equal 'attachment; filename="foo.txt"', response['Content-Disposition']
+    end
+  end
+
+  describe 'cache_control' do
+    setup do
+      mock_app {
+        get '/' do
+          cache_control :public, :no_cache, :max_age => 60
+          'Hello World'
+        end
+      }
+    end
+
+    it 'sets the Cache-Control header' do
+      get '/'
+      assert_equal ['public', 'no-cache', 'max-age=60'], response['Cache-Control'].split(', ')
+    end
+  end
+
+  describe 'expires' do
+    setup do
+      mock_app {
+        get '/' do
+          expires 60, :public, :no_cache
+          'Hello World'
+        end
+      }
+    end
+
+    it 'sets the Cache-Control header' do
+      get '/'
+      assert_equal ['public', 'no-cache', 'max-age=60'], response['Cache-Control'].split(', ')
+    end
+
+    it 'sets the Expires header' do
+      get '/'
+      assert_not_nil response['Expires']
     end
   end
 
