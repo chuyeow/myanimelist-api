@@ -14,6 +14,7 @@ class App < Sinatra::Base
     set :sessions, true
   end
 
+  JSON_RESPONSE_MIME_TYPE = 'application/json'
 
   # Error handlers.
   error MyAnimeList::NetworkError do
