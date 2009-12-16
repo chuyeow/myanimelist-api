@@ -277,6 +277,20 @@ class App < Sinatra::Base
   end
 
 
+  # GET /mangalist/#{username}
+  # Get a user's manga list.
+  get '/mangalist/:username' do
+    manga_list = MyAnimeList::MangaList.manga_list_of(params[:username])
+
+    case params[:format]
+    when 'xml'
+      manga_list.to_xml
+    else
+      manga_list.to_json
+    end
+  end
+
+
   # Verify that authentication credentials are valid.
   # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
   # FIXME This should be rate-limited to avoid brute-force attacks.
