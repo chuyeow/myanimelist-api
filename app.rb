@@ -13,7 +13,8 @@ require 'my_anime_list'
 class App < Sinatra::Base
 
   configure do
-    set :sessions, true
+    enable :sessions, :static
+    set :public, Proc.new { File.join(File.dirname(__FILE__), 'public') }
   end
 
   JSON_RESPONSE_MIME_TYPE = 'application/json'
