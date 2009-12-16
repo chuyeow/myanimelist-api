@@ -1,0 +1,1104 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html>
+<head>
+	<title>chuyeow's Manga List - MyAnimeList.net</title>
+    <meta name="Description" content="Start cataloging anime you've watched or manga you've read. Browse through our extensive anime and manga database. Get anime or manga suggestions, recommendations and reviews. View top rated anime and manga. Create anime and manga favorites. Tons more too!" />
+    <meta name="Keywords" content="anime, animelist, myanimelist, anime list, log anime seen, catalog anime watched, anime reviews, top anime, anime characters, favorite anime, anime discussion, anime information, manga series, manga information, top manga, mangalist, manga list, manga, manga reviews, voice actors, seiyuu" />
+    <meta name="Author" content="Garrett Gyssler">
+	
+		<script type="text/javascript" src="http://jqueryjs.googlecode.com/files/jquery-1.3.2.min.js"></script>
+		
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/dimensions.js"></script>
+		<style type="text/css">
+
+
+/*
+// Self-explanatory
+*/
+BODY
+        {
+				margin: 0;
+        color: #FFFFFF;
+        font-size: 11.00px;
+        font-family: Verdana, Arial;
+        background-color: #000000;
+        }
+
+/*
+// Determines the positioning of your list
+*/
+
+#list_surround
+{
+	margin: 0 auto;	
+	width: 920px;
+}
+
+/*
+// All links on your list
+*/
+
+    a
+        {
+        color: #9e1818;
+        text-decoration: none;
+        }
+
+    a:visited
+        {
+        color: #9e1818;
+        text-decoration: none;
+        }
+
+    a:hover
+        {
+        color: #a12f2f;
+        text-decoration: underline;
+        }
+
+/*
+// Alternating row color 1 
+*/
+
+    .td1
+        {
+				
+        color: #FFFFFF;
+        border-width: 0px 1px 1px 0px;
+        border-style: solid;
+        border-color: #000000;
+        padding: 2px;
+        background-color: #3b3b3b; 
+        }
+   
+/*
+// Alternating row color 2 
+*/
+
+    .td2
+        {
+				
+        color: #FFFFFF;
+        border-width: 0px 1px 1px 0px;
+        border-style: solid;
+        border-color: #000000;
+        padding: 2px;
+        background-color: #1c1c1c; 
+        }
+   
+/*
+// This represents the "Anime Title", "Score", "# Eps" columns 
+*/
+   
+    .table_header
+        {
+				
+        color: #FFFFFF;
+        border-width: 1px 1px 1px 0px;
+        border-style: solid;
+        border-color: #000000;
+        background-color: #000000;
+        padding: 2px;
+        }
+    
+/*
+// headerLink represents the color of the links inside the table_header 
+*/
+	
+    .table_headerLink
+        {
+        color: ;
+        }
+    
+    .table_headerLink:Visited
+        {
+        color: ;
+        }
+    
+    .table_headerLink:Hover
+        {
+        color: ;
+        }
+
+/*
+// Controls the select form decoration (the drop down select box)
+*/
+
+    .form
+        {
+        border-width: 1px 1px 1px 1px;
+        border-color: #FFFFFF;
+        border-style: solid;
+        color: #000000;
+        padding: 2px;
+        font-size: 11.00px;
+		font-family: Verdana, Arial;
+        }
+		
+
+/* Which 'status' up top is selected? */
+
+.status_selected
+{
+
+	color: #FFFFFF;
+	border-width: 0px 1px 1px 0px;
+    border-style: solid;
+    border-color: #000000;
+    padding: 2px;
+    background-color: #3b3b3b;
+	}
+
+.status_not_selected
+{
+
+	color: #FFFFFF;
+	border-width: 0px 1px 1px 0px;
+    border-style: solid;
+    border-color: #000000;
+    padding: 2px;
+    background-color: #1c1c1c;
+	}
+
+/*
+Header classes for Currently Watching, Completed, Dropped, etc...
+*/
+
+.header_cw
+{
+
+}
+
+.header_completed
+{
+
+}
+
+.header_onhold
+{
+
+}
+
+.header_dropped
+{
+
+}
+
+.header_ptw
+{
+
+}
+
+.header_title {
+	font-size: 14px;
+    font-weight: bold;
+}
+
+
+.category_totals
+{
+
+}
+
+#grand_totals
+{
+	text-align: center;
+}
+
+/* header_al is the div surrounding "User's Anime List" at the top */
+
+.header_al
+{
+	font-weight: bold;
+	font-size: 16px;
+}
+
+/* header_al_links is the div with your "Profile" and "MyAnimeList home" links */
+.header_al_links
+{
+
+}
+
+/* controls what styles you can give to all the anime titles in your list */
+.animetitle
+{
+	font-weight: bold;
+}
+
+/*
+copyright contains the "Producted by Garrett Gyssler" text
+DO NOT REMOVE OR HIDE THIS DIV
+IF FOUND TO BE REMOVED, YOUR LIST WILL BE REMOVED TOO
+*/
+
+#copyright
+{
+	padding-top: 6px;
+	text-align: center;
+	margin: 0 auto;
+	width: 920px;
+}
+
+
+		</style>
+		
+		<script type="text/javascript" src="http://cdn.myanimelist.net/js/hover.v4.js"></script>
+		
+				<script type="text/javascript" src="http://cdn.myanimelist.net/js/list.v12.js"></script>
+				<link rel="stylesheet" href="http://cdn.myanimelist.net/css/list.v2.css" type="text/css" />
+	<script type="text/javascript" src="http://cdn.myanimelist.net/js/myanimelist.v8.js"></script>
+	<script type="text/javascript" src="http://cdn.myanimelist.net/thickbox/thickbox.js"></script>
+	<link rel="stylesheet" href="http://cdn.myanimelist.net/thickbox/thickbox.css" type="text/css" media="screen" />
+	<link rel="stylesheet" type="text/css" href="http://cdn.myanimelist.net/css/dialog.v1.css" />
+	<link rel="search" type="application/opensearchdescription+xml" href="http://cdn.myanimelist.net/plugins/myanimelist.xml" title="MyAnimeList" />
+	
+<link rel="shortcut icon" href="http://cdn.myanimelist.net/images/faviconv5.ico" />
+	
+</head>
+
+<body onload="">
+
+	<table id="mal_control_strip" border="0" cellpadding="0" cellspacing="0">
+	<tr>
+		
+			<td id="mal_cs_pic"><a href="http://myanimelist.net"><img src="http://myanimelist.net/images/list-top-logo.gif"></a></td>
+			<td id="mal_cs_otherlinks">
+				<div><strong>You are viewing <a href="http://myanimelist.net/profile/chuyeow">chuyeow</a>'s Manga List</strong></div>
+				<div><a href="http://myanimelist.net/login.php">Log in</a>&nbsp;&nbsp;<a href="http://myanimelist.net/register.php">Create a Manga List</a>&nbsp;&nbsp;<a href="http://myanimelist.net/modules.php?go=faq">Learn more</a></div>
+			</td>
+			
+	<td id="mal_cs_powered" valign="top" align="right"><a href="http://myanimelist.net"><img src="http://myanimelist.net/images/list-top-powered.gif"></a></td>
+	</tr>
+	</table>
+	
+<div id="list_surround">
+<br>
+			<table border="0" cellpadding="0" cellspacing="0" width="920" align="center">
+			<tr><td class="status_not_selected" width="165" nowrap style="border-width: 1px 1px 1px 1px;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=1&order=" title="8 Entries">Currently Reading</td><td width="75" class="status_not_selected" style="border-width: 1px 1px 1px 0;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=2&order=" title="3 Entries">Completed</a></td><td width="75" class="status_not_selected" style="border-width: 1px 1px 1px 0;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=3&order=" title="0 Entries">On Hold</a></td><td width="75" class="status_not_selected" style="border-width: 1px 1px 1px 0;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=4&order=" title="0 Entries">Dropped</a></td><td width="115" class="status_not_selected" style="border-width: 1px 1px 1px 0;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=6&order=" title="3 Entries">Plan to Read</a></td><td width="90" class="status_selected" style="border-width: 1px 1px 1px 0;" align="center"><a href="http://myanimelist.net/mangalist/chuyeow&status=7&order=" title="14 Entries">Show All</a></td></tr>
+			</table>
+			<br><br>
+			    <table border="0" cellpadding="0" cellspacing="0" width="920" align="center" class="header_cw">
+	<tr>
+		<td>
+        
+		<div class="header_title">
+		
+		<span>Currently Reading</span>
+		</div>
+				</td>
+	</tr>
+	</table>
+    <table border="0" cellpadding="0" cellspacing="0" width="920">
+	<tr>
+				<td class="table_header" width="30" align="center" style="border-width: 1px 1px 1px 1px;"><b><span class="table_headerLink">#</span></b></td>
+		        <td class="table_header" style="border-left-width: 0"><a href="http://myanimelist.net/mangalist/chuyeow&order=1&status=7" class="table_headerLink"><strong>Manga Title</strong></a></td>
+   				<td class="table_header" width="45" align="center"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=4&status=7" class="table_headerLink">Score</a></strong></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=9&status=7" class="table_headerLink">Chapters</a></b></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=10&status=7" class="table_headerLink">Volumes</a></b></td>
+			</tr>
+	</table>
+    
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">1</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=2&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga2');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/2/Berserk" class="animetitle" target="_blank"><span>Berserk</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td1"><span id="score981250">-</span></td><td width="70" align="center" class="td1"><span id="chap981250">1</span>/-</td><td width="70" align="center" class="td1"><span id="vol981250">-</span>/-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga2" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=2" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 1<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">2</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=5627&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga5627');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/5627/Bloody_Monday" class="animetitle" target="_blank"><span>Bloody Monday</span></a>
+			</td><td width="45" align="center" class="td2"><span id="score3425357">-</span></td><td width="70" align="center" class="td2"><span id="chap3425357">29</span>/96</td><td width="70" align="center" class="td2"><span id="vol3425357">-</span>/11</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga5627" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=5627" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 29<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">3</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=1111&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga1111');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/1111/Buddha" class="animetitle" target="_blank"><span>Buddha</span></a>
+			</td><td width="45" align="center" class="td1"><span id="score2945397">-</span></td><td width="70" align="center" class="td1"><span id="chap2945397">-</span>/66</td><td width="70" align="center" class="td1"><span id="vol2945397">1</span>/14</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga1111" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=1111" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: -<br />
+			Volumes: 1<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">4</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=583&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga583');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/583/Claymore" class="animetitle" target="_blank"><span>Claymore</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td2"><span id="score692949">8</span></td><td width="70" align="center" class="td2"><span id="chap692949">96</span>/-</td><td width="70" align="center" class="td2"><span id="vol692949">-</span>/-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga583" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=583" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 96<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">5</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=564&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga564');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/564/GANTZ" class="animetitle" target="_blank"><span>GANTZ</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td1"><span id="score769395">10</span></td><td width="70" align="center" class="td1"><span id="chap769395">309</span>/-</td><td width="70" align="center" class="td1"><span id="vol769395">-</span>/-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga564" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=564" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 309<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">6</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=582&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga582');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/582/Kodomo_no_Jikan" class="animetitle" target="_blank"><span>Kodomo no Jikan</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td2"><span id="score1471082">-</span></td><td width="70" align="center" class="td2"><span id="chap1471082">-</span>/-</td><td width="70" align="center" class="td2"><span id="vol1471082">-</span>/-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga582" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=582" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: -<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">7</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=4505&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga4505');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/4505/Lucky_Star_Pocket_Travelers" class="animetitle" target="_blank"><span>Lucky Star Pocket Travelers</span></a>
+			</td><td width="45" align="center" class="td1"><span id="score692904">-</span></td><td width="70" align="center" class="td1"><span id="chap692904">1</span>/-</td><td width="70" align="center" class="td1"><span id="vol692904">-</span>/1</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga4505" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=4505" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 1<br />
+			Volumes: -<br />
+			Start Date: Oct  9, 2008<br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: 434<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">8</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=104&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga104');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/104/Yotsuba&!" class="animetitle" target="_blank"><span>Yotsuba&!</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td2"><span id="score75054">10</span></td><td width="70" align="center" class="td2"><span id="chap75054">62</span>/-</td><td width="70" align="center" class="td2"><span id="vol75054">5</span>/-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga104" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=104" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 62<br />
+			Volumes: 5<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: Very High<br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" width="920" cellpadding="0" cellspacing="0">
+			<tr>
+			<td class="category_totals"> 
+				Chapters: 498,
+				Volumes: 6,
+				Days: 2.77
+				Mean Score: 9.3, 
+				Score <span title="Deviation">Dev.</span>: 0.66
+				
+			</td>
+			</tr>
+			</table>
+			
+					<br><br>
+					    <table border="0" cellpadding="0" cellspacing="0" width="920" align="center" class="header_completed">
+	<tr>
+		<td>
+        
+		<div class="header_title">
+		
+		<span>Completed</span>
+		</div>
+				</td>
+	</tr>
+	</table>
+    <table border="0" cellpadding="0" cellspacing="0" width="920">
+	<tr>
+				<td class="table_header" width="30" align="center" style="border-width: 1px 1px 1px 1px;"><b><span class="table_headerLink">#</span></b></td>
+		        <td class="table_header" style="border-left-width: 0"><a href="http://myanimelist.net/mangalist/chuyeow&order=1&status=7" class="table_headerLink"><strong>Manga Title</strong></a></td>
+   				<td class="table_header" width="45" align="center"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=4&status=7" class="table_headerLink">Score</a></strong></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=9&status=7" class="table_headerLink">Chapters</a></b></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=10&status=7" class="table_headerLink">Volumes</a></b></td>
+			</tr>
+	</table>
+    
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">1</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=85&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga85');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/85/Azumanga_Daioh" class="animetitle" target="_blank"><span>Azumanga Daioh</span></a>
+			</td><td width="45" align="center" class="td1"><span id="score373483">8</span></td><td width="70" align="center" class="td1">39</td><td width="70" align="center" class="td1">4</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga85" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=85" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 39<br />
+			Volumes: 4<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">2</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=6604&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga6604');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/6604/Try!_Try!_Try!" class="animetitle" target="_blank"><span>Try! Try! Try!</span></a>
+			</td><td width="45" align="center" class="td2"><span id="score2201998">8</span></td><td width="70" align="center" class="td2">1</td><td width="70" align="center" class="td2">1</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga6604" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=6604" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 1<br />
+			Volumes: 1<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">3</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=10690&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga10690');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/10690/Try!_Try!_Try!_Webcomics" class="animetitle" target="_blank"><span>Try! Try! Try! Webcomics</span></a>
+			</td><td width="45" align="center" class="td1"><span id="score2201996">7</span></td><td width="70" align="center" class="td1">2</td><td width="70" align="center" class="td1">-</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga10690" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=10690" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: 2<br />
+			Volumes: 0<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" width="920" cellpadding="0" cellspacing="0">
+			<tr>
+			<td class="category_totals"> 
+				Chapters: 42,
+				Volumes: 5,
+				Days: 0.23
+				Mean Score: 7.7, 
+				Score <span title="Deviation">Dev.</span>: -0.13
+				
+			</td>
+			</tr>
+			</table>
+			
+					<br><br>
+					    <table border="0" cellpadding="0" cellspacing="0" width="920" align="center" class="header_onhold">
+	<tr>
+		<td>
+        
+		<div class="header_title">
+		
+		<span>On-Hold</span>
+		</div>
+				</td>
+	</tr>
+	</table>
+    <table border="0" cellpadding="0" cellspacing="0" width="920">
+	<tr>
+				<td class="table_header" width="30" align="center" style="border-width: 1px 1px 1px 1px;"><b><span class="table_headerLink">#</span></b></td>
+		        <td class="table_header" style="border-left-width: 0"><a href="http://myanimelist.net/mangalist/chuyeow&order=1&status=7" class="table_headerLink"><strong>Manga Title</strong></a></td>
+   				<td class="table_header" width="45" align="center"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=4&status=7" class="table_headerLink">Score</a></strong></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=9&status=7" class="table_headerLink">Chapters</a></b></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=10&status=7" class="table_headerLink">Volumes</a></b></td>
+			</tr>
+	</table>
+    
+					<br><br>
+					    <table border="0" cellpadding="0" cellspacing="0" width="920" align="center" class="header_dropped">
+	<tr>
+		<td>
+        
+		<div class="header_title">
+		
+		<span>Dropped</span>
+		</div>
+				</td>
+	</tr>
+	</table>
+    <table border="0" cellpadding="0" cellspacing="0" width="920">
+	<tr>
+				<td class="table_header" width="30" align="center" style="border-width: 1px 1px 1px 1px;"><b><span class="table_headerLink">#</span></b></td>
+		        <td class="table_header" style="border-left-width: 0"><a href="http://myanimelist.net/mangalist/chuyeow&order=1&status=7" class="table_headerLink"><strong>Manga Title</strong></a></td>
+   				<td class="table_header" width="45" align="center"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=4&status=7" class="table_headerLink">Score</a></strong></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=9&status=7" class="table_headerLink">Chapters</a></b></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=10&status=7" class="table_headerLink">Volumes</a></b></td>
+			</tr>
+	</table>
+    
+					<br><br>
+					    <table border="0" cellpadding="0" cellspacing="0" width="920" align="center" class="header_ptw">
+	<tr>
+		<td>
+        
+		<div class="header_title">
+		
+		<span>Plan to Read</span>
+		</div>
+				</td>
+	</tr>
+	</table>
+    <table border="0" cellpadding="0" cellspacing="0" width="920">
+	<tr>
+				<td class="table_header" width="30" align="center" style="border-width: 1px 1px 1px 1px;"><b><span class="table_headerLink">#</span></b></td>
+		        <td class="table_header" style="border-left-width: 0"><a href="http://myanimelist.net/mangalist/chuyeow&order=1&status=7" class="table_headerLink"><strong>Manga Title</strong></a></td>
+   				<td class="table_header" width="45" align="center"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=4&status=7" class="table_headerLink">Score</a></strong></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=9&status=7" class="table_headerLink">Chapters</a></b></td>
+				<td class="table_header" width="70" align="center" nowrap><b><a href="http://myanimelist.net/mangalist/chuyeow&order=10&status=7" class="table_headerLink">Volumes</a></b></td>
+		
+			<td class="table_header" width="80" align="center" nowrap><span title="Priority"><strong><a href="http://myanimelist.net/mangalist/chuyeow&order=8&status=7" class="table_headerLink">Priority</a></strong></span></td>
+				</tr>
+	</table>
+    
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">1</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=13992&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga13992');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/13992/Azumanga_Daioh:_Supplementary_Lessons" class="animetitle" target="_blank"><span>Azumanga Daioh: Supplementary Lessons</span></a>
+			 <small>Publishing</small> </td><td width="45" align="center" class="td1"><span id="score2287974">-</span></td><td width="70" align="center" class="td1"><span id="chap2287974">-</span>/3</td><td width="70" align="center" class="td1"><span id="vol2287974">-</span>/-</td><td class="td1" width="80" align="center" nowrap>Low</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga13992" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=13992" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: -<br />
+			Volumes: -<br />
+			Start Date: May  16, 2009<br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: 215<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td2" style="border-left-width: 1px;">2</td>
+			<td class="td2" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=509&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga509');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/509/Saiyuki" class="animetitle" target="_blank"><span>Saiyuki</span></a>
+			</td><td width="45" align="center" class="td2"><span id="score3281923">-</span></td><td width="70" align="center" class="td2"><span id="chap3281923">-</span>/55</td><td width="70" align="center" class="td2"><span id="vol3281923">-</span>/9</td><td class="td2" width="80" align="center" nowrap>Low</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga509" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td2" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=509" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: -<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			
+				<td align="center" width="30" class="td1" style="border-left-width: 1px;">3</td>
+			<td class="td1" style="border-left-width: 0">
+			<div style="float: right;">
+			<small>
+			<a href="http://myanimelist.net/panel.php?keepThis=true&go=addmanga&selected_manga_id=3864&hidenav=true&TB_iframe=true&height=550&width=790" class="thickbox" title="Add to My Manga List">Add</a> - <a href="javascript:void(0);" onclick="getExpand('manga3864');" title="View More Information">More</a> 
+			</small>
+			</div>
+			
+			<a href="http://myanimelist.net/manga/3864/Scrapped_Princess" class="animetitle" target="_blank"><span>Scrapped Princess</span></a>
+			</td><td width="45" align="center" class="td1"><span id="score2954262">-</span></td><td width="70" align="center" class="td1"><span id="chap2954262">-</span>/70</td><td width="70" align="center" class="td1"><span id="vol2954262">-</span>/13</td><td class="td1" width="80" align="center" nowrap>Low</td>
+			</tr>
+			</table>
+			
+			<!-- START HIDDEN -->
+			<div id="manga3864" style="display: none; width:920px;">
+			<table border="0" cellpadding="0" cellspacing="0" width="920">
+			<tr>
+			<td class="td1" style="border-width: 0px 1px 1px 1px;">
+			
+			<div style="margin-bottom: 3px;"><a href="http://www.myanimelist.net/forum/?mangaid=3864" target="_blank">Discuss Manga</a></div>
+			
+			Chapters: -<br />
+			Volumes: -<br />
+			Start Date: <br />
+			End Date: <br />
+			
+			Storage: <br />
+			
+			Downloaded Chap.: 0<br />
+			
+			Total Days Read: &nbsp;<br />
+			Times Read: 0<br />
+			Re-read Value: <br />
+			
+			Comments: <br />
+			
+			
+			</td>
+			</tr>
+			</table>
+			</div>
+			<table border="0" width="920" cellpadding="0" cellspacing="0">
+			<tr>
+			<td class="category_totals"> 
+				Chapters: 0,
+				Volumes: 0,
+				Days: 
+				Mean Score: 0.0, 
+				Score <span title="Deviation">Dev.</span>: 0.00
+				
+			</td>
+			</tr>
+			</table>
+			
+					<br><br>
+					
+			<br>
+			<div id="grand_totals">
+			<div id="grand_totals_header">Grand Totals</div>
+			Manga: 11, 
+			Novel: 1, One Shot: 2, Manwha: 0, Chapters: 540 Volumes: 11, Days: 3.00, Mean: 8.5
+			<br />
+			chuyeow's scores average about 0.26 points higher than the average scores posted by other members.
+			</div>
+			
+		<div id="inlineContent" style="display: none;"></div>
+		<div id="copyright" style="text-align: center; margin-top: 10px;">MyAnimeList.net, a property of CraveOnline Media LLC, a division of AtomicOnline, LLC.<br>
+&copy; 2009 CraveOnline Media, LLC. All Rights Reserved.</div>
+</div><!-- 10.2.10.232 --><script type="text/javascript">
+var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+</script>
+<script type="text/javascript">
+var pageTracker = _gat._getTracker("UA-369102-1");
+pageTracker._initData();
+pageTracker._trackPageview();
+</script>
+
+<!-- Start Quantcast tag -->
+<script type="text/javascript">
+_qoptions={
+qacct:"p-04kAgiUBi0LNA"
+};
+</script>
+<script type="text/javascript" src="http://edge.quantserve.com/quant.js"></script>
+<noscript>
+<img src="http://pixel.quantserve.com/pixel/p-04kAgiUBi0LNA.gif" style="display: none;" border="0" height="1" width="1" alt="Quantcast"/>
+</noscript>
+<!-- End Quantcast tag -->
+
+<!-- Begin comScore Tag -->
+<script>
+    document.write(unescape("%3Cscript src='" + (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js' %3E%3C/script%3E"));
+</script>
+
+<script>
+  COMSCORE.beacon({
+    c1:2,
+    c2:6036161,
+    c3:"",
+    c4:"",
+    c5:"",
+    c6:"",
+    c15:""
+  });
+</script>
+<noscript>
+  <img src="http://b.scorecardresearch.com/b?c1=2&c2=6036161&c3=&c4=&c5=&c6=&c15=&cv=1.3&cj=1" style="display:none" width="0" height="0" alt="" />
+</noscript>
+<!-- End comScore Tag -->
+</body>
+</html>
