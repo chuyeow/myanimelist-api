@@ -67,6 +67,7 @@
         <li><a href="#read_popular_anime">/anime/popular - Read the popular anime</a></li>
         <li><a href="#read_upcoming_anime">/anime/upcoming - Read the upcoming anime</a></li>
         <li><a href="#read_just_added_anime">/anime/just_added - Read the anime that have just been added to MyAnimeList</a></li>
+        <li><a href="#read_manga_list">/mangalist - Read a manga list</a></li>
       </ul>
     </li>
     <li>
@@ -148,6 +149,12 @@
           <td><a href="#read_just_added_anime">/anime/just_added</a></td>
           <td>Fetch the just added anime.</td>
           <td><a href="http://mal-api.com/anime/top">http://mal-api.com/anime/just_added</a></td>
+        </tr>
+
+        <tr>
+          <td><a href="#read_manga_list">/mangalist/<strong>username</strong></a></td>
+          <td>Fetch a user's manga list</td>
+          <td><a href="http://mal-api.com/mangalist/xinil">http://mal-api.com/mangalist/xinil</a></td>
         </tr>
       </tbody>
     </table>
@@ -302,6 +309,19 @@
       <li><code>watched_episodes</code> - Number of episodes already watched by the user.</li>
       <li><code>score</code> - User's score for the anime, from 1 to 10.</li>
     </ul>
+
+
+    <h4 id="type_manga_list">Manga list</h4>
+
+    <p>An anime list is a user's personal list of manga.</p>
+
+    <p>Format:</p>
+    <ul>
+      <li>
+        <code>manga</code> - A list of <a href="#type_manga">manga</a>.
+      </li>
+    </ul>
+
   </div>
 
 
@@ -530,6 +550,21 @@
       <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
       <li><code>per_page</code> - Number of anime to return per page. Defaults to 20.</li>
     </ul>
+  </div>
+
+
+  <div class="section">
+    <h3 id="read_manga_list">/mangalist - Read a manga list</h3>
+
+    <p>Fetch a manga list with the given username:</p>
+  
+    <blockquote>
+      <p><code>http://mal-api.com/mangalist/<strong>username</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/mangalist/xinil">http://mal-api.com/mangalist/xinil</a></p>
+    </blockquote>
+
+    <p>The response is a <a href="#type_manga_list">manga list</a>.</p>
   </div>
 
 
