@@ -22,13 +22,6 @@ class App < Sinatra::Base
   mime_type :json, JSON_RESPONSE_MIME_TYPE
 
   # Error handlers.
-  not_found do
-    if response.content_type == JSON_RESPONSE_MIME_TYPE
-      { :error => response.body }.to_json
-    else
-      "<error><code>#{response.body}</code></error>"
-    end
-  end
 
   error MyAnimeList::NetworkError do
     details = "Exception message: #{request.env['sinatra.error'].message}"
@@ -51,11 +44,12 @@ class App < Sinatra::Base
   end
 
   error MyAnimeList::NotFoundError do
+    status 404
     case params[:format]
     when 'xml'
-      halt 404, "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
+      "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
     else
-      halt 404, { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
+      { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
     end
   end
 
