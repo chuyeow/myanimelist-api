@@ -41,6 +41,16 @@ class App < Sinatra::Base
     end
   end
 
+  error MyAnimeList::NotFoundError do
+    status 404
+    case params[:format]
+    when 'xml'
+      "<error><code>not-found-error</code><details>#{request.env['sinatra.error'].message}</details></error>"
+    else
+      { :error => 'not-found-error', :details => request.env['sinatra.error'].message }.to_json
+    end
+  end
+
   error MyAnimeList::UnknownError do
     details = "Exception message: #{request.env['sinatra.error'].message}"
     case params[:format]

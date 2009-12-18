@@ -22,8 +22,19 @@ module MyAnimeList
     def to_s; @message; end
   end
 
-  # Raised when there's an error updating an anime.
+  # Raised when there's an error updating an anime/manga.
   class UpdateError < StandardError
+    attr_accessor :original_exception
+
+    def initialize(message, original_exception = nil)
+      @message = message
+      @original_exception = original_exception
+      super(message)
+    end
+    def to_s; @message; end
+  end
+
+  class NotFoundError < StandardError
     attr_accessor :original_exception
 
     def initialize(message, original_exception = nil)

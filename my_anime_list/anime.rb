@@ -24,9 +24,14 @@ module MyAnimeList
 
       response = curl.body_str
 
+      # Check for missing anime.
+      raise MyAnimeList::NotFoundError.new("Anime with ID #{id} doesn't exist.", nil) if response =~ /No series found/i
+
       anime = parse_anime_response(response)
 
       anime
+    rescue MyAnimeList::NotFoundError => e
+      raise e
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
