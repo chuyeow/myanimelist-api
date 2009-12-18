@@ -22,6 +22,14 @@ class App < Sinatra::Base
   mime_type :json, JSON_RESPONSE_MIME_TYPE
 
   # Error handlers.
+  not_found do
+    if response.content_type == JSON_RESPONSE_MIME_TYPE
+      { :error => response.body }.to_json
+    else
+      "<error><code>#{response.body}</code></error>"
+    end
+  end
+
   error MyAnimeList::NetworkError do
     details = "Exception message: #{request.env['sinatra.error'].message}"
     case params[:format]
@@ -69,13 +77,6 @@ class App < Sinatra::Base
       "<error><code>unknown-error</code><details>#{details}</details></error>"
     else
       { :error => 'unknown-error', :details => details }.to_json
-    end
-  end
-
-  not_found do
-    if response.content_type == JSON_RESPONSE_MIME_TYPE
-      { :error => response.body }.to_json
-    else "<error><code>#{response.body}</code></error>"
     end
   end
 
