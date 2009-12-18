@@ -51,12 +51,11 @@ class App < Sinatra::Base
   end
 
   error MyAnimeList::NotFoundError do
-    status 404
     case params[:format]
     when 'xml'
-      "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
+      halt 404, "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
     else
-      { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
+      halt 404, { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
     end
   end
 
