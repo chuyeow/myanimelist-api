@@ -14,6 +14,7 @@ class App < Sinatra::Base
 
   configure do
     enable :sessions, :static
+    disable :raise_errors
     set :public, Proc.new { File.join(File.dirname(__FILE__), 'public') }
   end
 
