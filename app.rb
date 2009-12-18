@@ -45,9 +45,9 @@ class App < Sinatra::Base
     status 404
     case params[:format]
     when 'xml'
-      "<error><code>not-found-error</code><details>#{request.env['sinatra.error'].message}</details></error>"
+      "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
     else
-      { :error => 'not-found-error', :details => request.env['sinatra.error'].message }.to_json
+      { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
     end
   end
 
