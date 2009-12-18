@@ -31,7 +31,7 @@ module MyAnimeList
 
       anime
     rescue MyAnimeList::NotFoundError => e
-      raise e
+      raise
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
     end
