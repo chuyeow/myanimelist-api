@@ -13,7 +13,7 @@ require 'my_anime_list'
 class App < Sinatra::Base
 
   configure do
-    enable :sessions, :static
+    enable :sessions, :static, :methodoverride
     disable :raise_errors
     set :public, Proc.new { File.join(File.dirname(__FILE__), 'public') }
   end
