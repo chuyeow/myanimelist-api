@@ -1,6 +1,6 @@
 module MyAnimeList
   class Manga
-    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :volumes, :chapters,
+    attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
                   :members_score, :members_count, :favorited_count, :synopsis
     attr_reader :status
     attr_writer :genres, :other_titles, :anime_adaptations, :related_manga
@@ -37,7 +37,42 @@ module MyAnimeList
         manga.id = manga_id_input['value'].to_i
       else
         details_link = doc.at('//a[text()="Details"]')
-        anime.id = details_link['href'][%r{http://myanimelist.net/manga/(\d+)/.*?}, 1].to_i
+        manga.id = details_link['href'][%r{http://myanimelist.net/manga/(\d+)/.*?}, 1].to_i
+      end
+
+      # Title and rank.
+      # Example:
+      # <h1>
+      #   <div style="float: right; font-size: 13px;">Ranked #8</div>Yotsuba&!
+      #   <span style="font-weight: normal;"><small>(Manga)</small></span>
+      # </h1>
+      manga.title = doc.at(:h1).children.find { |o| o.text? }.to_s.strip
+      manga.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
+
+      # Image URL.
+      if image_node = doc.at('div#rightcontent a img')
+        manga.image_url = image_node['src']
+      end
+
+      # -
+      # Extract from sections on the left column: Alternative Titles, Information, Statistics, Popular Tags.
+      # -
+      left_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
+
+      # Alternative Titles section.
+      # Example:
+      # <h2>Alternative Titles</h2>
+      # <div class="spaceit_pad"><span class="dark_text">English:</span> Yotsuba&!</div>
+      # <div class="spaceit_pad"><span class="dark_text">Synonyms:</span> Yotsubato!, Yotsuba and !, Yotsuba!, Yotsubato, Yotsuba and!</div>
+      # <div class="spaceit_pad"><span class="dark_text">Japanese:</span> よつばと！</div>
+      if (node = left_column_nodeset.at('//span[text()="English:"]')) && node.next
+        manga.other_titles[:english] = node.next.text.strip.split(/,\s?/)
+      end
+      if (node = left_column_nodeset.at('//span[text()="Synonyms:"]')) && node.next
+        manga.other_titles[:synonyms] = node.next.text.strip.split(/,\s?/)
+      end
+      if (node = left_column_nodeset.at('//span[text()="Japanese:"]')) && node.next
+        manga.other_titles[:japanese] = node.next.text.strip.split(/,\s?/)
       end
 
       manga
@@ -67,6 +102,10 @@ module MyAnimeList
     def attributes
       {
         :id => id,
+        :title => title,
+        :other_titles => other_titles,
+        :rank => rank,
+        :image_url => image_url
       }
     end
 
@@ -79,6 +118,19 @@ module MyAnimeList
       xml.instruct! unless options[:skip_instruct]
       xml.anime do |xml|
         xml.id id
+        xml.title title
+        xml.rank rank
+        xml.image_url image_url
+
+        other_titles[:synonyms].each do |title|
+          xml.synonym title
+        end if other_titles[:synonyms]
+        other_titles[:english].each do |title|
+          xml.english_title title
+        end if other_titles[:english]
+        other_titles[:japanese].each do |title|
+          xml.japanese_title title
+        end if other_titles[:japanese]
       end
 
       xml.target!
