@@ -282,6 +282,30 @@ class App < Sinatra::Base
   end
 
 
+  # GET /manga/#{manga_id}
+  # Get a manga's details.
+  # Optional parameters:
+  #  * mine=1 - If specified, include the authenticated user's manga details (e.g. user's score, read status). Requires
+  #             authentication.
+  get '/manga/:id' do
+    pass unless params[:id] =~ /^\d+$/
+
+    if params[:mine] == '1'
+      authenticate unless session['cookie_string']
+      manga = MyAnimeList::Manga.scrape_manga(params[:id], session['cookie_string'])
+    else
+      manga = MyAnimeList::Manga.scrape_manga(params[:id])
+    end
+
+    case params[:format]
+    when 'xml'
+      manga.to_xml
+    else
+      manga.to_json
+    end
+  end
+
+
   # GET /mangalist/#{username}
   # Get a user's manga list.
   get '/mangalist/:username' do
