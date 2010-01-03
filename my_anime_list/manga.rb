@@ -212,11 +212,73 @@ module MyAnimeList
         end
       end
 
+
+      # User's manga details (only available if he authenticates).
+      # <h2>My Info</h2>
+      # <div id="addtolist" style="display: block;">
+      #   <input type="hidden" id="myinfo_manga_id" value="104">
+      #   <table border="0" cellpadding="0" cellspacing="0" width="100%">
+      #   <tr>
+      #     <td class="spaceit">Status:</td>
+      #     <td class="spaceit"><select id="myinfo_status" name="myinfo_status" onchange="checkComp(this);" class="inputtext"><option value="1" selected>Reading</option><option value="2" >Completed</option><option value="3" >On-Hold</option><option value="4" >Dropped</option><option value="6" >Plan to Read</option></select></td>
+      #   </tr>
+      #   <tr>
+      #     <td class="spaceit">Chap. Read:</td>
+      #     <td class="spaceit"><input type="text" id="myinfo_chapters" size="3" maxlength="4" class="inputtext" value="62"> / <span id="totalChaps">0</span></td>
+      #   </tr>
+      #   <tr>
+      #     <td class="spaceit">Vol. Read:</td>
+      #     <td class="spaceit"><input type="text" id="myinfo_volumes" size="3" maxlength="4" class="inputtext" value="5"> / <span id="totalVols">?</span></td>
+      #   </tr>
+      #   <tr>
+      #     <td class="spaceit">Your Score:</td>
+      #     <td class="spaceit"><select id="myinfo_score" name="myinfo_score" class="inputtext"><option value="0">Select</option><option value="10" selected>(10) Masterpiece</option><option value="9" >(9) Great</option><option value="8" >(8) Very Good</option><option value="7" >(7) Good</option><option value="6" >(6) Fine</option><option value="5" >(5) Average</option><option value="4" >(4) Bad</option><option value="3" >(3) Very Bad</option><option value="2" >(2) Horrible</option><option value="1" >(1) Unwatchable</option></select></td>
+      #   </tr>
+      #   <tr>
+      #     <td>&nbsp;</td>
+      #     <td><input type="button" name="myinfo_submit" value="Update" onclick="myinfo_updateInfo();" class="inputButton"> <small><a href="http://www.myanimelist.net/panel.php?go=editmanga&id=75054">Edit Details</a></small></td>
+      #   </tr>
+      #   </table>
+      # </div>
+      read_status_select_node = doc.at('select#myinfo_status')
+      if read_status_select_node && (selected_option = read_status_select_node.at('option[selected="selected"]'))
+        manga.read_status = selected_option['value']
+      end
+      chapters_node = doc.at('input#myinfo_chapters')
+      if chapters_node
+        manga.chapters_read = chapters_node['value'].to_i
+      end
+      volumes_node = doc.at('input#myinfo_volumes')
+      if volumes_node
+        manga.volumes_read = volumes_node['value'].to_i
+      end  
+      score_select_node = doc.at('select#myinfo_score')
+      if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
+        manga.score = selected_option['value'].to_i
+      end
+
       manga
     rescue MyAnimeList::NotFoundError => e
       raise
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
+    end
+
+    def read_status=(value)
+      @read_status = case value
+      when /reading/i, '1', 1
+        :reading
+      when /completed/i, '2', 2
+        :completed
+      when /on-hold/i, /onhold/i, '3', 3
+        :"on-hold"
+      when /dropped/i, '4', 4
+        :dropped
+      when /plan/i, '6', 6
+        :"plan to read"
+      else
+        :reading
+      end
     end
 
     def status=(value)
@@ -292,7 +354,11 @@ module MyAnimeList
         :tags => tags,
         :synopsis => synopsis,
         :anime_adaptations => anime_adaptations,
-        :related_manga => related_manga
+        :related_manga => related_manga,
+        :read_status => read_status,
+        :chapters_read => chapters_read,
+        :volumes_read => volumes_read,
+        :score => score
       }
     end
 
@@ -317,6 +383,10 @@ module MyAnimeList
         xml.popularity_rank popularity_rank
         xml.favorited_count favorited_count
         xml.synopsis synopsis
+        xml.read_status read_status.to_s
+        xml.chapters_read chapters_read
+        xml.volumes_read volumes_read
+        xml.score score
 
         other_titles[:synonyms].each do |title|
           xml.synonym title
