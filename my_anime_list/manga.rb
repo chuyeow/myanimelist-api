@@ -175,6 +175,43 @@ module MyAnimeList
         end
       end
 
+      # Related Manga
+      # Example:
+      # <h2>Related Manga</h2>
+      #   Adaptation: <a href="http://myanimelist.net/anime/66/Azumanga_Daioh">Azumanga Daioh</a><br>
+      #   Side story: <a href="http://myanimelist.net/manga/13992/Azumanga_Daioh:_Supplementary_Lessons">Azumanga Daioh: Supplementary Lessons</a><br>
+      related_manga_h2 = right_column_nodeset.at('//h2[text()="Related Manga"]')
+      if related_manga_h2
+
+        # Get all text between <h2>Related Manga</h2> and the next <h2> tag.
+        match_data = related_manga_h2.parent.to_s.match(%r{<h2>Related Manga</h2>(.+?)<h2>}m)
+
+        if match_data
+          related_anime_text = match_data[1]
+
+          if related_anime_text.match %r{Adaptation: ?(<a .+?)<br}
+            $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+              manga.anime_adaptations << {
+                :anime_id => anime_id,
+                :title => title,
+                :url => url
+              }
+            end
+          end
+
+          if related_anime_text.match %r{.+: ?(<a .+?)<br}
+            $1.scan(%r{<a href="(http://myanimelist.net/manga/(\d+)/.*?)">(.+?)</a>}) do |url, manga_id, title|
+              manga.related_manga << {
+                :manga_id => manga_id,
+                :title => title,
+                :url => url
+              }
+            end
+          end
+
+        end
+      end
+
       manga
     rescue MyAnimeList::NotFoundError => e
       raise
@@ -228,6 +265,14 @@ module MyAnimeList
       @tags ||= []
     end
 
+    def anime_adaptations
+      @anime_adaptations ||= []
+    end
+
+    def related_manga
+      @related_manga ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -245,7 +290,9 @@ module MyAnimeList
         :popularity_rank => popularity_rank,
         :favorited_count => favorited_count,
         :tags => tags,
-        :synopsis => synopsis
+        :synopsis => synopsis,
+        :anime_adaptations => anime_adaptations,
+        :related_manga => related_manga
       }
     end
 
@@ -286,6 +333,22 @@ module MyAnimeList
         end
         tags.each do |tag|
           xml.tag tag
+        end
+
+        anime_adaptations.each do |anime|
+          xml.anime_adaptation do |xml|
+            xml.anime_id  anime[:anime_id]
+            xml.title     anime[:title]
+            xml.url       anime[:url]
+          end
+        end
+
+        related_manga.each do |manga|
+          xml.related_manga do |xml|
+            xml.manga_id  manga[:manga_id]
+            xml.title     manga[:title]
+            xml.url       manga[:url]
+          end
         end
       end
 
