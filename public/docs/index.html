@@ -68,6 +68,7 @@
         <li><a href="#read_upcoming_anime">/anime/upcoming - Read the upcoming anime</a></li>
         <li><a href="#read_just_added_anime">/anime/just_added - Read the anime that have just been added to MyAnimeList</a></li>
         <li><a href="#read_manga_list">/mangalist - Read a manga list</a></li>
+        <li><a href="#read_manga">/manga - Read a manga's details</a></li>
       </ul>
     </li>
     <li>
@@ -103,6 +104,7 @@
         <th>Example</th>
       </thead>
       <tbody>
+
         <tr>
           <td><a href="#read_anime_list">/animelist/<strong>username</strong></a></td>
           <td>Fetch a user's anime list</td>
@@ -156,6 +158,13 @@
           <td>Fetch a user's manga list</td>
           <td><a href="http://mal-api.com/mangalist/xinil">http://mal-api.com/mangalist/xinil</a></td>
         </tr>
+
+        <tr>
+          <td><a href="#read_manga">/manga/<strong>manga_id</strong></a></td>
+          <td>Fetch a manga's details</td>
+          <td><a href="http://mal-api.com/manga/104">http://mal-api.com/anime/104</a></td>
+        </tr>
+
       </tbody>
     </table>
 
@@ -260,7 +269,7 @@
       <li><code>popularity_rank</code> - Rank of this anime based on its popularity, i.e. number of users that have added this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>image_url</code> - URL to an image for this anime.</li>
       <li><code>type</code> - Type of anime. Possible values: <code>TV</code>, <code>Movie</code>, <code>OVA</code>, <code>ONA</code>, <code>Special</code>, <code>Music</code>.</li>
-      <li><code>episodes</code> - Number of episodes.</li>
+      <li><code>episodes</code> - Number of episodes. <code>null</code> is returned if the number of episodes is known.</li>
       <li><code>status</code> - Airing status of this anime. Possible values: <code>finished airing</code>, <code>currently airing</code>, <code>not yet aired</code>.</li>
       <li><code>classification</code> - Classification or rating of this anime. This is a freeform text field, with possible values like: <code>R - 17+ (violence &amp; profanity)</code>, <code>PG - Children</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>members_score</code> - Weighted score members of MyAnimeList have given to this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
@@ -320,6 +329,14 @@
       <li>
         <code>manga</code> - A list of <a href="#type_manga">manga</a>.
       </li>
+    </ul>
+
+
+    <h4 id="type_manga">Manga</h4>
+
+    <ul>
+      <li><code>id</code> - The manga ID.</li>
+      <li><code>title</code> - The manga title.</li>
     </ul>
 
   </div>
@@ -567,6 +584,25 @@
     <p>The response is a <a href="#type_manga_list">manga list</a>.</p>
   </div>
 
+
+  <div class="section">
+    <h3 id="read_manga">/manga - Read a manga's details</h3>
+
+    <p>Retrieve details for the manga with the given manga id:</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/manga/<strong>manga_id</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/manga/104">http://mal-api.com/manga/104</a></p>
+    </blockquote>
+
+    <p>The response is an <a href="#type_manga">manga</a>.</p>
+
+    <p>The following optional parameters are supported:</p>
+    <ul>
+      <li><code>mine=1</code> - If specified, include the authenticated user's manga details (e.g. user's score, chapters read, volumes read). Requires <a href="#authentication">authentication</a>. See <a href="#type_manga">manga response type</a>.</li>
+    </ul>
+  </div>
 
 
   <h2 id="write_methods">Writing data to MyAnimeList</h2>

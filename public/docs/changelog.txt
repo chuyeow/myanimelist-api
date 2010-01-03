@@ -1,5 +1,6 @@
 3 January 2010
 --------------
+* Added API method /manga/manga_id for retrieving details of a single manga.
 * The anime "episodes" attribute now returns null (for JSON format responses) or an empty
   <episodes> tag in cases where the number of episodes is "Unknown" on MyAnimeList.net.
 
