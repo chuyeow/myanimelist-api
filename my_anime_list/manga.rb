@@ -3,7 +3,7 @@ module MyAnimeList
     attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
                   :members_score, :members_count, :favorited_count, :synopsis
     attr_reader :type, :status
-    attr_writer :genres, :other_titles, :anime_adaptations, :related_manga
+    attr_writer :genres, :tags, :other_titles, :anime_adaptations, :related_manga
 
     # These attributes are specific to a user-manga pair.
     attr_accessor :volumes_read, :chapters_read, :score
@@ -136,6 +136,18 @@ module MyAnimeList
         manga.favorited_count = node.next.text.strip.gsub(',', '').to_i
       end
 
+      # Popular Tags
+      # Example:
+      # <h2>Popular Tags</h2>
+      # <span style="font-size: 11px;">
+      #   <a href="http://myanimelist.net/manga.php?tag=comedy" style="font-size: 24px" title="241 people tagged with comedy">comedy</a>
+      #   <a href="http://myanimelist.net/manga.php?tag=slice of life" style="font-size: 11px" title="207 people tagged with slice of life">slice of life</a>
+      # </span>
+      if (node = left_column_nodeset.at('//span[preceding-sibling::h2[text()="Popular Tags"]]'))
+        node.search('a').each do |a|
+          manga.tags << a.text
+        end
+      end
 
       manga
     rescue MyAnimeList::NotFoundError => e
@@ -186,6 +198,10 @@ module MyAnimeList
       @genres ||= []
     end
 
+    def tags
+      @tags ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -201,7 +217,8 @@ module MyAnimeList
         :members_score => members_score,
         :members_count => members_count,
         :popularity_rank => popularity_rank,
-        :favorited_count => favorited_count
+        :favorited_count => favorited_count,
+        :tags => tags
       }
     end
 
@@ -217,6 +234,14 @@ module MyAnimeList
         xml.title title
         xml.rank rank
         xml.image_url image_url
+        xml.type type.to_s
+        xml.status status.to_s
+        xml.volumes volumes
+        xml.chapters chapters
+        xml.members_score members_score
+        xml.members_count members_count
+        xml.popularity_rank popularity_rank
+        xml.favorited_count favorited_count
 
         other_titles[:synonyms].each do |title|
           xml.synonym title
@@ -227,6 +252,13 @@ module MyAnimeList
         other_titles[:japanese].each do |title|
           xml.japanese_title title
         end if other_titles[:japanese]
+
+        genres.each do |genre|
+          xml.genre genre
+        end
+        tags.each do |tag|
+          xml.tag tag
+        end
       end
 
       xml.target!
