@@ -92,13 +92,8 @@ module MyAnimeList
       #   <a href="http://myanimelist.net/people/1939/Kiyohiko_Azuma">Azuma, Kiyohiko</a> (Story & Art)
       # </div>
       # <div class="spaceit"><span class="dark_text">Serialization:</span>
-      #   <a href="http://myanimelist.net/manga.php?mid=23">Dengeki Daioh (Monthly)</a></div><br />
-      #   <h2>Statistics</h2><div><span class="dark_text">Score:</span> 8.90<sup><small>1</small></sup> <small>(scored by 4899 users)</small>
+      #   <a href="http://myanimelist.net/manga.php?mid=23">Dengeki Daioh (Monthly)</a>
       # </div>
-      # <div class="spaceit"><span class="dark_text">Ranked:</span> #8<sup><small>2</small></sup></div>
-      # <div><span class="dark_text">Popularity:</span> #32</div>
-      # <div class="spaceit"><span class="dark_text">Members:</span> 8,344</div>
-      # <div><span class="dark_text">Favorites:</span> 1,700</div>
       if (node = left_column_nodeset.at('//span[text()="Type:"]')) && node.next
         manga.type = node.next.text.strip
       end
@@ -113,6 +108,34 @@ module MyAnimeList
       if (node = left_column_nodeset.at('//span[text()="Status:"]')) && node.next
         manga.status = node.next.text.strip
       end
+      if node = left_column_nodeset.at('//span[text()="Genres:"]')
+        node.parent.search('a').each do |a|
+          manga.genres << a.text.strip
+        end
+      end
+
+      # Statistics
+      # Example:
+      # <h2>Statistics</h2>
+      # <div><span class="dark_text">Score:</span> 8.90<sup><small>1</small></sup> <small>(scored by 4899 users)</small>
+      # </div>
+      # <div class="spaceit"><span class="dark_text">Ranked:</span> #8<sup><small>2</small></sup></div>
+      # <div><span class="dark_text">Popularity:</span> #32</div>
+      # <div class="spaceit"><span class="dark_text">Members:</span> 8,344</div>
+      # <div><span class="dark_text">Favorites:</span> 1,700</div>
+      if (node = left_column_nodeset.at('//span[text()="Score:"]')) && node.next
+        manga.members_score = node.next.text.strip.to_f
+      end
+      if (node = left_column_nodeset.at('//span[text()="Popularity:"]')) && node.next
+        manga.popularity_rank = node.next.text.strip.sub('#', '').gsub(',', '').to_i
+      end
+      if (node = left_column_nodeset.at('//span[text()="Members:"]')) && node.next
+        manga.members_count = node.next.text.strip.gsub(',', '').to_i
+      end
+      if (node = left_column_nodeset.at('//span[text()="Favorites:"]')) && node.next
+        manga.favorited_count = node.next.text.strip.gsub(',', '').to_i
+      end
+
 
       manga
     rescue MyAnimeList::NotFoundError => e
@@ -159,6 +182,10 @@ module MyAnimeList
       @other_titles ||= {}
     end
 
+    def genres
+      @genres ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -170,6 +197,11 @@ module MyAnimeList
         :status => status,
         :volumes => volumes,
         :chapters => chapters,
+        :genres => genres,
+        :members_score => members_score,
+        :members_count => members_count,
+        :popularity_rank => popularity_rank,
+        :favorited_count => favorited_count
       }
     end
 
