@@ -213,7 +213,7 @@ module MyAnimeList
         :completed
       when /on-hold/i, /onhold/i, '3', 3
         :"on-hold"
-      when /dropped/i, '4', 3
+      when /dropped/i, '4', 4
         :dropped
       when /plan to watch/i, /plantowatch/i, '6', 6
         :"plan to watch"
