@@ -2,7 +2,7 @@ module MyAnimeList
   class Manga
     attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
                   :members_score, :members_count, :favorited_count, :synopsis
-    attr_reader :status
+    attr_reader :type, :status
     attr_writer :genres, :other_titles, :anime_adaptations, :related_manga
 
     # These attributes are specific to a user-manga pair.
@@ -75,6 +75,45 @@ module MyAnimeList
         manga.other_titles[:japanese] = node.next.text.strip.split(/,\s?/)
       end
 
+
+      # Information section.
+      # Example:
+      # <h2>Information</h2>
+      # <div><span class="dark_text">Type:</span> Manga</div>
+      # <div class="spaceit"><span class="dark_text">Volumes:</span> Unknown</div>
+      # <div><span class="dark_text">Chapters:</span> Unknown</div>
+      # <div class="spaceit"><span class="dark_text">Status:</span> Publishing</div>
+      # <div><span class="dark_text">Published:</span> Mar  21, 2003 to ?</div>
+      # <div class="spaceit"><span class="dark_text">Genres:</span>
+      #   <a href="http://myanimelist.net/manga.php?genre[]=4">Comedy</a>,
+      #   <a href="http://myanimelist.net/manga.php?genre[]=36">Slice of Life</a>
+      # </div>
+      # <div><span class="dark_text">Authors:</span>
+      #   <a href="http://myanimelist.net/people/1939/Kiyohiko_Azuma">Azuma, Kiyohiko</a> (Story & Art)
+      # </div>
+      # <div class="spaceit"><span class="dark_text">Serialization:</span>
+      #   <a href="http://myanimelist.net/manga.php?mid=23">Dengeki Daioh (Monthly)</a></div><br />
+      #   <h2>Statistics</h2><div><span class="dark_text">Score:</span> 8.90<sup><small>1</small></sup> <small>(scored by 4899 users)</small>
+      # </div>
+      # <div class="spaceit"><span class="dark_text">Ranked:</span> #8<sup><small>2</small></sup></div>
+      # <div><span class="dark_text">Popularity:</span> #32</div>
+      # <div class="spaceit"><span class="dark_text">Members:</span> 8,344</div>
+      # <div><span class="dark_text">Favorites:</span> 1,700</div>
+      if (node = left_column_nodeset.at('//span[text()="Type:"]')) && node.next
+        manga.type = node.next.text.strip
+      end
+      if (node = left_column_nodeset.at('//span[text()="Volumes:"]')) && node.next
+        manga.volumes = node.next.text.strip.gsub(',', '').to_i
+        manga.volumes = nil if manga.volumes == 0
+      end
+      if (node = left_column_nodeset.at('//span[text()="Chapters:"]')) && node.next
+        manga.chapters = node.next.text.strip.gsub(',', '').to_i
+        manga.chapters = nil if manga.chapters == 0
+      end
+      if (node = left_column_nodeset.at('//span[text()="Status:"]')) && node.next
+        manga.status = node.next.text.strip
+      end
+
       manga
     rescue MyAnimeList::NotFoundError => e
       raise
@@ -84,14 +123,35 @@ module MyAnimeList
 
     def status=(value)
       @status = case value
-      when /finished/i
+      when '2', 2, /finished/i
         :finished
-      when /publishing/i
+      when '1', 1, /publishing/i
         :publishing
-      when /not yet published/i
-        :"Not yet published"
+      when '3', 3, /not yet published/i
+        :"not yet published"
       else
         :finished
+      end
+    end
+
+    def type=(value)
+      @type = case value
+      when /manga/i, '1', 1
+        :Manga
+      when /novel/i, '2', 2
+        :Novel
+      when /one shot/i, '3', 3
+        :"One Shot"
+      when /doujin/i, '4', 4
+        :Doujin
+      when /manwha/i, '5', 5
+        :Manwha
+      when /manhua/i, '6', 6
+        :Manhua
+      when /OEL/i, '7', 7 # "OEL manga = Original English-language manga"
+        :OEL
+      else
+        :Manga
       end
     end
 
@@ -105,7 +165,11 @@ module MyAnimeList
         :title => title,
         :other_titles => other_titles,
         :rank => rank,
-        :image_url => image_url
+        :image_url => image_url,
+        :type => type,
+        :status => status,
+        :volumes => volumes,
+        :chapters => chapters,
       }
     end
 
