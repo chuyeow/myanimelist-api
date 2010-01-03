@@ -269,7 +269,7 @@
       <li><code>popularity_rank</code> - Rank of this anime based on its popularity, i.e. number of users that have added this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>image_url</code> - URL to an image for this anime.</li>
       <li><code>type</code> - Type of anime. Possible values: <code>TV</code>, <code>Movie</code>, <code>OVA</code>, <code>ONA</code>, <code>Special</code>, <code>Music</code>.</li>
-      <li><code>episodes</code> - Number of episodes. <code>null</code> is returned if the number of episodes is known.</li>
+      <li><code>episodes</code> - Number of episodes. <code>null</code> is returned if the number of episodes is unknown.</li>
       <li><code>status</code> - Airing status of this anime. Possible values: <code>finished airing</code>, <code>currently airing</code>, <code>not yet aired</code>.</li>
       <li><code>classification</code> - Classification or rating of this anime. This is a freeform text field, with possible values like: <code>R - 17+ (violence &amp; profanity)</code>, <code>PG - Children</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>members_score</code> - Weighted score members of MyAnimeList have given to this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
@@ -337,6 +337,52 @@
     <ul>
       <li><code>id</code> - The manga ID.</li>
       <li><code>title</code> - The manga title.</li>
+      <li>
+        <code>other_titles</code> - A hash/dictionary containing other titles this manga has.
+        <ul>
+          <li><code>synonyms</code> - A list of synonym(s) of the manga's title.</li>
+          <li><code>english</code> - A list of English title(s).</li>
+          <li><code>japanese</code> - A list of Japanese title(s).</li>
+        </ul>
+      </li>
+      <li><code>rank</code> - Global rank of this manga.</li>
+      <li><code>popularity_rank</code> - Rank of this manga based on its popularity, i.e. number of users that have added this manga.</li>
+      <li><code>image_url</code> - URL to an image for this manga.</li>
+      <li><code>type</code> - Type of manga. Possible values: <code>Manga</code>, <code>Novel</code>, <code>One Shot</code>, <code>Doujin</code>, <code>Manwha</code>, <code>Manhua</code>, <code>OEL</code> ("OEL manga" refers to "Original English-Language manga").</li>
+      <li><code>chapters</code> - Number of chapters. <code>null</code> is returned if the number of chapters is unknown.</li>
+      <li><code>volumes</code> - Number of volumes. <code>null</code> is returned if the number of volumes is unknown.</li>
+      <li><code>status</code> - Publishing status of this anime. Possible values: <code>finished</code>, <code>publishing</code>, <code>not yet published</code>.</li>
+      <li><code>members_score</code> - Weighted score members of MyAnimeList have given to this manga.</li>
+      <li><code>members_count</code> - Number of members who have this manga on their list.</li>
+      <li><code>favorited_count</code> - Number of members who have this manga marked as one of their favorites.</li>
+      <li><code>synopsis</code> - Text describing the manga.</li>
+      <li><code>genres</code> - A list of genres for this manga, e.g. <code>["Comedy", "Slice of Life"]</code>.</li>
+      <li><code>tags</code> - A list of popular tags for this manga, e.g. <code>["comedy", "slice of life"]</code>.</li>
+
+      <li>
+        <code>anime_adaptations</code> - A list of anime adaptations of this anime (or conversely, anime from which this manga is adapted).
+        <ul>
+          <li><code>anime_id</code> - ID of the anime.</li>
+          <li><code>title</code> - Title of the anime.</li>
+          <li><code>url</code> - URL to the anime on the MyAnimeList website.</li>
+        </ul>
+      </li>
+      <li>
+        <code>related_manga</code> - A list of related manga.
+        <ul>
+          <li><code>manga_id</code> - ID of the manga.</li>
+          <li><code>title</code> - Title of the manga.</li>
+          <li><code>url</code> - URL to the manga on the MyAnimeList website.</li>
+        </ul>
+      </li>
+    </ul>
+
+    <p>These additional properties are available for authenticated users who have the requested manga on their manga list:</p>
+    <ul>
+      <li><code>read_status</code> - User's read status of the anime. This is a string that is one of: <code>reading</code>, <code>completed</code>, <code>on-hold</code>, <code>dropped</code>, <code>plan to read</code>.</li>
+      <li><code>chapters_read</code> - Number of chapters already read by the user.</li>
+      <li><code>volumes_read</code> - Number of volumes already read by the user.</li>
+      <li><code>score</code> - User's score for the manga, from 1 to 10.</li>
     </ul>
 
   </div>
@@ -397,7 +443,7 @@
     <h3 id="read_anime_list">/animelist - Read an anime list</h3>
 
     <p>Fetch an anime list with the given username:</p>
-  
+
     <blockquote>
       <p><code>http://mal-api.com/animelist/<strong>username</strong></code></p>
 
@@ -576,7 +622,7 @@
     <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
 
     <p>Fetch a manga list with the given username:</p>
-  
+
     <blockquote>
       <p><code>http://mal-api.com/mangalist/<strong>username</strong></code></p>
 
