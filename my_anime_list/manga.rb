@@ -2,6 +2,7 @@ module MyAnimeList
   class Manga
     attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
                   :members_score, :members_count, :favorited_count, :synopsis
+    attr_accessor :listed_manga_id
     attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :anime_adaptations, :related_manga
 
@@ -255,6 +256,10 @@ module MyAnimeList
       score_select_node = doc.at('select#myinfo_score')
       if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
         manga.score = selected_option['value'].to_i
+      end
+      listed_manga_id_node = doc.at('//a[text()="Edit Details"]')
+      if listed_manga_id_node
+        manga.listed_manga_id = listed_manga_id_node['href'].match('id=(\d+)')[1].to_i
       end
 
       manga
