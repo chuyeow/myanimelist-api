@@ -469,6 +469,7 @@ module MyAnimeList
         end
         if (node = left_column_nodeset.at('//span[text()="Episodes:"]')) && node.next
           anime.episodes = node.next.text.strip.gsub(',', '').to_i
+          anime.episodes = nil if anime.episodes == 0
         end
         if (node = left_column_nodeset.at('//span[text()="Status:"]')) && node.next
           anime.status = node.next.text.strip

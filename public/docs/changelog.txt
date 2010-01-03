@@ -1,3 +1,8 @@
+3 January 2010
+--------------
+* The anime "episodes" attribute now returns null (for JSON format responses) or an empty
+  <episodes> tag in cases where the number of episodes is "Unknown" on MyAnimeList.net.
+
 13 September 2009
 -----------------
 * Added support for XML output. Send along the "format=xml" parameter in your requests.
