@@ -149,6 +149,32 @@ module MyAnimeList
         end
       end
 
+
+      # -
+      # Extract from sections on the right column: Synopsis, Related Manga
+      # -
+      right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td/div/table')
+
+      # Synopsis
+      # Example:
+      # <h2>Synopsis</h2>
+      # Yotsuba's daily life is full of adventure. She is energetic, curious, and a bit odd &ndash; odd enough to be called strange by her father as well as ignorant of many things that even a five-year-old should know. Because of this, the most ordinary experience can become an adventure for her. As the days progress, she makes new friends and shows those around her that every day can be enjoyable.<br />
+      # <br />
+      # [Written by MAL Rewrite]
+      synopsis_h2 = right_column_nodeset.at('//h2[text()="Synopsis"]')
+      if synopsis_h2
+        node = synopsis_h2.next
+        while node
+          if manga.synopsis
+            manga.synopsis << node.to_s
+          else
+            manga.synopsis = node.to_s
+          end
+
+          node = node.next
+        end
+      end
+
       manga
     rescue MyAnimeList::NotFoundError => e
       raise
@@ -218,7 +244,8 @@ module MyAnimeList
         :members_count => members_count,
         :popularity_rank => popularity_rank,
         :favorited_count => favorited_count,
-        :tags => tags
+        :tags => tags,
+        :synopsis => synopsis
       }
     end
 
@@ -242,6 +269,7 @@ module MyAnimeList
         xml.members_count members_count
         xml.popularity_rank popularity_rank
         xml.favorited_count favorited_count
+        xml.synopsis synopsis
 
         other_titles[:synonyms].each do |title|
           xml.synonym title
