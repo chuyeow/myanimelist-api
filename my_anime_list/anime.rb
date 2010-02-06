@@ -160,7 +160,7 @@ module MyAnimeList
         # Otherwise, parse the table of search results.
 
         doc = Nokogiri::HTML(response.body)
-        results_table = doc.xpath('//div[@id="rightbody"]/div/div/table')
+        results_table = doc.xpath('//div[@id="_nopad"]/div[2]/table')
 
         results_table.xpath('//tr').each do |results_row|
 
@@ -414,7 +414,7 @@ module MyAnimeList
         anime.title = doc.at(:h1).children.find { |o| o.text? }.to_s
         anime.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
 
-        if image_node = doc.at('div#rightcontent a img')
+        if image_node = doc.at('div#content a img')
           anime.image_url = image_node['src']
         end
 
@@ -428,7 +428,7 @@ module MyAnimeList
         # <div class="spaceit_pad"><span class="dark_text">English:</span> Lucky Star/div>
         # <div class="spaceit_pad"><span class="dark_text">Synonyms:</span> Lucky Star, Raki ☆ Suta</div>
         # <div class="spaceit_pad"><span class="dark_text">Japanese:</span> らき すた</div>
-        left_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
+        left_column_nodeset = doc.xpath('//div[@id="content"]/table/tr/td[@class="borderClass"]')
 
         if (node = left_column_nodeset.at('//span[text()="English:"]')) && node.next
           anime.other_titles[:english] = node.next.text.strip.split(/,\s?/)
@@ -527,7 +527,7 @@ module MyAnimeList
         # Extract from sections on the right column: Synopsis, Related Anime, Characters & Voice Actors, Reviews
         # Recommendations.
         # -
-        right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td/div/table')
+        right_column_nodeset = doc.xpath('//div[@id="content"]/table/tr/td/div/table')
 
         # Synopsis
         # Example:

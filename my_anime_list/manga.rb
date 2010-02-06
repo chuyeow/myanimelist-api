@@ -51,14 +51,14 @@ module MyAnimeList
       manga.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
 
       # Image URL.
-      if image_node = doc.at('div#rightcontent a img')
+      if image_node = doc.at('div#content a img')
         manga.image_url = image_node['src']
       end
 
       # -
       # Extract from sections on the left column: Alternative Titles, Information, Statistics, Popular Tags.
       # -
-      left_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td[@class="borderClass"]')
+      left_column_nodeset = doc.xpath('//div[@id="content"]/table/tr/td[@class="borderClass"]')
 
       # Alternative Titles section.
       # Example:
@@ -154,7 +154,7 @@ module MyAnimeList
       # -
       # Extract from sections on the right column: Synopsis, Related Manga
       # -
-      right_column_nodeset = doc.xpath('//div[@id="rightcontent"]/table/tr/td/div/table')
+      right_column_nodeset = doc.xpath('//div[@id="content"]/table/tr/td/div/table')
 
       # Synopsis
       # Example:
