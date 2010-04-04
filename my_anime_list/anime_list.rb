@@ -3,7 +3,7 @@ module MyAnimeList
     attr_writer :anime
 
     def self.anime_list_of(username)
-      curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{username}&status=all")
+      curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{username}&status=all&type=anime")
       curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
       begin
         curl.perform

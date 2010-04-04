@@ -361,6 +361,7 @@ module MyAnimeList
         :anime_adaptations => anime_adaptations,
         :related_manga => related_manga,
         :read_status => read_status,
+        :listed_manga_id => listed_manga_id,
         :chapters_read => chapters_read,
         :volumes_read => volumes_read,
         :score => score
