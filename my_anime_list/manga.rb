@@ -26,15 +26,191 @@ module MyAnimeList
       # Check for missing manga.
       raise MyAnimeList::NotFoundError.new("Manga with ID #{id} doesn't exist.", nil) if response =~ /No manga found/i
 
-      manga = Manga.new
+      manga = parse_manga_response(response)
 
+      manga
+    rescue MyAnimeList::NotFoundError => e
+      raise
+    rescue Exception => e
+      raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
+    end
+
+    def read_status=(value)
+      @read_status = case value
+      when /reading/i, '1', 1
+        :reading
+      when /completed/i, '2', 2
+        :completed
+      when /on-hold/i, /onhold/i, '3', 3
+        :"on-hold"
+      when /dropped/i, '4', 4
+        :dropped
+      when /plan/i, '6', 6
+        :"plan to read"
+      else
+        :reading
+      end
+    end
+
+    def status=(value)
+      @status = case value
+      when '2', 2, /finished/i
+        :finished
+      when '1', 1, /publishing/i
+        :publishing
+      when '3', 3, /not yet published/i
+        :"not yet published"
+      else
+        :finished
+      end
+    end
+
+    def type=(value)
+      @type = case value
+      when /manga/i, '1', 1
+        :Manga
+      when /novel/i, '2', 2
+        :Novel
+      when /one shot/i, '3', 3
+        :"One Shot"
+      when /doujin/i, '4', 4
+        :Doujin
+      when /manwha/i, '5', 5
+        :Manwha
+      when /manhua/i, '6', 6
+        :Manhua
+      when /OEL/i, '7', 7 # "OEL manga = Original English-language manga"
+        :OEL
+      else
+        :Manga
+      end
+    end
+
+    def other_titles
+      @other_titles ||= {}
+    end
+
+    def genres
+      @genres ||= []
+    end
+
+    def tags
+      @tags ||= []
+    end
+
+    def anime_adaptations
+      @anime_adaptations ||= []
+    end
+
+    def related_manga
+      @related_manga ||= []
+    end
+
+    def attributes
+      {
+        :id => id,
+        :title => title,
+        :other_titles => other_titles,
+        :rank => rank,
+        :image_url => image_url,
+        :type => type,
+        :status => status,
+        :volumes => volumes,
+        :chapters => chapters,
+        :genres => genres,
+        :members_score => members_score,
+        :members_count => members_count,
+        :popularity_rank => popularity_rank,
+        :favorited_count => favorited_count,
+        :tags => tags,
+        :synopsis => synopsis,
+        :anime_adaptations => anime_adaptations,
+        :related_manga => related_manga,
+        :read_status => read_status,
+        :listed_manga_id => listed_manga_id,
+        :chapters_read => chapters_read,
+        :volumes_read => volumes_read,
+        :score => score
+      }
+    end
+
+    def to_json
+      attributes.to_json
+    end
+
+    def to_xml(options = {})
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct! unless options[:skip_instruct]
+      xml.anime do |xml|
+        xml.id id
+        xml.title title
+        xml.rank rank
+        xml.image_url image_url
+        xml.type type.to_s
+        xml.status status.to_s
+        xml.volumes volumes
+        xml.chapters chapters
+        xml.members_score members_score
+        xml.members_count members_count
+        xml.popularity_rank popularity_rank
+        xml.favorited_count favorited_count
+        xml.synopsis synopsis
+        xml.read_status read_status.to_s
+        xml.chapters_read chapters_read
+        xml.volumes_read volumes_read
+        xml.score score
+
+        other_titles[:synonyms].each do |title|
+          xml.synonym title
+        end if other_titles[:synonyms]
+        other_titles[:english].each do |title|
+          xml.english_title title
+        end if other_titles[:english]
+        other_titles[:japanese].each do |title|
+          xml.japanese_title title
+        end if other_titles[:japanese]
+
+        genres.each do |genre|
+          xml.genre genre
+        end
+        tags.each do |tag|
+          xml.tag tag
+        end
+
+        anime_adaptations.each do |anime|
+          xml.anime_adaptation do |xml|
+            xml.anime_id  anime[:anime_id]
+            xml.title     anime[:title]
+            xml.url       anime[:url]
+          end
+        end
+
+        related_manga.each do |manga|
+          xml.related_manga do |xml|
+            xml.manga_id  manga[:manga_id]
+            xml.title     manga[:title]
+            xml.url       manga[:url]
+          end
+        end
+      end
+
+      xml.target!
+    end
+
+    private
+    
+    def self.parse_manga_response(response)
+      
       doc = Nokogiri::HTML(response)
+
+      manga = Manga.new
 
       # Manga ID.
       # Example:
       # <input type="hidden" value="104" name="mid" />
       manga_id_input = doc.at('input[@name="mid"]')
       if manga_id_input
+
         manga.id = manga_id_input['value'].to_i
       else
         details_link = doc.at('//a[text()="Details"]')
@@ -263,172 +439,6 @@ module MyAnimeList
       end
 
       manga
-    rescue MyAnimeList::NotFoundError => e
-      raise
-    rescue Exception => e
-      raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
-    end
-
-    def read_status=(value)
-      @read_status = case value
-      when /reading/i, '1', 1
-        :reading
-      when /completed/i, '2', 2
-        :completed
-      when /on-hold/i, /onhold/i, '3', 3
-        :"on-hold"
-      when /dropped/i, '4', 4
-        :dropped
-      when /plan/i, '6', 6
-        :"plan to read"
-      else
-        :reading
-      end
-    end
-
-    def status=(value)
-      @status = case value
-      when '2', 2, /finished/i
-        :finished
-      when '1', 1, /publishing/i
-        :publishing
-      when '3', 3, /not yet published/i
-        :"not yet published"
-      else
-        :finished
-      end
-    end
-
-    def type=(value)
-      @type = case value
-      when /manga/i, '1', 1
-        :Manga
-      when /novel/i, '2', 2
-        :Novel
-      when /one shot/i, '3', 3
-        :"One Shot"
-      when /doujin/i, '4', 4
-        :Doujin
-      when /manwha/i, '5', 5
-        :Manwha
-      when /manhua/i, '6', 6
-        :Manhua
-      when /OEL/i, '7', 7 # "OEL manga = Original English-language manga"
-        :OEL
-      else
-        :Manga
-      end
-    end
-
-    def other_titles
-      @other_titles ||= {}
-    end
-
-    def genres
-      @genres ||= []
-    end
-
-    def tags
-      @tags ||= []
-    end
-
-    def anime_adaptations
-      @anime_adaptations ||= []
-    end
-
-    def related_manga
-      @related_manga ||= []
-    end
-
-    def attributes
-      {
-        :id => id,
-        :title => title,
-        :other_titles => other_titles,
-        :rank => rank,
-        :image_url => image_url,
-        :type => type,
-        :status => status,
-        :volumes => volumes,
-        :chapters => chapters,
-        :genres => genres,
-        :members_score => members_score,
-        :members_count => members_count,
-        :popularity_rank => popularity_rank,
-        :favorited_count => favorited_count,
-        :tags => tags,
-        :synopsis => synopsis,
-        :anime_adaptations => anime_adaptations,
-        :related_manga => related_manga,
-        :read_status => read_status,
-        :listed_manga_id => listed_manga_id,
-        :chapters_read => chapters_read,
-        :volumes_read => volumes_read,
-        :score => score
-      }
-    end
-
-    def to_json
-      attributes.to_json
-    end
-
-    def to_xml(options = {})
-      xml = Builder::XmlMarkup.new(:indent => 2)
-      xml.instruct! unless options[:skip_instruct]
-      xml.anime do |xml|
-        xml.id id
-        xml.title title
-        xml.rank rank
-        xml.image_url image_url
-        xml.type type.to_s
-        xml.status status.to_s
-        xml.volumes volumes
-        xml.chapters chapters
-        xml.members_score members_score
-        xml.members_count members_count
-        xml.popularity_rank popularity_rank
-        xml.favorited_count favorited_count
-        xml.synopsis synopsis
-        xml.read_status read_status.to_s
-        xml.chapters_read chapters_read
-        xml.volumes_read volumes_read
-        xml.score score
-
-        other_titles[:synonyms].each do |title|
-          xml.synonym title
-        end if other_titles[:synonyms]
-        other_titles[:english].each do |title|
-          xml.english_title title
-        end if other_titles[:english]
-        other_titles[:japanese].each do |title|
-          xml.japanese_title title
-        end if other_titles[:japanese]
-
-        genres.each do |genre|
-          xml.genre genre
-        end
-        tags.each do |tag|
-          xml.tag tag
-        end
-
-        anime_adaptations.each do |anime|
-          xml.anime_adaptation do |xml|
-            xml.anime_id  anime[:anime_id]
-            xml.title     anime[:title]
-            xml.url       anime[:url]
-          end
-        end
-
-        related_manga.each do |manga|
-          xml.related_manga do |xml|
-            xml.manga_id  manga[:manga_id]
-            xml.title     manga[:title]
-            xml.url       manga[:url]
-          end
-        end
-      end
-
-      xml.target!
     end
   end
 end
