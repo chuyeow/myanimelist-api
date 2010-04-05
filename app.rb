@@ -306,6 +306,31 @@ class App < Sinatra::Base
   end
 
 
+  # DELETE /mangalist/manga/#{manga_id}
+  # Delete a manga from user's manga list.
+  delete '/mangalist/manga/:manga_id' do
+    authenticate unless session['cookie_string']
+
+    manga = MyAnimeList::Manga.delete(params[:manga_id], session['cookie_string'])
+
+    if manga
+      case params[:format]
+      when 'xml'
+        manga.to_xml
+      else
+        manga.to_json # Return HTTP 200 OK and the original manga if successful.
+      end
+    else
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>unknown-error</code></error>'
+      else
+        halt 400, { :error => 'unknown-error' }.to_json
+      end
+    end
+  end
+
+
   # GET /mangalist/#{username}
   # Get a user's manga list.
   get '/mangalist/:username' do

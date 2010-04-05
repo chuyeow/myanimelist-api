@@ -77,6 +77,9 @@
         <li><a href="#write_add_anime">Add anime to anime list</a></li>
         <li><a href="#write_update_anime">Update an anime on user's anime list</a></li>
         <li><a href="#write_delete_anime">Delete an anime from user's anime list</a></li>
+        <li><a href="#write_add_manga">Add manga to manga list</a></li>
+        <li><a href="#write_update_manga">Update a manga on user's manga list</a></li>
+        <li><a href="#write_delete_manga">Delete a manga from user's manga list</a></li>
       </ul>
     </li>
     <li>
@@ -202,6 +205,27 @@
           <td nowrap="nowrap"><a href="#write_delete_anime">/animelist/anime/<strong>anime_id</strong></a></td>
           <td><code>DELETE</code></td>
           <td>Delete an anime from user's anime list</td>
+          <td class="args">-</td>
+        </tr>
+
+        <tr>
+          <td nowrap="nowrap"><a href="#write_add_manga">/mangalist/manga</a></td>
+          <td><code>POST</code></td>
+          <td>Add a manga to user's manga list</td>
+          <td class="args"><code>manga_id</code>, <code>status?</code>, <code>chapters?</code>, <code>score?</code></td>
+        </tr>
+
+        <tr>
+          <td nowrap="nowrap"><a href="#write_update_manga">/mangalist/manga/<strong>manga_id</strong></a></td>
+          <td><code>PUT</code></td>
+          <td>Update a manga already on user's manga list</td>
+          <td class="args"><code>status?</code>, <code>chapters?</code>, <code>score?</code></td>
+        </tr>
+
+        <tr>
+          <td nowrap="nowrap"><a href="#write_delete_manga">/mangalist/manga/<strong>manga_id</strong></a></td>
+          <td><code>DELETE</code></td>
+          <td>Delete a manga from user's manga list</td>
           <td class="args">-</td>
         </tr>
       </tbody>
@@ -728,6 +752,86 @@
     <p>Example:</p>
     <blockquote>
       <p><code>DELETE http://mal-api.com/animelist/anime/1887</code></p>
+    </blockquote>
+  </div>
+
+
+  <div class="section">
+    <h3 id="write_add_manga">/mangalist/manga - Add manga to manga list</h3>
+
+    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Adds a manga to a user's manga list:</p>
+
+    <blockquote>
+      <p><code>POST http://mal-api.com/mangalist/manga</code></p>
+    </blockquote>
+
+    <p><strong>Parameters</strong>:</p>
+    <ul>
+      <li><code>manga_id</code> - <strong>required</strong> - ID of manga to add to user's mangalist.</li>
+      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+      <li><code>chapters</code> - Number of chapters read. Default: 0</li>
+      <li><code>score</code> - User's score for an manga. An integer from 1 to 10.</li>
+    </ul>
+
+    <p>Example:</p>
+    <blockquote>
+      <p><code>POST http://mal-api.com/mangalist/manga</code></p>
+      <pre>Request body:
+  <code>manga_id=1887
+  status=watching
+  chapters=12
+  score=9</code></pre>
+    </blockquote>
+  </div>
+
+
+  <div class="section">
+    <h3 id="write_update_manga">/mangalist/manga/<strong>manga_id</strong> - Update a manga on user's manga list</h3>
+
+    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
+
+    <p>Updates a manga already on a user's manga list:</p>
+
+    <blockquote>
+      <p><code>PUT http://mal-api.com/mangalist/manga/<strong>manga_id</strong></code></p>
+    </blockquote>
+
+    <p><strong>Parameters</strong>:</p>
+    <ul>
+      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+      <li><code>chapters</code> - Number of chapters read. Default: 0</li>
+      <li><code>score</code> - User's score for an manga. An integer from 1 to 10.</li>
+    </ul>
+
+    <p>Example:</p>
+    <blockquote>
+      <p><code>PUT http://mal-api.com/mangalist/manga/1887</code></p>
+      <pre>Request body:
+  <code>status=completed
+  chapters=24
+  score=10</code></pre>
+    </blockquote>
+  </div>
+
+
+  <div class="section">
+    <h3 id="write_delete_manga">/mangalist/manga/<strong>manga_id</strong> - Delete a manga from user's manga list</h3>
+
+    <p>Delete a manga from a user's manga list. This removes any record of the manga from a user's manga list and cannot be undone.</p>
+
+    <blockquote>
+      <code>DELETE http://mal-api.com/mangalist/manga/<strong>manga_id</strong></code>
+    </blockquote>
+
+    <p><strong>Parameters</strong>: none.</p>
+
+    <p><strong>Returns</strong>: HTTP 200 OK and the original <a href="#type_manga">manga</a> (this is useful for undoing a delete) if the manga was successfully deleted from mangalist. Otherwise, returns appropriate HTTP response code and an <a href="#errors">error message</a>.</p>
+
+    <p>Example:</p>
+    <blockquote>
+      <p><code>DELETE http://mal-api.com/mangalist/manga/1887</code></p>
     </blockquote>
   </div>
 

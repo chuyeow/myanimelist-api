@@ -35,6 +35,31 @@ module MyAnimeList
       raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
+    def self.delete(id, cookie_string)
+      manga = scrape_manga(id, cookie_string)
+
+      curl = Curl::Easy.new("http://myanimelist.net/panel.php?go=editmanga&id=#{manga.listed_manga_id}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.cookies = cookie_string
+
+      begin
+        curl.http_post(
+          Curl::PostField.content('entry_id', manga.listed_manga_id),
+          Curl::PostField.content('manga_id', id),
+          Curl::PostField.content('submitIt', '3')
+        )
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error deleting manga with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      # Deletion is successful for an HTTP 200 response with this string.
+      if curl.response_code == 200 && curl.body_str =~ /Successfully deleted manga entry/i
+        manga # Return the original manga if successful.
+      else
+        false
+      end
+    end
+
     def read_status=(value)
       @read_status = case value
       when /reading/i, '1', 1
