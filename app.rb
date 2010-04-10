@@ -345,6 +345,42 @@ class App < Sinatra::Base
   end
 
 
+  # GET /manga/search
+  # Search for manga.
+  get '/manga/search' do
+    # Ensure "q" param is given.
+    if params[:q] !~ /\S/
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>q-required</code></error>'
+      else
+        halt 400, { :error => 'q-required' }.to_json
+      end
+    end
+
+    results = MyAnimeList::Manga.search(params[:q])
+
+    case params[:format]
+    when 'xml'
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct!
+
+      xml.results do |xml|
+        xml.query params[:q]
+        xml.count results.size
+
+        results.each do |a|
+          xml << a.to_xml(:skip_instruct => true)
+        end
+      end
+
+      xml.target!
+    else
+      results.to_json
+    end
+  end
+
+
   # Verify that authentication credentials are valid.
   # Returns an HTTP 200 OK response if authentication was successful, or an HTTP 401 response.
   # FIXME This should be rate-limited to avoid brute-force attacks.

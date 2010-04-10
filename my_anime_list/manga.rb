@@ -60,6 +60,77 @@ module MyAnimeList
       end
     end
 
+    def self.search(query)
+
+      begin
+        response = Net::HTTP.start('myanimelist.net', 80) do |http|
+          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}")
+        end
+
+        case response
+        when Net::HTTPRedirection
+          redirected = true
+
+          # Strip everything after the manga ID - in cases where there is a non-ASCII character in the URL,
+          # MyAnimeList.net will return a page that says "Access has been restricted for this account".
+          redirect_url = response['location'].sub(%r{(http://myanimelist.net/manga/\d+)/?.*}, '\1')
+
+          response = Net::HTTP.start('myanimelist.net', 80) do |http|
+            http.get(redirect_url)
+          end
+        end
+
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error searching manga with query '#{query}'. Original exception: #{e.message}", e)
+      end
+
+      results = []
+      if redirected
+        # If there's a single redirect, it means there's only 1 match and MAL is redirecting to the manga's details
+        # page.
+
+        manga = parse_manga_response(response.body)
+        results << manga
+
+      else
+        # Otherwise, parse the table of search results.
+
+        doc = Nokogiri::HTML(response.body)
+        results_table = doc.xpath('//div[@id="_nopad"]/div[2]/table')
+
+        results_table.xpath('//tr').each do |results_row|
+
+          manga_title_node = results_row.at('td a strong')
+          next unless manga_title_node
+          url = manga_title_node.parent['href']
+          next unless url.match %r{http://myanimelist.net/manga/(\d+)/?.*}
+
+          manga = Manga.new
+          manga.id = $1.to_i
+          manga.title = manga_title_node.text
+          if image_node = results_row.at('td a img')
+            manga.image_url = image_node['src']
+          end
+
+          table_cell_nodes = results_row.search('td')
+
+          manga.volumes = table_cell_nodes[3].text.to_i
+          manga.chapters = table_cell_nodes[4].text.to_i
+          manga.members_score = table_cell_nodes[5].text.to_f
+          synopsis_node = results_row.at('div.spaceit_pad')
+          if synopsis_node
+            synopsis_node.search('a').remove
+            manga.synopsis = synopsis_node.text.strip
+          end
+          manga.type = table_cell_nodes[2].text
+
+          results << manga
+        end
+      end
+
+      results
+    end
+
     def read_status=(value)
       @read_status = case value
       when /reading/i, '1', 1

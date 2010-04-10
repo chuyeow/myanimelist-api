@@ -69,6 +69,7 @@
         <li><a href="#read_just_added_anime">/anime/just_added - Read the anime that have just been added to MyAnimeList</a></li>
         <li><a href="#read_manga_list">/mangalist - Read a manga list</a></li>
         <li><a href="#read_manga">/manga - Read a manga's details</a></li>
+        <li><a href="#read_search_manga">/manga/search - Search manga</a></li>
       </ul>
     </li>
     <li>
@@ -166,6 +167,12 @@
           <td><a href="#read_manga">/manga/<strong>manga_id</strong></a></td>
           <td>Fetch a manga's details</td>
           <td><a href="http://mal-api.com/manga/104">http://mal-api.com/anime/104</a></td>
+        </tr>
+
+        <tr>
+          <td><a href="#read_search_manga">/manga/search</a></td>
+          <td>Search for manga matching a query.</td>
+          <td><a href="http://mal-api.com/manga/search?q=berserk">http://mal-api.com/manga/search?q=berserk</a></td>
         </tr>
 
       </tbody>
@@ -672,6 +679,26 @@
     <ul>
       <li><code>mine=1</code> - If specified, include the authenticated user's manga details (e.g. user's score, chapters read, volumes read). Requires <a href="#authentication">authentication</a>. See <a href="#type_manga">manga response type</a>.</li>
     </ul>
+  </div>
+
+
+  <div class="section">
+    <h3 id="read_search_manga">/manga/search - Search manga</h3>
+
+    <p>Search for manga matching a query.</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/manga/search?q=<strong>query</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/manga/search?q=berserk">http://mal-api.com/manga/search?q=berserk</a></p>
+    </blockquote>
+
+    <p>Only 1 required parameter is supported:</p>
+    <ul>
+      <li><code>q</code> - The query (URL encoded).</li>
+    </ul>
+
+    <p>The response is a list of <a href="#type_manga">manga</a>. Only the following manga properties are available: <code>id</code>, <code>title</code>, <code>chapters</code>, <code>volumes</code>, <code>type</code>, <code>synopsis</code>, <code>image_url</code>, <code>members_score</code></p>
   </div>
 
 
