@@ -35,6 +35,71 @@ module MyAnimeList
       raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
     end
 
+    def self.add(id, cookie_string, options)
+      # This is the same as self.update except that the "status" param is required and the URL is
+      # http://myanimelist.net/includes/ajax.inc.php?t=49.
+
+      # Default read_status to 1/reading if not given.
+      options[:status] = 1 if options[:status] !~ /\S/
+      options[:new] = true
+
+      update(id, cookie_string, options)
+    end
+
+    def self.update(id, cookie_string, options)
+
+      # Convert status to the number values that MyAnimeList uses.
+      # 1 = Reading, 2 = Completed, 3 = On-hold, 4 = Dropped, 6 = Plan to Read
+      status = case options[:status]
+      when 'Reading', 'reading', 1
+        1
+      when 'Completed', 'completed', 2
+        2
+      when 'On-hold', 'on-hold', 3
+        3
+      when 'Dropped', 'dropped', 4
+        4
+      when 'Plan to Read', 'plan to read', 6
+        6
+      else
+        1
+      end
+
+      # There're different URLs to POST to for adding and updating a manga.
+      url = options[:new] ? 'http://myanimelist.net/includes/ajax.inc.php?t=49' : 'http://myanimelist.net/includes/ajax.inc.php?t=34'
+
+      curl = Curl::Easy.new(url)
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.cookies = cookie_string
+      params = [
+        Curl::PostField.content('mid', id),
+        Curl::PostField.content('status', status)
+      ]
+      params << Curl::PostField.content('chapters', options[:chapters]) if options[:chapters]
+      params << Curl::PostField.content('volumes', options[:volumes]) if options[:volumes]
+      params << Curl::PostField.content('score', options[:score]) if options[:score]
+
+      begin
+        curl.http_post(*params)
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error updating manga with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      if options[:new]
+        # An add is successful for an HTTP 200 response containing "successful".
+        # The MyAnimeList site is actually pretty bad and seems to respond with 200 OK for all requests.
+        # It's also oblivious to IDs for non-existent manga and responds wrongly with a "successful" message.
+        # It responds with an empty response body for bad adds or if you try to add a manga that's already on the
+        # manga list.
+        # Due to these limitations, we will return false if the response body doesn't match "successful" and assume that
+        # anything else is a failure.
+        return curl.response_code == 200 && curl.body_str =~ /Added/i
+      else
+        # Update is successful for an HTTP 200 response with this string.
+        curl.response_code == 200 && curl.body_str =~ /Updated/i
+      end
+    end
+
     def self.delete(id, cookie_string)
       manga = scrape_manga(id, cookie_string)
 

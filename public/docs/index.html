@@ -786,8 +786,6 @@
   <div class="section">
     <h3 id="write_add_manga">/mangalist/manga - Add manga to manga list</h3>
 
-    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
-
     <p>Adds a manga to a user's manga list:</p>
 
     <blockquote>
@@ -797,8 +795,9 @@
     <p><strong>Parameters</strong>:</p>
     <ul>
       <li><code>manga_id</code> - <strong>required</strong> - ID of manga to add to user's mangalist.</li>
-      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"reading", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to read"/"plantoread". Default: 1/"reading"</li>
       <li><code>chapters</code> - Number of chapters read. Default: 0</li>
+      <li><code>volumes</code> - Number of volumes read. Default: 0</li>
       <li><code>score</code> - User's score for an manga. An integer from 1 to 10.</li>
     </ul>
 
@@ -817,8 +816,6 @@
   <div class="section">
     <h3 id="write_update_manga">/mangalist/manga/<strong>manga_id</strong> - Update a manga on user's manga list</h3>
 
-    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
-
     <p>Updates a manga already on a user's manga list:</p>
 
     <blockquote>
@@ -827,8 +824,9 @@
 
     <p><strong>Parameters</strong>:</p>
     <ul>
-      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"watching", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to watch"/"plantowatch". Default: 1/"watching"</li>
+      <li><code>status</code> - Integer or string representing user's watched status of the manga. Possible values: 1/"reading", 2/"completed", 3/"on-hold"/"onhold", 4/"dropped", 6/"plan to read"/"plantoread". Default: 1/"reading"</li>
       <li><code>chapters</code> - Number of chapters read. Default: 0</li>
+      <li><code>volumes</code> - Number of volumes read. Default: 0</li>
       <li><code>score</code> - User's score for an manga. An integer from 1 to 10.</li>
     </ul>
 
