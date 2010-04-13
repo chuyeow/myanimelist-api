@@ -306,6 +306,91 @@ class App < Sinatra::Base
   end
 
 
+  # POST /mangalist/manga
+  # Adds a manga to a user's manga list.
+  post '/mangalist/manga' do
+    authenticate unless session['cookie_string']
+
+    # Ensure "manga_id" param is given.
+    if params[:manga_id] !~ /\S/
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>manga_id-required</code></error>'
+      else
+        halt 400, { :error => 'manga_id-required' }.to_json
+      end
+    end
+
+    successful = MyAnimeList::Manga.add(params[:manga_id], session['cookie_string'], {
+      :status => params[:status],
+      :chapters => params[:chapters],
+      :volumes => params[:volumes],
+      :score => params[:score]
+    })
+
+    if successful
+      nil # Return HTTP 200 OK and empty response body if successful.
+    else
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>unknown-error</code></error>'
+      else
+        halt 400, { :error => 'unknown-error' }.to_json
+      end
+    end
+  end
+
+
+  # PUT /mangalist/manga/#{manga_id}
+  # Updates a manga already on a user's manga list.
+  put '/mangalist/manga/:manga_id' do
+    authenticate unless session['cookie_string']
+
+    successful = MyAnimeList::Manga.update(params[:manga_id], session['cookie_string'], {
+      :status => params[:status],
+      :chapters => params[:chapters],
+      :volumes => params[:volumes],
+      :score => params[:score]
+    })
+
+    if successful
+      nil # Return HTTP 200 OK and empty response body if successful.
+    else
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>unknown-error</code></error>'
+      else
+        halt 400, { :error => 'unknown-error' }.to_json
+      end
+    end
+  end
+
+
+  # DELETE /mangalist/manga/#{manga_id}
+  # Delete a manga from user's manga list.
+  delete '/mangalist/manga/:manga_id' do
+    authenticate unless session['cookie_string']
+
+    manga = MyAnimeList::Manga.delete(params[:manga_id], session['cookie_string'])
+
+    if manga
+      case params[:format]
+      when 'xml'
+        manga.to_xml
+      else
+        manga.to_json # Return HTTP 200 OK and the original manga if successful.
+      end
+    else
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>unknown-error</code></error>'
+      else
+        halt 400, { :error => 'unknown-error' }.to_json
+      end
+    end
+  end
+
+
   # GET /mangalist/#{username}
   # Get a user's manga list.
   get '/mangalist/:username' do
@@ -316,6 +401,42 @@ class App < Sinatra::Base
       manga_list.to_xml
     else
       manga_list.to_json
+    end
+  end
+
+
+  # GET /manga/search
+  # Search for manga.
+  get '/manga/search' do
+    # Ensure "q" param is given.
+    if params[:q] !~ /\S/
+      case params[:format]
+      when 'xml'
+        halt 400, '<error><code>q-required</code></error>'
+      else
+        halt 400, { :error => 'q-required' }.to_json
+      end
+    end
+
+    results = MyAnimeList::Manga.search(params[:q])
+
+    case params[:format]
+    when 'xml'
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct!
+
+      xml.results do |xml|
+        xml.query params[:q]
+        xml.count results.size
+
+        results.each do |a|
+          xml << a.to_xml(:skip_instruct => true)
+        end
+      end
+
+      xml.target!
+    else
+      results.to_json
     end
   end
 

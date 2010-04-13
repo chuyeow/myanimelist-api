@@ -110,6 +110,7 @@ module MyAnimeList
       begin
         curl.http_post(
           Curl::PostField.content('series_id', anime.listed_anime_id),
+          Curl::PostField.content('series_title', id),
           Curl::PostField.content('submitIt', '3')
         )
       rescue Exception => e

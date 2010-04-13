@@ -26,15 +26,352 @@ module MyAnimeList
       # Check for missing manga.
       raise MyAnimeList::NotFoundError.new("Manga with ID #{id} doesn't exist.", nil) if response =~ /No manga found/i
 
-      manga = Manga.new
+      manga = parse_manga_response(response)
 
+      manga
+    rescue MyAnimeList::NotFoundError => e
+      raise
+    rescue Exception => e
+      raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
+    end
+
+    def self.add(id, cookie_string, options)
+      # This is the same as self.update except that the "status" param is required and the URL is
+      # http://myanimelist.net/includes/ajax.inc.php?t=49.
+
+      # Default read_status to 1/reading if not given.
+      options[:status] = 1 if options[:status] !~ /\S/
+      options[:new] = true
+
+      update(id, cookie_string, options)
+    end
+
+    def self.update(id, cookie_string, options)
+
+      # Convert status to the number values that MyAnimeList uses.
+      # 1 = Reading, 2 = Completed, 3 = On-hold, 4 = Dropped, 6 = Plan to Read
+      status = case options[:status]
+      when 'Reading', 'reading', 1
+        1
+      when 'Completed', 'completed', 2
+        2
+      when 'On-hold', 'on-hold', 3
+        3
+      when 'Dropped', 'dropped', 4
+        4
+      when 'Plan to Read', 'plan to read', 6
+        6
+      else
+        1
+      end
+
+      # There're different URLs to POST to for adding and updating a manga.
+      url = options[:new] ? 'http://myanimelist.net/includes/ajax.inc.php?t=49' : 'http://myanimelist.net/includes/ajax.inc.php?t=34'
+
+      curl = Curl::Easy.new(url)
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.cookies = cookie_string
+      params = [
+        Curl::PostField.content('mid', id),
+        Curl::PostField.content('status', status)
+      ]
+      params << Curl::PostField.content('chapters', options[:chapters]) if options[:chapters]
+      params << Curl::PostField.content('volumes', options[:volumes]) if options[:volumes]
+      params << Curl::PostField.content('score', options[:score]) if options[:score]
+
+      begin
+        curl.http_post(*params)
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error updating manga with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      if options[:new]
+        # An add is successful for an HTTP 200 response containing "successful".
+        # The MyAnimeList site is actually pretty bad and seems to respond with 200 OK for all requests.
+        # It's also oblivious to IDs for non-existent manga and responds wrongly with a "successful" message.
+        # It responds with an empty response body for bad adds or if you try to add a manga that's already on the
+        # manga list.
+        # Due to these limitations, we will return false if the response body doesn't match "successful" and assume that
+        # anything else is a failure.
+        return curl.response_code == 200 && curl.body_str =~ /Added/i
+      else
+        # Update is successful for an HTTP 200 response with this string.
+        curl.response_code == 200 && curl.body_str =~ /Updated/i
+      end
+    end
+
+    def self.delete(id, cookie_string)
+      manga = scrape_manga(id, cookie_string)
+
+      curl = Curl::Easy.new("http://myanimelist.net/panel.php?go=editmanga&id=#{manga.listed_manga_id}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.cookies = cookie_string
+
+      begin
+        curl.http_post(
+          Curl::PostField.content('entry_id', manga.listed_manga_id),
+          Curl::PostField.content('manga_id', id),
+          Curl::PostField.content('submitIt', '3')
+        )
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error deleting manga with ID=#{id}. Original exception: #{e.message}", e)
+      end
+
+      # Deletion is successful for an HTTP 200 response with this string.
+      if curl.response_code == 200 && curl.body_str =~ /Successfully deleted manga entry/i
+        manga # Return the original manga if successful.
+      else
+        false
+      end
+    end
+
+    def self.search(query)
+
+      begin
+        response = Net::HTTP.start('myanimelist.net', 80) do |http|
+          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}")
+        end
+
+        case response
+        when Net::HTTPRedirection
+          redirected = true
+
+          # Strip everything after the manga ID - in cases where there is a non-ASCII character in the URL,
+          # MyAnimeList.net will return a page that says "Access has been restricted for this account".
+          redirect_url = response['location'].sub(%r{(http://myanimelist.net/manga/\d+)/?.*}, '\1')
+
+          response = Net::HTTP.start('myanimelist.net', 80) do |http|
+            http.get(redirect_url)
+          end
+        end
+
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error searching manga with query '#{query}'. Original exception: #{e.message}", e)
+      end
+
+      results = []
+      if redirected
+        # If there's a single redirect, it means there's only 1 match and MAL is redirecting to the manga's details
+        # page.
+
+        manga = parse_manga_response(response.body)
+        results << manga
+
+      else
+        # Otherwise, parse the table of search results.
+
+        doc = Nokogiri::HTML(response.body)
+        results_table = doc.xpath('//div[@id="_nopad"]/div[2]/table')
+
+        results_table.xpath('//tr').each do |results_row|
+
+          manga_title_node = results_row.at('td a strong')
+          next unless manga_title_node
+          url = manga_title_node.parent['href']
+          next unless url.match %r{http://myanimelist.net/manga/(\d+)/?.*}
+
+          manga = Manga.new
+          manga.id = $1.to_i
+          manga.title = manga_title_node.text
+          if image_node = results_row.at('td a img')
+            manga.image_url = image_node['src']
+          end
+
+          table_cell_nodes = results_row.search('td')
+
+          manga.volumes = table_cell_nodes[3].text.to_i
+          manga.chapters = table_cell_nodes[4].text.to_i
+          manga.members_score = table_cell_nodes[5].text.to_f
+          synopsis_node = results_row.at('div.spaceit_pad')
+          if synopsis_node
+            synopsis_node.search('a').remove
+            manga.synopsis = synopsis_node.text.strip
+          end
+          manga.type = table_cell_nodes[2].text
+
+          results << manga
+        end
+      end
+
+      results
+    end
+
+    def read_status=(value)
+      @read_status = case value
+      when /reading/i, '1', 1
+        :reading
+      when /completed/i, '2', 2
+        :completed
+      when /on-hold/i, /onhold/i, '3', 3
+        :"on-hold"
+      when /dropped/i, '4', 4
+        :dropped
+      when /plan/i, '6', 6
+        :"plan to read"
+      else
+        :reading
+      end
+    end
+
+    def status=(value)
+      @status = case value
+      when '2', 2, /finished/i
+        :finished
+      when '1', 1, /publishing/i
+        :publishing
+      when '3', 3, /not yet published/i
+        :"not yet published"
+      else
+        :finished
+      end
+    end
+
+    def type=(value)
+      @type = case value
+      when /manga/i, '1', 1
+        :Manga
+      when /novel/i, '2', 2
+        :Novel
+      when /one shot/i, '3', 3
+        :"One Shot"
+      when /doujin/i, '4', 4
+        :Doujin
+      when /manwha/i, '5', 5
+        :Manwha
+      when /manhua/i, '6', 6
+        :Manhua
+      when /OEL/i, '7', 7 # "OEL manga = Original English-language manga"
+        :OEL
+      else
+        :Manga
+      end
+    end
+
+    def other_titles
+      @other_titles ||= {}
+    end
+
+    def genres
+      @genres ||= []
+    end
+
+    def tags
+      @tags ||= []
+    end
+
+    def anime_adaptations
+      @anime_adaptations ||= []
+    end
+
+    def related_manga
+      @related_manga ||= []
+    end
+
+    def attributes
+      {
+        :id => id,
+        :title => title,
+        :other_titles => other_titles,
+        :rank => rank,
+        :image_url => image_url,
+        :type => type,
+        :status => status,
+        :volumes => volumes,
+        :chapters => chapters,
+        :genres => genres,
+        :members_score => members_score,
+        :members_count => members_count,
+        :popularity_rank => popularity_rank,
+        :favorited_count => favorited_count,
+        :tags => tags,
+        :synopsis => synopsis,
+        :anime_adaptations => anime_adaptations,
+        :related_manga => related_manga,
+        :read_status => read_status,
+        :listed_manga_id => listed_manga_id,
+        :chapters_read => chapters_read,
+        :volumes_read => volumes_read,
+        :score => score
+      }
+    end
+
+    def to_json
+      attributes.to_json
+    end
+
+    def to_xml(options = {})
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct! unless options[:skip_instruct]
+      xml.anime do |xml|
+        xml.id id
+        xml.title title
+        xml.rank rank
+        xml.image_url image_url
+        xml.type type.to_s
+        xml.status status.to_s
+        xml.volumes volumes
+        xml.chapters chapters
+        xml.members_score members_score
+        xml.members_count members_count
+        xml.popularity_rank popularity_rank
+        xml.favorited_count favorited_count
+        xml.synopsis synopsis
+        xml.read_status read_status.to_s
+        xml.chapters_read chapters_read
+        xml.volumes_read volumes_read
+        xml.score score
+
+        other_titles[:synonyms].each do |title|
+          xml.synonym title
+        end if other_titles[:synonyms]
+        other_titles[:english].each do |title|
+          xml.english_title title
+        end if other_titles[:english]
+        other_titles[:japanese].each do |title|
+          xml.japanese_title title
+        end if other_titles[:japanese]
+
+        genres.each do |genre|
+          xml.genre genre
+        end
+        tags.each do |tag|
+          xml.tag tag
+        end
+
+        anime_adaptations.each do |anime|
+          xml.anime_adaptation do |xml|
+            xml.anime_id  anime[:anime_id]
+            xml.title     anime[:title]
+            xml.url       anime[:url]
+          end
+        end
+
+        related_manga.each do |manga|
+          xml.related_manga do |xml|
+            xml.manga_id  manga[:manga_id]
+            xml.title     manga[:title]
+            xml.url       manga[:url]
+          end
+        end
+      end
+
+      xml.target!
+    end
+
+    private
+    
+    def self.parse_manga_response(response)
+      
       doc = Nokogiri::HTML(response)
+
+      manga = Manga.new
 
       # Manga ID.
       # Example:
       # <input type="hidden" value="104" name="mid" />
       manga_id_input = doc.at('input[@name="mid"]')
       if manga_id_input
+
         manga.id = manga_id_input['value'].to_i
       else
         details_link = doc.at('//a[text()="Details"]')
@@ -263,171 +600,6 @@ module MyAnimeList
       end
 
       manga
-    rescue MyAnimeList::NotFoundError => e
-      raise
-    rescue Exception => e
-      raise MyAnimeList::UnknownError.new("Error scraping manga with ID=#{id}. Original exception: #{e.message}.", e)
-    end
-
-    def read_status=(value)
-      @read_status = case value
-      when /reading/i, '1', 1
-        :reading
-      when /completed/i, '2', 2
-        :completed
-      when /on-hold/i, /onhold/i, '3', 3
-        :"on-hold"
-      when /dropped/i, '4', 4
-        :dropped
-      when /plan/i, '6', 6
-        :"plan to read"
-      else
-        :reading
-      end
-    end
-
-    def status=(value)
-      @status = case value
-      when '2', 2, /finished/i
-        :finished
-      when '1', 1, /publishing/i
-        :publishing
-      when '3', 3, /not yet published/i
-        :"not yet published"
-      else
-        :finished
-      end
-    end
-
-    def type=(value)
-      @type = case value
-      when /manga/i, '1', 1
-        :Manga
-      when /novel/i, '2', 2
-        :Novel
-      when /one shot/i, '3', 3
-        :"One Shot"
-      when /doujin/i, '4', 4
-        :Doujin
-      when /manwha/i, '5', 5
-        :Manwha
-      when /manhua/i, '6', 6
-        :Manhua
-      when /OEL/i, '7', 7 # "OEL manga = Original English-language manga"
-        :OEL
-      else
-        :Manga
-      end
-    end
-
-    def other_titles
-      @other_titles ||= {}
-    end
-
-    def genres
-      @genres ||= []
-    end
-
-    def tags
-      @tags ||= []
-    end
-
-    def anime_adaptations
-      @anime_adaptations ||= []
-    end
-
-    def related_manga
-      @related_manga ||= []
-    end
-
-    def attributes
-      {
-        :id => id,
-        :title => title,
-        :other_titles => other_titles,
-        :rank => rank,
-        :image_url => image_url,
-        :type => type,
-        :status => status,
-        :volumes => volumes,
-        :chapters => chapters,
-        :genres => genres,
-        :members_score => members_score,
-        :members_count => members_count,
-        :popularity_rank => popularity_rank,
-        :favorited_count => favorited_count,
-        :tags => tags,
-        :synopsis => synopsis,
-        :anime_adaptations => anime_adaptations,
-        :related_manga => related_manga,
-        :read_status => read_status,
-        :chapters_read => chapters_read,
-        :volumes_read => volumes_read,
-        :score => score
-      }
-    end
-
-    def to_json
-      attributes.to_json
-    end
-
-    def to_xml(options = {})
-      xml = Builder::XmlMarkup.new(:indent => 2)
-      xml.instruct! unless options[:skip_instruct]
-      xml.anime do |xml|
-        xml.id id
-        xml.title title
-        xml.rank rank
-        xml.image_url image_url
-        xml.type type.to_s
-        xml.status status.to_s
-        xml.volumes volumes
-        xml.chapters chapters
-        xml.members_score members_score
-        xml.members_count members_count
-        xml.popularity_rank popularity_rank
-        xml.favorited_count favorited_count
-        xml.synopsis synopsis
-        xml.read_status read_status.to_s
-        xml.chapters_read chapters_read
-        xml.volumes_read volumes_read
-        xml.score score
-
-        other_titles[:synonyms].each do |title|
-          xml.synonym title
-        end if other_titles[:synonyms]
-        other_titles[:english].each do |title|
-          xml.english_title title
-        end if other_titles[:english]
-        other_titles[:japanese].each do |title|
-          xml.japanese_title title
-        end if other_titles[:japanese]
-
-        genres.each do |genre|
-          xml.genre genre
-        end
-        tags.each do |tag|
-          xml.tag tag
-        end
-
-        anime_adaptations.each do |anime|
-          xml.anime_adaptation do |xml|
-            xml.anime_id  anime[:anime_id]
-            xml.title     anime[:title]
-            xml.url       anime[:url]
-          end
-        end
-
-        related_manga.each do |manga|
-          xml.related_manga do |xml|
-            xml.manga_id  manga[:manga_id]
-            xml.title     manga[:title]
-            xml.url       manga[:url]
-          end
-        end
-      end
-
-      xml.target!
     end
   end
 end
