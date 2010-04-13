@@ -1,3 +1,10 @@
+13 April 2010
+-------------
+* Added the following manga API methods - thanks to Guillaume Cassonnet (gcassonnet):
+  * /mangalist - Read a manga list.
+  * /mangalist/manga/manga_id - Add, update or delete a manga in a user's manga list.
+  * /manga/search - Search for manga.
+
 3 January 2010
 --------------
 * Added API method /manga/manga_id for retrieving details of a single manga.
@@ -13,7 +20,6 @@
 * Fix /anime/search return 500 errors with some queries. Supplemented official
   API's search method (which was returning badly encoded Japanese characters)
   with scraping MyAnimeList for synopsis.
-
 
 1 September 2009
 ----------------
