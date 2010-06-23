@@ -161,7 +161,7 @@ module MyAnimeList
         # Otherwise, parse the table of search results.
 
         doc = Nokogiri::HTML(response.body)
-        results_table = doc.xpath('//div[@id="_nopad"]/div[2]/table')
+        results_table = doc.xpath('//div[@id="content"]/div[2]/table')
 
         results_table.xpath('//tr').each do |results_row|
 
