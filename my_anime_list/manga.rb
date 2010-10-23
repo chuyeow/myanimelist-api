@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module MyAnimeList
   class Manga
     attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
@@ -388,7 +389,7 @@ module MyAnimeList
       manga.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
 
       # Image URL.
-      if image_node = doc.at('div#content a img')
+      if image_node = doc.at('div#content tr td div img')
         manga.image_url = image_node['src']
       end
 
