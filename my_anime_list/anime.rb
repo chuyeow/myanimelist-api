@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module MyAnimeList
 
   class Anime
@@ -415,7 +416,7 @@ module MyAnimeList
         anime.title = doc.at(:h1).children.find { |o| o.text? }.to_s
         anime.rank = doc.at('h1 > div').text.gsub(/\D/, '').to_i
 
-        if image_node = doc.at('div#content a img')
+        if image_node = doc.at('div#content tr td div img')
           anime.image_url = image_node['src']
         end
 
