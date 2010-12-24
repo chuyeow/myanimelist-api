@@ -1,7 +1,0 @@
-*.rdb
-*.swp
-bin/
-coverage/
-pkg/
-vendor/
-tmp/

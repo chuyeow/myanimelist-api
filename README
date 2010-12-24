@@ -11,5 +11,4 @@ intend to use this API to build other apps.
 What do I need to run this?
 ---------------------------
 * ruby 1.8.6 or later.
-* Curb 0.3.7 or later.
-* Sintara. See http://www.sinatrarb.com/.
+* Bundler gem.
