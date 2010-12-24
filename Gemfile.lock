@@ -4,7 +4,7 @@ GEM
     builder (3.0.0)
     chronic (0.3.0)
     curb (0.7.9)
-    json (1.4.6)
+    json (1.2.3)
     nokogiri (1.4.4)
     rack (1.2.1)
     sinatra (1.1.0)
@@ -19,6 +19,6 @@ DEPENDENCIES
   builder
   chronic
   curb
-  json
+  json (= 1.2.3)
   nokogiri
   sinatra
