@@ -5,7 +5,7 @@ require 'net/http'
 require 'nokogiri'
 require 'builder'
 require 'json'
-require 'my_anime_list'
+require './my_anime_list'
 
 
 class App < Sinatra::Base
