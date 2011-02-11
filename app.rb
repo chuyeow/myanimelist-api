@@ -28,7 +28,7 @@ class App < Sinatra::Base
       "<error><code>network-error</code><details>#{details}</details></error>"
     else
       body = { :error => 'network-error', :details => details }.to_json
-      params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+      params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
     end
   end
 
@@ -39,7 +39,7 @@ class App < Sinatra::Base
       "<error><code>anime-update-error</code><details>#{details}</details></error>"
     else
       body = { :error => 'anime-update-error', :details => details }.to_json
-      params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+      params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
     end
   end
 
@@ -50,7 +50,7 @@ class App < Sinatra::Base
       "<error><code>not-found</code><details>#{request.env['sinatra.error'].message}</details></error>"
     else
       body = { :error => 'not-found', :details => request.env['sinatra.error'].message }.to_json
-      params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+      params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
     end
   end
 
@@ -61,7 +61,7 @@ class App < Sinatra::Base
       "<error><code>unknown-error</code><details>#{details}</details></error>"
     else
       body = { :error => 'unknown-error', :details => details }.to_json
-      params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+      params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
     end
   end
 
@@ -72,7 +72,7 @@ class App < Sinatra::Base
       "<error><code>unknown-error</code><details>#{details}</details></error>"
     else
       body = { :error => 'unknown-error', :details => details }.to_json
-      params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+      params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
     end
   end
 
@@ -111,7 +111,7 @@ class App < Sinatra::Base
     when 'xml'
       anime.to_xml
     else
-      params[:callback].blank? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+      params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
     end
   end
 
@@ -128,7 +128,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>anime_id-required</code></error>'
       else
         body = { :error => 'anime_id-required' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
 
@@ -146,7 +146,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -171,7 +171,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -190,7 +190,7 @@ class App < Sinatra::Base
       when 'xml'
         anime.to_xml
       else
-        params[:callback].blank? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+        params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
       end
     else
       case params[:format]
@@ -198,7 +198,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -213,7 +213,7 @@ class App < Sinatra::Base
     when 'xml'
       anime_list.to_xml
     else
-      params[:callback].blank? ? anime_list.to_json : "#{params[:callback]}(#{anime_list.to_json})"
+      params[:callback].nil? ? anime_list.to_json : "#{params[:callback]}(#{anime_list.to_json})"
     end
   end
 
@@ -228,7 +228,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>q-required</code></error>'
       else
         body = { :error => 'q-required' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
 
@@ -250,7 +250,7 @@ class App < Sinatra::Base
 
       xml.target!
     else
-      params[:callback].blank? ? results.to_json : "#{params[:callback]}(#{results.to_json})"
+      params[:callback].nil? ? results.to_json : "#{params[:callback]}(#{results.to_json})"
     end
   end
 
@@ -268,7 +268,7 @@ class App < Sinatra::Base
     when 'xml'
       anime.to_xml
     else
-      params[:callback].blank? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+      params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
     end
   end
 
@@ -286,7 +286,7 @@ class App < Sinatra::Base
     when 'xml'
       history.to_xml
     else
-      params[:callback].blank? ? history.to_json : "#{params[:callback]}(#{history.to_json})"
+      params[:callback].nil? ? history.to_json : "#{params[:callback]}(#{history.to_json})"
     end
   end
 
@@ -310,7 +310,7 @@ class App < Sinatra::Base
     when 'xml'
       manga.to_xml
     else
-      params[:callback].blank? ? manga.to_json : "#{params[:callback]}(#{manga.to_json})"
+      params[:callback].nil? ? manga.to_json : "#{params[:callback]}(#{manga.to_json})"
     end
   end
 
@@ -327,7 +327,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>manga_id-required</code></error>'
       else
         body = { :error => 'manga_id-required' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
 
@@ -346,7 +346,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -372,7 +372,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -391,7 +391,7 @@ class App < Sinatra::Base
       when 'xml'
         manga.to_xml
       else
-        params[:callback].blank? ? manga.to_json : "#{params[:callback]}(#{manga.to_json})"
+        params[:callback].nil? ? manga.to_json : "#{params[:callback]}(#{manga.to_json})"
       end
     else
       case params[:format]
@@ -399,7 +399,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>unknown-error</code></error>'
       else
         body = { :error => 'unknown-error' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
   end
@@ -414,7 +414,7 @@ class App < Sinatra::Base
     when 'xml'
       manga_list.to_xml
     else
-      params[:callback].blank? ? manga_list.to_json : "#{params[:callback]}(#{manga_list.to_json})"
+      params[:callback].nil? ? manga_list.to_json : "#{params[:callback]}(#{manga_list.to_json})"
     end
   end
 
@@ -429,7 +429,7 @@ class App < Sinatra::Base
         halt 400, '<error><code>q-required</code></error>'
       else
         body = { :error => 'q-required' }.to_json
-        halt 400, params[:callback].blank? ? body : "#{params[:callback]}(#{body})"
+        halt 400, params[:callback].nil? ? body : "#{params[:callback]}(#{body})"
       end
     end
 
@@ -451,7 +451,7 @@ class App < Sinatra::Base
 
       xml.target!
     else
-      params[:callback].blank? ? results.to_json : "#{params[:callback]}(#{results.to_json})"
+      params[:callback].nil? ? results.to_json : "#{params[:callback]}(#{results.to_json})"
     end
   end
 
