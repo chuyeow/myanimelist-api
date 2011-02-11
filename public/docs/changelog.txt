@@ -1,3 +1,7 @@
+11 Feb 2011
+-----------
+* Added support for a callback parameter for JSON responses.
+
 13 April 2010
 -------------
 * Added the following manga API methods - thanks to Guillaume Cassonnet (gcassonnet):
