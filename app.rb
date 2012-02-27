@@ -13,7 +13,7 @@ class App < Sinatra::Base
   configure do
     enable :sessions, :static, :methodoverride
     disable :raise_errors
-    set :public, Proc.new { File.join(File.dirname(__FILE__), 'public') }
+    set :public_folder, Proc.new { File.join(File.dirname(__FILE__), 'public') }
   end
 
   JSON_RESPONSE_MIME_TYPE = 'application/json'
