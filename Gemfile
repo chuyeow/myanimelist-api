@@ -1,6 +1,7 @@
 source :rubygems
 
 gem 'rack', '~> 1.4'
+gem 'rack-cors', :require => 'rack/cors'
 gem 'sinatra'
 
 gem 'builder'
