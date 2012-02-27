@@ -1,11 +1,12 @@
 source :rubygems
 
+gem 'rack', '~> 1.4'
 gem 'sinatra'
 
 gem 'builder'
 gem 'chronic'
 gem 'curb'
-gem 'json', '1.2.3'
+gem 'json'
 gem 'nokogiri'
 
 group :development do
