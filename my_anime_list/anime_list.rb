@@ -54,11 +54,11 @@ module MyAnimeList
       @statistics ||= {}
     end
 
-    def to_json
+    def to_json(*args)
       {
         :anime => anime,
         :statistics => statistics
-      }.to_json
+      }.to_json(*args)
     end
 
     def to_xml

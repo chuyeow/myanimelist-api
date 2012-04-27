@@ -10,5 +10,6 @@ intend to use this API to build other apps.
 
 What do I need to run this?
 ---------------------------
-* ruby 1.8.6 or later.
+* ruby 1.9.3 or later.
+* libxml2 and libxslt (for nokogiri)
 * Bundler gem.
