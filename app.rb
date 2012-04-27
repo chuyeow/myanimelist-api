@@ -1,4 +1,5 @@
 require 'sinatra/base'
+require 'sinatra/reloader'
 
 require 'curb'
 require 'net/http'
@@ -20,6 +21,10 @@ class App < Sinatra::Base
     # as a proxy and not dealing with sensitive information, we'll disable this to
     # prevent all manner of headaches.
     set :protection, :except => :json_csrf
+  end
+
+  configure :development do
+    register Sinatra::Reloader
   end
 
   # CORS support: this let's us make cross domain ajax requests to

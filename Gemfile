@@ -3,6 +3,7 @@ source :rubygems
 gem 'rack', '~> 1.4'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'sinatra'
+gem 'sinatra-contrib'
 
 gem 'builder'
 gem 'chronic'
