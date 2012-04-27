@@ -13,7 +13,25 @@ class App < Sinatra::Base
   configure do
     enable :sessions, :static, :methodoverride
     disable :raise_errors
+
     set :public_folder, Proc.new { File.join(File.dirname(__FILE__), 'public') }
+
+    # JSON CSRF protection interefers with CORS requests. Seeing as we're only acting
+    # as a proxy and not dealing with sensitive information, we'll disable this to
+    # prevent all manner of headaches.
+    set :protection, :except => :json_csrf
+  end
+
+  # CORS support: this let's us make cross domain ajax requests to
+  # this app without having to resort to jsonp.
+  #
+  # For more details, see the project's readme: https://github.com/cyu/rack-cors
+  use Rack::Cors do
+    # Blanket whitelist all cross-domain xhr requests
+    allow do
+      origins '*'
+      resource '*'
+    end
   end
 
   JSON_RESPONSE_MIME_TYPE = 'application/json'
