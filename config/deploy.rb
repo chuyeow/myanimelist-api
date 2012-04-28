@@ -5,7 +5,16 @@ require 'bundler/capistrano'
 set :stages, %w(production staging)
 
 namespace :deploy do
+  after 'deploy:update_code', 'deploy:post_update_code'
   after 'deploy', 'deploy:cleanup'
+
+  task :post_update_code, :roles => :app do
+
+    # Copy config files from shared directory into current release directory.
+    configs = %w(dalli.yml)
+    config_paths = configs.map { |config| "#{shared_path}/config/#{config}" }
+    run "cp #{config_paths.join(' ')} #{release_path}/config/"
+  end
 
   desc "Start application"
   task :start, :roles => :app do
