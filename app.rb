@@ -261,6 +261,11 @@ class App < Sinatra::Base
 
     results = MyAnimeList::Anime.search(params[:q])
 
+    # Caching.
+    expires 3600, :public, :must_revalidate
+    last_modified Time.now
+    etag "anime/search/#{params[:q]}"
+
     case params[:format]
     when 'xml'
       xml = Builder::XmlMarkup.new(:indent => 2)
@@ -331,6 +336,11 @@ class App < Sinatra::Base
       manga = MyAnimeList::Manga.scrape_manga(params[:id], session['cookie_string'])
     else
       manga = MyAnimeList::Manga.scrape_manga(params[:id])
+
+      # Caching.
+      expires 3600, :public, :must_revalidate
+      last_modified Time.now
+      etag "manga/#{manga.id}"
     end
 
     case params[:format]
@@ -461,6 +471,11 @@ class App < Sinatra::Base
     end
 
     results = MyAnimeList::Manga.search(params[:q])
+
+    # Caching.
+    expires 3600, :public, :must_revalidate
+    last_modified Time.now
+    etag "manga/search/#{params[:q]}"
 
     case params[:format]
     when 'xml'
