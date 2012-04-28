@@ -1,0 +1,7 @@
+development:
+  :server: localhost:11211
+  :expires_in: 86400 # 1.day
+
+production:
+  :server: localhost:11211
+  :expires_in: 86400 # 1.day

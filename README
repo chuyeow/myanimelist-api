@@ -13,3 +13,4 @@ What do I need to run this?
 * ruby 1.9.3 or later.
 * libxml2 and libxslt (for nokogiri)
 * Bundler gem.
+* memcached
