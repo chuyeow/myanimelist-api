@@ -126,8 +126,12 @@ class App < Sinatra::Base
       authenticate unless session['cookie_string']
       anime = MyAnimeList::Anime.scrape_anime(params[:id], session['cookie_string'])
     else
-      # FIXME Cache this.
       anime = MyAnimeList::Anime.scrape_anime(params[:id])
+
+      # Caching.
+      expires 3600, :public, :must_revalidate
+      last_modified Time.now
+      etag "anime/#{anime.id}"
     end
 
     case params[:format]
