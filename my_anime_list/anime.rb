@@ -3,9 +3,10 @@ module MyAnimeList
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis
-    attr_accessor :listed_anime_id
+    attr_accessor :listed_anime_id, :parent_story
     attr_reader :type, :status
-    attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories
+    attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories,
+                :character_anime, :spin_offs, :summaries
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score
@@ -283,6 +284,18 @@ module MyAnimeList
       @side_stories ||= []
     end
 
+    def character_anime
+      @character_anime ||= []
+    end
+
+    def spin_offs
+      @spin_offs ||= []
+    end
+
+    def summaries
+      @summaries ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -305,6 +318,10 @@ module MyAnimeList
         :prequels => prequels,
         :sequels => sequels,
         :side_stories => side_stories,
+        :parent_story => parent_story,
+        :character_anime => character_anime,
+        :spin_offs => spin_offs,
+        :summaries => summaries,
         :listed_anime_id => listed_anime_id,
         :watched_episodes => watched_episodes,
         :score => score,
@@ -384,6 +401,36 @@ module MyAnimeList
             xml.anime_id  side_story[:anime_id]
             xml.title     side_story[:title]
             xml.url       side_story[:url]
+          end
+        end
+
+        xml.parent_story do |xml|
+          xml.anime_id  parent_story[:anime_id]
+          xml.title     parent_story[:title]
+          xml.url       parent_story[:url]
+        end if parent_story
+
+        character_anime.each do |o|
+          xml.character_anime do |xml|
+            xml.anime_id  o[:anime_id]
+            xml.title     o[:title]
+            xml.url       o[:url]
+          end
+        end
+
+        spin_offs.each do |o|
+          xml.spin_off do |xml|
+            xml.anime_id  o[:anime_id]
+            xml.title     o[:title]
+            xml.url       o[:url]
+          end
+        end
+
+        summaries.each do |o|
+          xml.summary do |xml|
+            xml.anime_id  o[:anime_id]
+            xml.title     o[:title]
+            xml.url       o[:url]
           end
         end
       end
@@ -602,6 +649,46 @@ module MyAnimeList
             if related_anime_text.match %r{Side story: ?(<a .+?)<br}
               $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
                 anime.side_stories << {
+                  :anime_id => anime_id,
+                  :title => title,
+                  :url => url
+                }
+              end
+            end
+
+            if related_anime_text.match %r{Parent story: ?(<a .+?)<br}
+              $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+                anime.parent_story = {
+                  :anime_id => anime_id,
+                  :title => title,
+                  :url => url
+                }
+              end
+            end
+
+            if related_anime_text.match %r{Character: ?(<a .+?)<br}
+              $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+                anime.character_anime << {
+                  :anime_id => anime_id,
+                  :title => title,
+                  :url => url
+                }
+              end
+            end
+
+            if related_anime_text.match %r{Spin-off: ?(<a .+?)<br}
+              $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+                anime.spin_offs << {
+                  :anime_id => anime_id,
+                  :title => title,
+                  :url => url
+                }
+              end
+            end
+
+            if related_anime_text.match %r{Summary: ?(<a .+?)<br}
+              $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+                anime.summaries << {
                   :anime_id => anime_id,
                   :title => title,
                   :url => url

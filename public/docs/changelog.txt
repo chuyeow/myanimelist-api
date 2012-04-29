@@ -1,3 +1,11 @@
+29 Apr 2012
+-----------
+* Added these Related Anime attributes to anime:
+  * character_anime
+  * spin_offs
+  * summaries
+  * parent_story
+
 11 Feb 2011
 -----------
 * Added support for a callback parameter for JSON responses.
