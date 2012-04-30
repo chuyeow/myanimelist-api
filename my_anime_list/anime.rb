@@ -6,7 +6,7 @@ module MyAnimeList
     attr_accessor :listed_anime_id, :parent_story
     attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories,
-                :character_anime, :spin_offs, :summaries
+                :character_anime, :spin_offs, :summaries, :alternative_versions
 
     # These attributes are specific to a user-anime pair, probably should go into another model.
     attr_accessor :watched_episodes, :score
@@ -296,6 +296,10 @@ module MyAnimeList
       @summaries ||= []
     end
 
+    def alternative_versions
+      @alternative_versions ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -322,6 +326,7 @@ module MyAnimeList
         :character_anime => character_anime,
         :spin_offs => spin_offs,
         :summaries => summaries,
+        :alternative_versions => alternative_versions,
         :listed_anime_id => listed_anime_id,
         :watched_episodes => watched_episodes,
         :score => score,
@@ -428,6 +433,14 @@ module MyAnimeList
 
         summaries.each do |o|
           xml.summary do |xml|
+            xml.anime_id  o[:anime_id]
+            xml.title     o[:title]
+            xml.url       o[:url]
+          end
+        end
+
+        alternative_versions.each do |o|
+          xml.alternative_version do |xml|
             xml.anime_id  o[:anime_id]
             xml.title     o[:title]
             xml.url       o[:url]
@@ -689,6 +702,16 @@ module MyAnimeList
             if related_anime_text.match %r{Summary: ?(<a .+?)<br}
               $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
                 anime.summaries << {
+                  :anime_id => anime_id,
+                  :title => title,
+                  :url => url
+                }
+              end
+            end
+
+            if related_anime_text.match %r{Alternative versions?: ?(<a .+?)<br}
+              $1.scan(%r{<a href="(http://myanimelist.net/anime/(\d+)/.*?)">(.+?)</a>}) do |url, anime_id, title|
+                anime.alternative_versions << {
                   :anime_id => anime_id,
                   :title => title,
                   :url => url

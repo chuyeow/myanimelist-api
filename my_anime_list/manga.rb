@@ -4,7 +4,7 @@ module MyAnimeList
                   :members_score, :members_count, :favorited_count, :synopsis
     attr_accessor :listed_manga_id
     attr_reader :type, :status
-    attr_writer :genres, :tags, :other_titles, :anime_adaptations, :related_manga
+    attr_writer :genres, :tags, :other_titles, :anime_adaptations, :related_manga, :alternative_versions
 
     # These attributes are specific to a user-manga pair.
     attr_accessor :volumes_read, :chapters_read, :score
@@ -267,6 +267,10 @@ module MyAnimeList
       @related_manga ||= []
     end
 
+    def alternative_versions
+      @alternative_versions ||= []
+    end
+
     def attributes
       {
         :id => id,
@@ -287,6 +291,7 @@ module MyAnimeList
         :synopsis => synopsis,
         :anime_adaptations => anime_adaptations,
         :related_manga => related_manga,
+        :alternative_versions => alternative_versions,
         :read_status => read_status,
         :listed_manga_id => listed_manga_id,
         :chapters_read => chapters_read,
@@ -353,15 +358,23 @@ module MyAnimeList
             xml.url       manga[:url]
           end
         end
+
+        alternative_versions.each do |manga|
+          xml.alternative_version do |xml|
+            xml.manga_id  manga[:manga_id]
+            xml.title     manga[:title]
+            xml.url       manga[:url]
+          end
+        end
       end
 
       xml.target!
     end
 
     private
-    
+
     def self.parse_manga_response(response)
-      
+
       doc = Nokogiri::HTML(response)
 
       manga = Manga.new
@@ -547,6 +560,15 @@ module MyAnimeList
             end
           end
 
+          if related_anime_text.match %r{Alternative versions?: ?(<a .+?)<br}
+            $1.scan(%r{<a href="(http://myanimelist.net/manga/(\d+)/.*?)">(.+?)</a>}) do |url, manga_id, title|
+              manga.alternative_versions << {
+                :manga_id => manga_id,
+                :title => title,
+                :url => url
+              }
+            end
+          end
         end
       end
 
@@ -589,7 +611,7 @@ module MyAnimeList
       volumes_node = doc.at('input#myinfo_volumes')
       if volumes_node
         manga.volumes_read = volumes_node['value'].to_i
-      end  
+      end
       score_select_node = doc.at('select#myinfo_score')
       if score_select_node && (selected_option = score_select_node.at('option[selected="selected"]'))
         manga.score = selected_option['value'].to_i

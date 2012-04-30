@@ -1,3 +1,7 @@
+30 Apr 2012
+-----------
+* Added alternative_versions attribute to anime and manga models.
+
 29 Apr 2012
 -----------
 * Added these Related Anime attributes to anime:
