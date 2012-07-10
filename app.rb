@@ -234,6 +234,8 @@ class App < Sinatra::Base
   # GET /animelist/#{username}
   # Get a user's anime list.
   get '/animelist/:username' do
+    response['Cache-Control'] = 'private,max-age=0,must-revalidate,no-store'
+
     anime_list = MyAnimeList::AnimeList.anime_list_of(params[:username])
 
     case params[:format]
