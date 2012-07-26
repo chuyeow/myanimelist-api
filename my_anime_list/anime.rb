@@ -2,7 +2,7 @@ module MyAnimeList
 
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :classification,
-                  :members_score, :members_count, :favorited_count, :synopsis
+                  :members_score, :members_count, :favorited_count, :synopsis, :start_date, :end_date
     attr_accessor :listed_anime_id, :parent_story
     attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories,
@@ -312,6 +312,8 @@ module MyAnimeList
         :image_url => image_url,
         :episodes => episodes,
         :status => status,
+        :start_date => start_date,
+        :end_date => end_date,
         :genres => genres,
         :tags => tags,
         :classification => classification,
@@ -351,6 +353,8 @@ module MyAnimeList
         xml.image_url image_url
         xml.episodes episodes
         xml.status status.to_s
+        xml.start_date start_date
+        xml.end_date end_date
         xml.classification classification
         xml.members_score members_score
         xml.members_count members_count
@@ -534,6 +538,11 @@ module MyAnimeList
         end
         if (node = left_column_nodeset.at('//span[text()="Status:"]')) && node.next
           anime.status = node.next.text.strip
+        end
+        if (node = left_column_nodeset.at('//span[text()="Aired:"]')) && node.next
+          airdates_text = node.next.text.strip
+          anime.start_date = parse_start_date(airdates_text)
+          anime.end_date = parse_end_date(airdates_text)
         end
         if node = left_column_nodeset.at('//span[text()="Genres:"]')
           node.parent.search('a').each do |a|
@@ -765,5 +774,38 @@ module MyAnimeList
 
         anime
       end
+
+      def self.parse_start_date(text)
+        text = text.strip
+
+        case text
+        when /^\d{4}$/
+          return text.strip
+        when /^(\d{4}) to \?/
+          return $1
+        else
+          date_string = text.split(/\s+to\s+/).first
+          return nil if !date_string
+
+          Chronic.parse(date_string)
+        end
+      end
+
+      def self.parse_end_date(text)
+        text = text.strip
+
+        case text
+        when /^\d{4}$/
+          return text.strip
+        when /^\? to (\d{4})/
+          return $1
+        else
+          date_string = text.split(/\s+to\s+/).last
+          return nil if !date_string
+
+          Chronic.parse(date_string)
+        end
+      end
+
   end # END class Anime
 end
