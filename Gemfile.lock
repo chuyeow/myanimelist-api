@@ -1,9 +1,9 @@
 GEM
   remote: http://rubygems.org/
   specs:
-    backports (2.5.1)
+    backports (2.6.2)
     builder (3.0.0)
-    capistrano (2.11.2)
+    capistrano (2.12.0)
       highline
       net-scp (>= 1.0.0)
       net-sftp (>= 2.0.0)
@@ -12,24 +12,24 @@ GEM
     capistrano-ext (1.2.1)
       capistrano (>= 1.0.0)
     chronic (0.6.7)
-    curb (0.8.0)
+    curb (0.8.1)
     daemons (1.1.8)
-    dalli (2.0.3)
+    dalli (2.1.0)
     eventmachine (0.12.10)
-    highline (1.6.11)
-    json (1.6.5)
+    highline (1.6.13)
+    json (1.7.4)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
-    net-ssh (2.3.0)
+    net-ssh (2.5.2)
     net-ssh-gateway (1.1.0)
       net-ssh (>= 1.99.1)
-    nokogiri (1.5.0)
+    nokogiri (1.5.5)
     rack (1.4.1)
     rack-cache (1.2)
       rack (>= 0.4)
-    rack-cors (0.2.4)
+    rack-cors (0.2.7)
       rack
     rack-protection (1.2.0)
       rack
