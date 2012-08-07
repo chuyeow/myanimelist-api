@@ -188,6 +188,8 @@ module MyAnimeList
             anime.synopsis = synopsis_node.text.strip
           end
           anime.type = table_cell_nodes[2].text
+          anime.start_date = parse_start_date(table_cell_nodes[5].text)
+          anime.end_date = parse_end_date(table_cell_nodes[6].text)
           anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
 
           results << anime
@@ -783,6 +785,8 @@ module MyAnimeList
           return text.strip
         when /^(\d{4}) to \?/
           return $1
+        when /^\d{2}-\d{2}-\d{2}$/
+          return Date.strptime(text, '%m-%d-%y')
         else
           date_string = text.split(/\s+to\s+/).first
           return nil if !date_string
@@ -799,6 +803,8 @@ module MyAnimeList
           return text.strip
         when /^\? to (\d{4})/
           return $1
+        when /^\d{2}-\d{2}-\d{2}$/
+          return Date.strptime(text, '%m-%d-%y')
         else
           date_string = text.split(/\s+to\s+/).last
           return nil if !date_string
