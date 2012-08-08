@@ -17,7 +17,7 @@ class App < Sinatra::Base
 
     set :public_folder, Proc.new { File.join(File.dirname(__FILE__), 'public') }
 
-    # JSON CSRF protection interefers with CORS requests. Seeing as we're only acting
+    # JSON CSRF protection interferes with CORS requests. Seeing as we're only acting
     # as a proxy and not dealing with sensitive information, we'll disable this to
     # prevent all manner of headaches.
     set :protection, :except => :json_csrf
