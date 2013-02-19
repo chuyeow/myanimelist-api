@@ -17,5 +17,4 @@ group :development do
   gem 'capistrano'
   gem 'capistrano-ext'
   gem 'thin'
-  gem 'puma'
 end
