@@ -88,6 +88,8 @@ module MyAnimeList
 
       {
         :details => UserDetails.parse(details),
+        :anime_stats => UserStats.parse(anime_stats),
+        :manga_stats => UserStats.parse(manga_stats),
       }
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
@@ -115,6 +117,18 @@ module MyAnimeList
 
       def self.parse_integer(integer_string)
         integer_string.gsub(",", "").to_i
+      end
+    end
+
+    class UserStats
+      def self.parse(node)
+        result = {}
+        node.search("tr").each do |tr|
+          label, value, _ = tr.search("td")
+          parameterized_label = label.text.downcase.gsub(/[\(\)]/, "").gsub(/\s+/, "_")
+          result[parameterized_label] = value.text.to_f
+        end
+        result
       end
     end
 
