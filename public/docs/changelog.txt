@@ -1,3 +1,7 @@
+21 Feb 2013
+-----------
+* Added /profile/username API method - thanks to Peter Graham (https://github.com/6)!
+
 26 Jul 2012
 -----------
 * Added start_date and end_date to anime model.

@@ -59,6 +59,7 @@
     <li>
       <a href="#read_methods">Reading data from MyAnimeList</a>
       <ul>
+        <li><a href="#read_profile">/profile - Read a user's profile</a></li>
         <li><a href="#read_anime_list">/animelist - Read an anime list</a></li>
         <li><a href="#read_anime">/anime - Read an anime's details</a></li>
         <li><a href="#read_history">/history - Read a user's history</a></li>
@@ -108,6 +109,12 @@
         <th>Example</th>
       </thead>
       <tbody>
+
+        <tr>
+          <td><a href="#read_profile">/profile/<strong>username</strong></a></td>
+          <td>Fetch a user's MAL profile</td>
+          <td><a href="http://mal-api.com/animelist/xinil">http://mal-api.com/profile/xinil</a></td>
+        </tr>
 
         <tr>
           <td><a href="#read_anime_list">/animelist/<strong>username</strong></a></td>
@@ -466,6 +473,18 @@
       <li><code>score</code> - User's score for the manga, from 1 to 10.</li>
     </ul>
 
+
+    <h4 id="type_user">User</h4>
+
+    <p>A representation of a MyAnimeList user.</p>
+
+    <p>Format:</p>
+    <ul>
+      <li><code>details</code> - user's general (not anime/manga-specific) details</a>.</li>
+      <li><code>anime_stats</code> - user's anime statistics</a>.</li>
+      <li><code>manga_stats</code> - user's manga statistics</a>.</li>
+    </ul>
+
   </div>
 
 
@@ -519,6 +538,21 @@
 
 
   <h2 id="read_methods">Reading data from MyAnimeList</h2>
+
+  <div class="section">
+    <h3 id="read_profile">/profile - Read a user's profile</h3>
+
+    <p>Fetch the MAL profile for the username:</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/profile/<strong>username</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/profile/xinil">http://mal-api.com/profile/xinil</a></p>
+    </blockquote>
+
+    <p>The response is an <a href="#type_user">user</a>.</p>
+  </div>
+
 
   <div class="section">
     <h3 id="read_anime_list">/animelist - Read an anime list</h3>
