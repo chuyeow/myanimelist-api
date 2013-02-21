@@ -112,11 +112,25 @@ module MyAnimeList
             value.text
           end
         end
-        result
+        add_defaults(result)
       end
 
       def self.parse_integer(integer_string)
         integer_string.gsub(",", "").to_i
+      end
+
+      def self.add_defaults(result)
+        # Default values for details that are not necessarily visible
+        {
+          "birthday" => nil,
+          "location" => nil,
+          "website" => nil,
+          "aim" => nil,
+          "msn" => nil,
+          "yahoo" => nil,
+          "comments" => 0,
+          "forum_posts" => 0,
+        }.merge(result)
       end
     end
 
