@@ -84,10 +84,10 @@ module MyAnimeList
 
       doc = Nokogiri::HTML(response)
 
-      left_content = doc.search("#content .profile_leftcell").first
-      avatar = left_content.search("#profileRows").first.previous_element.search("img").first
+      left_content = doc.at("#content .profile_leftcell")
+      avatar = left_content.at("#profileRows").previous_element.at("img")
 
-      main_content = doc.search('#content #horiznav_nav').first.next_element
+      main_content = doc.at('#content #horiznav_nav').next_element
       details, updates, anime_stats, manga_stats = main_content.search("> table table")
 
       {
@@ -112,7 +112,7 @@ module MyAnimeList
           when "forum_posts"
             parse_integer(value.text.match(/^[,0-9]+/)[0])
           when "website"
-            value.search("a").first['href']
+            value.at("a")['href']
           else
             value.text
           end
