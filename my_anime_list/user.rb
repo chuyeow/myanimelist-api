@@ -83,10 +83,15 @@ module MyAnimeList
       response = curl.body_str
 
       doc = Nokogiri::HTML(response)
+
+      left_content = doc.search("#content .profile_leftcell").first
+      avatar = left_content.search("#profileRows").first.previous_element.search("img").first
+
       main_content = doc.search('#content #horiznav_nav').first.next_element
       details, updates, anime_stats, manga_stats = main_content.search("> table table")
 
       {
+        :avatar_url => avatar['src'],
         :details => UserDetails.parse(details),
         :anime_stats => UserStats.parse(anime_stats),
         :manga_stats => UserStats.parse(manga_stats),
