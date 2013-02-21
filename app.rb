@@ -324,6 +324,21 @@ class App < Sinatra::Base
     end
   end
 
+  # GET /profile/#{username}
+  # Get user's profile information.
+  get '/profile/:username' do
+    user = MyAnimeList::User.new
+    user.username = params[:username]
+
+    profile = user.profile
+
+    case params[:format]
+    when 'xml'
+      profile.to_xml
+    else
+      params[:callback].nil? ? profile.to_json : "#{params[:callback]}(#{profile.to_json})"
+    end
+  end
 
   # GET /manga/#{manga_id}
   # Get a manga's details.
