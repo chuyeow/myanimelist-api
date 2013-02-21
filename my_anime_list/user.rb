@@ -69,5 +69,54 @@ module MyAnimeList
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
     end
+
+    def profile
+      profile_url = "http://myanimelist.net/profile/#{username}"
+      curl = Curl::Easy.new(profile_url)
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      begin
+        curl.perform
+      rescue Exception => e
+        raise MyAnimeList::NetworkError.new("Network error getting profile details for username=#{username}. Original exception: #{e.message}.", e)
+      end
+
+      response = curl.body_str
+
+      doc = Nokogiri::HTML(response)
+      main_content = doc.search('#content #horiznav_nav').first.next_element
+      details, updates, anime_stats, manga_stats = main_content.search("> table table")
+
+      {
+        :details => UserDetails.parse(details),
+      }
+    rescue Exception => e
+      raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
+    end
+
+    class UserDetails
+      def self.parse(node)
+        result = {}
+        node.search("tr").each do |tr|
+          label, value = tr.search("> td")
+          parameterized_label = label.text.downcase.gsub(/\s+/, "_")
+          result[parameterized_label] = case parameterized_label
+          when "anime_list_views", "manga_list_views", "comments"
+            parse_integer(value.text)
+          when "forum_posts"
+            parse_integer(value.text.match(/^[,0-9]+/)[0])
+          when "website"
+            value.search("a").first['href']
+          else
+            value.text
+          end
+        end
+        result
+      end
+
+      def self.parse_integer(integer_string)
+        integer_string.gsub(",", "").to_i
+      end
+    end
+
   end
 end
