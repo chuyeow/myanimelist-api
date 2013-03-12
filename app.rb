@@ -35,7 +35,7 @@ class App < Sinatra::Base
     # Blanket whitelist all cross-domain xhr requests
     allow do
       origins '*'
-      resource '*'
+      resource '*', :headers => :any, :methods => [:get, :post, :put, :delete]
     end
   end
 
