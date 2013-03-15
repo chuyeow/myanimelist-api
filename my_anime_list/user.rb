@@ -71,11 +71,9 @@ module MyAnimeList
       end
 
       results
-    rescue Exception => e
-      raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
-  end
-
-
+      rescue Exception => e
+        raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
+    end
 
     def profile
       profile_url = "http://myanimelist.net/profile/#{username}"
