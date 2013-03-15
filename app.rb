@@ -309,12 +309,15 @@ class App < Sinatra::Base
 
   # GET /history/#{username}
   # Get user's history.
-  # FIXME implement /history/:username/anime and /history/:username/manga - use regex for routing?
-  get '/history/:username' do
+  get '/history/:username/?:type?' do
     user = MyAnimeList::User.new
     user.username = params[:username]
 
-    history = user.history
+    options = Hash.new.tap do |options|
+      options[:type] = params[:type].to_sym unless params[:type].nil?
+    end
+
+    history = user.history(options)
 
     case params[:format]
     when 'xml'
