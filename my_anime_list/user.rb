@@ -73,8 +73,7 @@ module MyAnimeList
       results
     rescue Exception => e
       raise MyAnimeList::UnknownError.new("Error getting history for username=#{username}. Original exception: #{e.message}.", e)
-  end
-
+    end
 
 
     def profile
