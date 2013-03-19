@@ -47,7 +47,7 @@ module MyAnimeList
         manga_id = manga_id.to_i
 
         title = link.text.strip
-        episodeOrChapter = cells[0].at('strong').text.to_i
+        episode_or_chapter = cells[0].at('strong').text.to_i
         time_string = cells[1].text.strip
 
         begin
@@ -62,9 +62,9 @@ module MyAnimeList
         # based on the presence of either id.
         results << Hash.new.tap do |history_entry|
           history_entry[:anime_id] = anime_id if anime_id > 0
-          history_entry[:episode] = episodeOrChapter if anime_id > 0
+          history_entry[:episode] = episode_or_chapter if anime_id > 0
           history_entry[:manga_id] = manga_id if manga_id > 0
-          history_entry[:chapter] = episodeOrChapter if manga_id > 0
+          history_entry[:chapter] = episode_or_chapter if manga_id > 0
           history_entry[:title] = title
           history_entry[:time] = time
         end
