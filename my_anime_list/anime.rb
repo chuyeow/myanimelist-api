@@ -201,12 +201,66 @@ module MyAnimeList
 
     # Returns top Anime.
     # Options:
-    #  * type - Type of anime to return. Possible values: TV, Movie, OVA, Special. Defaults to nothing, which returns
+    #  * type - Type of anime to return. Possible values: tv, movie, ova, special, bypopularity. Defaults to nothing, which returns
     #           top anime of any type.
     #  * page - Page of top anime to return. Defaults to 1.
     #  * per_page - Number of anime to return per page. Defaults to 30.
     def self.top(options = {})
-      []
+      page = options[:page] || 1
+      limit = (page.to_i - 1) * 30
+      type = options[:type].to_s.downcase
+
+      curl = Curl::Easy.new("http://myanimelist.net/topanime.php?type=#{type}&limit=#{limit}")
+      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      begin
+        curl.perform
+      rescue Exception => e
+        raise MyAnimeList::NetworkError.new("Network error getting top anime. Original exception: #{e.message}.", e)
+      end
+
+      response = curl.body_str
+
+      doc = Nokogiri::HTML(response)
+
+      results = []
+
+      doc.search('div#content table tr').each do |results_row|
+        anime_title_node = results_row.at('td a strong')
+        next unless anime_title_node
+        anime_url = anime_title_node.parent['href']
+        next unless anime_url
+        anime_url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
+
+        anime = Anime.new
+        anime.id = $1.to_i
+        anime.title = anime_title_node.text
+
+        table_cell_nodes = results_row.search('td')
+        content_cell = table_cell_nodes.at('div.spaceit_pad')
+
+        members_cell = content_cell.at('span.lightLink')
+        members = members_cell.text.strip.gsub!(/\D/, '').to_i
+        members_cell.remove
+
+        stats = content_cell.text.strip.split(',')
+        type = stats[0]
+        episodes = stats[1].gsub!(/\D/, '')
+        episodes = if episodes.size > 0 then episodes.to_i else nil end
+        score = stats[2].match(/\d+(\.\d+)?/).to_s.to_f
+
+        anime.type = type
+        anime.episodes = episodes
+        anime.members_count = members
+        anime.score = score
+
+        if image_node = results_row.at('td a img')
+          anime.image_url = image_node['src']
+        end
+
+        results << anime
+      end
+
+      results
     end
 
     def watched_status=(value)
