@@ -306,6 +306,22 @@ class App < Sinatra::Base
     end
   end
 
+  # GET /anime/popular
+  # Get the popular anime.
+  get '/anime/popular' do
+    anime = MyAnimeList::Anime.top(
+      :type => 'bypopularity',
+      :page => params[:page],
+      :per_page => params[:per_page]
+    )
+
+    case params[:format]
+      when 'xml'
+        anime.to_xml
+      else
+        params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+    end
+  end
 
   # GET /history/#{username}
   # Get user's history.
