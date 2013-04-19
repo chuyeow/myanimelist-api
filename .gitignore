@@ -3,3 +3,4 @@ config/dalli.yml
 .bundle
 bin
 vendor/bundle
+/.idea
