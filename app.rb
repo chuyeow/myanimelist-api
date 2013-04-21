@@ -246,7 +246,6 @@ class App < Sinatra::Base
     end
   end
 
-
   # GET /anime/search
   # Search for anime.
   get '/anime/search' do
@@ -320,6 +319,39 @@ class App < Sinatra::Base
         anime.to_xml
       else
         params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+    end
+  end
+
+  # GET /anime/upcoming
+  # Get the upcoming anime
+  get '/anime/upcoming' do
+    anime = MyAnimeList::Anime.upcoming(
+      :page => params[:page],
+      :per_page => params[:per_page],
+      :start_date => params[:start_date]
+    )
+
+    case params[:format]
+      when 'xml'
+        anime.to_xml
+      else
+        params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json}"
+    end
+  end
+
+  # GET /anime/just_added
+  # Get just added anime
+  get '/anime/just_added' do
+    anime = MyAnimeList::Anime.just_added(
+        :page => params[:page],
+        :per_page => params[:per_page],
+    )
+
+    case params[:format]
+      when 'xml'
+        anime.to_xml
+      else
+        params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json}"
     end
   end
 
