@@ -691,8 +691,6 @@
   <div class="section">
     <h3 id="read_upcoming_anime">/anime/upcoming - Read the upcoming anime</h3>
 
-    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
-
     <p>Fetch the upcoming anime. This is a list of anime sorted by airing date.</p>
 
     <blockquote>
@@ -705,17 +703,15 @@
     <ul>
       <li><code>start_date</code> - Only anime which air after this date (in <code>YYYYMMDD</code> format) are returned. Defaults to the current date in UTC.</li>
       <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
-      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20. <span class="warn"><strong>NOT YET IMPLEMENTED</strong></span></li>
     </ul>
 
-    <p>The response is a list of <a href="#type_anime">anime</a>. Only the following anime properties are available: <code>id</code>, <code>title</code>, <code>episodes</code>, <code>type</code>, <code>image_url</code>, <code>members_count</code>, <code>members_score</code></p>
+    <p>The response is a list of <a href="#type_anime">anime</a>. Only the following anime properties are available: <code>id</code>, <code>title</code>, <code>episodes</code>, <code>type</code>, <code>synopsis</code>, <code>image_url</code>, <code>members_score</code>, <code>start_date</code>, <code>end_date</code>, <code>classification</code></p>
   </div>
 
 
   <div class="section">
     <h3 id="read_just_added_anime">/anime/just_added - Read the anime that have just been added to MyAnimeList</h3>
-
-    <p class="warn"><strong>NOT YET IMPLEMENTED</strong></p>
 
     <p>Fetch anime that have just been added to the MyAnimeList database. The anime are sorted with the most recently added ones in front.</p>
 
@@ -728,8 +724,10 @@
     <p>The following optional parameters are supported:</p>
     <ul>
       <li><code>page</code> - Page of anime to return. Defaults to 1, i.e. the 1st page.</li>
-      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20.</li>
+      <li><code>per_page</code> - Number of anime to return per page. Defaults to 20. <span class="warn"><strong>NOT YET IMPLEMENTED</strong></span></li>
     </ul>
+
+    <p>The response is a list of <a href="#type_anime">anime</a>. Only the following anime properties are available: <code>id</code>, <code>title</code>, <code>episodes</code>, <code>type</code>, <code>synopsis</code>, <code>image_url</code>, <code>members_score</code>, <code>start_date</code>, <code>end_date</code>, <code>classification</code></p>
   </div>
 
 
