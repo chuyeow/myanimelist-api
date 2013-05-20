@@ -2,7 +2,8 @@ module MyAnimeList
 
   class Anime
     attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :thumb_url, :episodes, :classification,
-                  :members_score, :members_count, :favorited_count, :synopsis, :start_date, :end_date
+                  :members_score, :members_count, :favorited_count, :synopsis, :start_date, :end_date,
+                  :characters, :staff, :producers
     attr_accessor :listed_anime_id, :parent_story
     attr_reader :type, :status
     attr_writer :genres, :tags, :other_titles, :manga_adaptations, :prequels, :sequels, :side_stories,
@@ -375,6 +376,10 @@ module MyAnimeList
       end
     end
 
+    def producers
+      @producers ||= []
+    end
+
     def other_titles
       @other_titles ||= {}
     end
@@ -452,13 +457,19 @@ module MyAnimeList
         :listed_anime_id => listed_anime_id,
         :watched_episodes => watched_episodes,
         :score => score,
-        :watched_status => watched_status
+        :watched_status => watched_status,
+
+        # added attributes
+        :producers => producers,
+        :characters => characters
       }
     end
 
     def to_json(*args)
       attributes.to_json(*args)
     end
+
+    # TODO update XML with added attributes
 
     def to_xml(options = {})
       xml = Builder::XmlMarkup.new(:indent => 2)
@@ -579,7 +590,6 @@ module MyAnimeList
 
       def self.parse_anime_response(response)
         doc = Nokogiri::HTML(response)
-
         anime = Anime.new
 
         # Anime ID.
@@ -664,6 +674,18 @@ module MyAnimeList
           anime.start_date = parse_start_date(airdates_text)
           anime.end_date = parse_end_date(airdates_text)
         end
+        
+        # NEW - Producers of the anime
+        #
+        if (node = left_column_nodeset.at('//span[text()="Producers:"]')) && node.next
+          node.parent.search('a').each do |a|
+          producer = Hash.new
+          producer[:id] = a["href"].split("=")[1]
+          producer[:name] = a.text.strip
+          anime.producers << producer
+          end
+        end
+
         if node = left_column_nodeset.at('//span[text()="Genres:"]')
           node.parent.search('a').each do |a|
             anime.genres << a.text.strip
@@ -851,7 +873,17 @@ module MyAnimeList
 
         end
 
-        # <h2>My Info</h2>
+        # parse characters and staff
+        # should add the html above
+
+        characters_link = right_column_nodeset.at('//a[text()="More characters"]')
+        if characters_link
+          characters_url = characters_link["href"]
+          characters_doc = read_characters_url(characters_url)
+          anime.characters = scrape_characters(characters_doc)
+        end  
+     
+     # <h2>My Info</h2>
         # <a name="addtolistanchor"></a>
         # <div id="addtolist" style="display: block;">
         #   <input type="hidden" id="myinfo_anime_id" value="934">
@@ -894,6 +926,109 @@ module MyAnimeList
 
         anime
       end
+
+      def self.read_characters_url(url, cookie_string = nil)
+
+#        begin
+#        response = Net::HTTP.start('myanimelist.net', 80) do |http|
+#          http.get("")
+#        end
+
+#        case response
+#        when Net::HTTPRedirection
+#          redirected = true
+
+          # Strip everything after the anime ID - in cases where there is a non-ASCII character in the URL,
+          # MyAnimeList.net will return a page that says "Access has been restricted for this account".
+#          redirect_url = response['location'].sub(%r{(http://myanimelist.net/anime/\d+)/?.*}, '\1')
+
+#          response = Net::HTTP.start('myanimelist.net', 80) do |http|
+#            http.get(redirect_url)
+#          end
+#        end
+
+#      rescue Exception => e
+#        raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
+#      end
+
+        curl = Curl::Easy.new(url)
+        curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+        curl.cookies = cookie_string if cookie_string
+        begin
+          curl.perform
+        rescue Exception => e
+          raise MyAnimeList::NetworkError.new("Network error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+        end
+
+        response = curl.body_str
+        return response
+
+        # Check for missing anime.
+        raise MyAnimeList::NotFoundError.new("Anime with ID #{id} doesn't exist.", nil) if response =~ /No series found/i
+
+      rescue MyAnimeList::NotFoundError => e
+        raise
+      rescue Exception => e
+        raise MyAnimeList::UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
+      end
+
+      def self.scrape_characters(response)
+        doc = Nokogiri::HTML(response)
+        
+        character_list = []
+
+        characters_row = doc.at('//table[preceding-sibling::h2[text()="Characters & Voice Actors"] and following-sibling::h2]')
+        while characters_row
+          if characters_row.name == "br"
+            break
+          end
+          characters = characters_row.children[0]
+          image_col = characters.children[0]
+          name_col = characters.children[2]
+          seiyuu_col = characters.children[4]
+
+          thumb_url = image_col.children[1].children.at("img")["src"]
+          image_url = image_from_thumb_url(thumb_url, "t")
+
+          url = name_col.children[1]["href"]
+          split = url.split("/")
+          id = split[split.length-2].to_i
+
+          name = name_col.children[1].text
+          char_role = name_col.children[3].text
+
+          seiyuu = []
+
+          (0..seiyuu_col.children[1].children.length-1).each do |i|
+            info = Hash.new
+            node  = seiyuu_col.children[1].children[i]
+            if node.children[0] != nil and node.children[0] != nil
+              info[:name] = node.children[0].at("a").text
+              url = node.children[0].at("a")["href"] # split and get ID for /people api
+              split = url.split("/")
+              info[:id] = split[split.length-2].to_i
+              info[:nation] = node.children[0].at("small").text
+              info[:thumb_url] = node.children[2].at("img")["src"]
+              info[:image_url] = image_from_thumb_url(info[:thumb_url], "v")
+              seiyuu.push info
+            end
+          end
+          character_list.push Hash(:name => name, :id => id, :char_role => char_role, :thumb_url => thumb_url, :image_url => image_url, :seiyuu => seiyuu )
+          characters_row = characters_row.next
+        end
+        puts character_list
+        character_list
+      end
+
+      def self.image_from_thumb_url(url, char)
+        thumb_url = String::new(url)
+        t_pos = thumb_url.rindex(".")
+        if thumb_url[t_pos- 1] == char
+          thumb_url[t_pos - 1] = ""
+        end
+        thumb_url
+      end
+
 
       def self.parse_start_date(text)
         text = text.strip
@@ -953,12 +1088,8 @@ module MyAnimeList
 
           if image_node = results_row.at('td a img')
             thumb_url = image_node['src']
+            anime.image_url = image_from_thumb_url(thumb_url, "t")
             anime.thumb_url = image_node['src']
-            t_pos = thumb_url.rindex(".")
-            if thumb_url[t_pos- 1] == "t"
-              thumb_url[t_pos - 1] = ""
-            end
-            anime.image_url = thumb_url
           end
 
           table_cell_nodes = results_row.search('td')
