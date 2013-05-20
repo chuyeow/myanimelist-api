@@ -8,7 +8,6 @@ require 'builder'
 require 'json'
 require './my_anime_list'
 
-
 class App < Sinatra::Base
 
   configure do
@@ -295,7 +294,8 @@ class App < Sinatra::Base
     anime = MyAnimeList::Anime.top(
       :type     => params[:type],
       :page     => params[:page],
-      :per_page => params[:per_page]
+      :per_page => params[:per_page],
+      :from => params[:from]
     )
 
     case params[:format]

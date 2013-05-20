@@ -1,7 +1,7 @@
 module MyAnimeList
 
   class Anime
-    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :episodes, :classification,
+    attr_accessor :id, :title, :rank, :popularity_rank, :image_url, :thumb_url, :episodes, :classification,
                   :members_score, :members_count, :favorited_count, :synopsis, :start_date, :end_date
     attr_accessor :listed_anime_id, :parent_story
     attr_reader :type, :status
@@ -162,42 +162,55 @@ module MyAnimeList
         # Otherwise, parse the table of search results.
 
         doc = Nokogiri::HTML(response.body)
-        results_table = doc.xpath('//div[@id="content"]/div[2]/table')
+#        results_table = doc.xpath('//div[@id="content"]/div[2]/table')
 
-        results_table.xpath('//tr').each do |results_row|
+#        results_table.xpath('//tr').each do |results_row|
 
-          anime_title_node = results_row.at('td a strong')
-          next unless anime_title_node
-          url = anime_title_node.parent['href']
-          next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
+#          anime_title_node = results_row.at('td a strong')
+#          next unless anime_title_node
+#          url = anime_title_node.parent['href']
+#          next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
 
-          anime = Anime.new
-          anime.id = $1.to_i
-          anime.title = anime_title_node.text
-          if image_node = results_row.at('td a img')
-            anime.image_url = image_node['src']
-          end
+#          anime = Anime.new
+#          anime.id = $1.to_i
+#          anime.title = anime_title_node.text
 
-          table_cell_nodes = results_row.search('td')
+          # added attribute thumb_url to represent the thumbnail URL
+          # thumbnails represented by a 't' after the image id.
+          # full sized images omit the 't'
 
-          anime.episodes = table_cell_nodes[3].text.to_i
-          anime.members_score = table_cell_nodes[4].text.to_f
-          synopsis_node = results_row.at('div.spaceit')
-          if synopsis_node
-            synopsis_node.search('a').remove
-            anime.synopsis = synopsis_node.text.strip
-          end
-          anime.type = table_cell_nodes[2].text
-          anime.start_date = parse_start_date(table_cell_nodes[5].text)
-          anime.end_date = parse_end_date(table_cell_nodes[6].text)
-          anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+#          if image_node = results_row.at('td a img')
+#            thumb_url = image_node['src']
+#            anime.thumb_url = image_node['src']
+#            t_pos = thumb_url.rindex(".")
+#            if thumb_url[t_pos- 1] == "t"
+#              thumb_url[t_pos - 1] = ""
+#            end
+#            anime.image_url = thumb_url
+#          end
 
-          results << anime
-        end
+#          table_cell_nodes = results_row.search('td')
+#
+#          anime.episodes = table_cell_nodes[3].text.to_i
+#          anime.members_score = table_cell_nodes[4].text.to_f
+#          synopsis_node = results_row.at('div.spaceit')
+#          if synopsis_node
+#            synopsis_node.search('a').remove
+#            anime.synopsis = synopsis_node.text.strip
+#          end
+#          anime.type = table_cell_nodes[2].text
+#          anime.start_date = parse_start_date(table_cell_nodes[5].text)
+#          anime.end_date = parse_end_date(table_cell_nodes[6].text)
+#          anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+
+#          results << anime
+#        end
+#      end
+
+      results = parse_search_table(doc)
       end
-
-      results
     end
+
 
     # Returns top Anime.
     # Options:
@@ -205,9 +218,18 @@ module MyAnimeList
     #           top anime of any type.
     #  * page - Page of top anime to return. Defaults to 1.
     #  * per_page - Number of anime to return per page. Defaults to 30.
+    #  NEW * from - Starts search from the anime ranked by this number.
+    #        should be mutually exclusive with page
     def self.top(options = {})
+      puts options
       page = options[:page] || 1
       limit = (page.to_i - 1) * 30
+      if options[:page] == nil and options[:from] != nil
+        puts "from"
+        limit = options[:from].to_i
+      end
+      puts limit
+
       type = options[:type].to_s.downcase
 
       curl = Curl::Easy.new("http://myanimelist.net/topanime.php?type=#{type}&limit=#{limit}")
@@ -366,6 +388,7 @@ module MyAnimeList
         :rank => rank,
         :popularity_rank => popularity_rank,
         :image_url => image_url,
+        :thumb_url => thumb_url,
         :episodes => episodes,
         :status => status,
         :start_date => start_date,
@@ -866,6 +889,56 @@ module MyAnimeList
           Chronic.parse(date_string)
         end
       end
+
+
+      def self.parse_search_table(doc)
+        results = []
+        results_table = doc.xpath('//div[@id="content"]/div[2]/table')
+
+        results_table.xpath('//tr').each do |results_row|
+
+          anime_title_node = results_row.at('td a strong')
+          next unless anime_title_node
+          url = anime_title_node.parent['href']
+          next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
+
+          anime = Anime.new
+          anime.id = $1.to_i
+          anime.title = anime_title_node.text
+
+          # added attribute thumb_url to represent the thumbnail URL
+          # thumbnails represented by a 't' after the image id.
+          # full sized images omit the 't'
+
+          if image_node = results_row.at('td a img')
+            thumb_url = image_node['src']
+            anime.thumb_url = image_node['src']
+            t_pos = thumb_url.rindex(".")
+            if thumb_url[t_pos- 1] == "t"
+              thumb_url[t_pos - 1] = ""
+            end
+            anime.image_url = thumb_url
+          end
+
+          table_cell_nodes = results_row.search('td')
+
+          anime.episodes = table_cell_nodes[3].text.to_i
+          anime.members_score = table_cell_nodes[4].text.to_f
+          synopsis_node = results_row.at('div.spaceit')
+          if synopsis_node
+            synopsis_node.search('a').remove
+            anime.synopsis = synopsis_node.text.strip
+          end
+          anime.type = table_cell_nodes[2].text
+          anime.start_date = parse_start_date(table_cell_nodes[5].text)
+          anime.end_date = parse_end_date(table_cell_nodes[6].text)
+          anime.classification = table_cell_nodes[8].text if table_cell_nodes[8]
+
+          results << anime
+        end
+        results
+      end
+
 
   end # END class Anime
 end

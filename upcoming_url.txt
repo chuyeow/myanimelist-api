@@ -1,0 +1,2 @@
+c[0]=a&c[1]=b&c[2]=c&c[3]=d&c[4]=e&c[5]=f&c[6]=g&q=&tag=&sm=0&sd=0&em=0&ed=0&o=2&w=1&show=0
+c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=&
