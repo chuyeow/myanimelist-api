@@ -306,6 +306,23 @@ class App < Sinatra::Base
     end
   end
 
+  # GET /anime/upcoming
+  # Get upcoming anime - sorted by start date
+  get '/anime/upcoming' do
+    anime = MyAnimeList::Anime.upcoming(
+      :start_date    => params[:type],
+      :page     => params[:page],
+      :per_page => params[:per_page]
+    )
+
+    case params[:format]
+    when 'xml'
+      anime.to_xml
+    else
+      params[:callback].nil? ? anime.to_json : "#{params[:callback]}(#{anime.to_json})"
+    end
+  end
+
   # GET /anime/popular
   # Get the popular anime.
   get '/anime/popular' do

@@ -211,6 +211,50 @@ module MyAnimeList
       end
     end
 
+    # get upcoming anime
+    #
+    # ISSUES - page and per_page values are not effective given the API contract
+    # - API is meant to return anime airing after a certain date
+    # - should be start_date and until_date?, specifying a time period
+    # implemented page by page functionality
+
+    def self.upcoming(options = {})
+      start_date = options[:start_date] || Time.new.getutc.strftime("%Y-%m-%d")
+      page = options[:page] || 1
+      show = (page.to_i - 1) * 20
+
+      begin
+        response = Net::HTTP.start('myanimelist.net', 80) do |http|
+          http.get("/anime.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=&o=2&show=#{show}")
+        end
+
+        case response
+        when Net::HTTPRedirection
+          redirected = true
+
+          # Strip everything after the anime ID - in cases where there is a non-ASCII character in the URL,
+          # MyAnimeList.net will return a page that says "Access has been restricted for this account".
+          redirect_url = response['location'].sub(%r{(http://myanimelist.net/anime/\d+)/?.*}, '\1')
+
+          response = Net::HTTP.start('myanimelist.net', 80) do |http|
+            http.get(redirect_url)
+          end
+        end
+
+      rescue Exception => e
+        raise MyAnimeList::UpdateError.new("Error searching anime with query '#{query}'. Original exception: #{e.message}", e)
+      end
+
+
+      doc = Nokogiri::HTML(response.body)
+      results = parse_search_table(doc)
+      results
+
+      # check if any results are past the provided start date
+      # if yes, split the array at that point
+      # else recreate the url and recursively get more results
+    end
+
 
     # Returns top Anime.
     # Options:
@@ -221,14 +265,11 @@ module MyAnimeList
     #  NEW * from - Starts search from the anime ranked by this number.
     #        should be mutually exclusive with page
     def self.top(options = {})
-      puts options
       page = options[:page] || 1
       limit = (page.to_i - 1) * 30
       if options[:page] == nil and options[:from] != nil
-        puts "from"
         limit = options[:from].to_i
       end
-      puts limit
 
       type = options[:type].to_s.downcase
 
