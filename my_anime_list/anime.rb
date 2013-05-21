@@ -376,6 +376,14 @@ module MyAnimeList
       end
     end
 
+    def characters
+      @characters ||= []
+    end
+    
+    def staff
+      @staff ||= []
+    end
+
     def producers
       @producers ||= []
     end
@@ -461,7 +469,8 @@ module MyAnimeList
 
         # added attributes
         :producers => producers,
-        :characters => characters
+        :characters => characters,
+        :staff => staff
       }
     end
 
@@ -880,7 +889,9 @@ module MyAnimeList
         if characters_link
           characters_url = characters_link["href"]
           characters_doc = read_characters_url(characters_url)
-          anime.characters = scrape_characters(characters_doc)
+          chars_and_staff = scrape_characters_and_staff(characters_doc)
+          anime.characters = chars_and_staff[0]
+          anime.staff = chars_and_staff[1]
         end  
      
      # <h2>My Info</h2>
@@ -972,52 +983,63 @@ module MyAnimeList
         raise MyAnimeList::UnknownError.new("Error scraping anime with ID=#{id}. Original exception: #{e.message}.", e)
       end
 
-      def self.scrape_characters(response)
+      def self.scrape_characters_and_staff(response)
         doc = Nokogiri::HTML(response)
         
         character_list = []
+        staff_list = []
 
-        characters_row = doc.at('//table[preceding-sibling::h2[text()="Characters & Voice Actors"] and following-sibling::h2]')
-        while characters_row
-          if characters_row.name == "br"
-            break
-          end
-          characters = characters_row.children[0]
-          image_col = characters.children[0]
-          name_col = characters.children[2]
-          seiyuu_col = characters.children[4]
+        nodes = doc.at('//table[preceding-sibling::h2[text()="Characters & Voice Actors"]]').parent.xpath("table")
+        
+        nodes.each do |node|
+          if node.children.size == 1
+            seiyuu_list = []
+            character = Hash.new
+            char_nodes = node.at("tr").css("td")
+            char_node = char_nodes[1]
+            char_thumb_node = char_nodes[0]
 
-          thumb_url = image_col.children[1].children.at("img")["src"]
-          image_url = image_from_thumb_url(thumb_url, "t")
-
-          url = name_col.children[1]["href"]
-          split = url.split("/")
-          id = split[split.length-2].to_i
-
-          name = name_col.children[1].text
-          char_role = name_col.children[3].text
-
-          seiyuu = []
-
-          (0..seiyuu_col.children[1].children.length-1).each do |i|
-            info = Hash.new
-            node  = seiyuu_col.children[1].children[i]
-            if node.children[0] != nil and node.children[0] != nil
-              info[:name] = node.children[0].at("a").text
-              url = node.children[0].at("a")["href"] # split and get ID for /people api
-              split = url.split("/")
-              info[:id] = split[split.length-2].to_i
-              info[:nation] = node.children[0].at("small").text
-              info[:thumb_url] = node.children[2].at("img")["src"]
-              info[:image_url] = image_from_thumb_url(info[:thumb_url], "v")
-              seiyuu.push info
+            character[:id] = id_from_url(char_node.at("a")["href"])
+            character[:type] = char_node.at("small").text
+            character[:name] = char_node.at("a").text
+            character[:thumb_url] = char_thumb_node.at("a img")["src"]
+            character[:image_url] = image_from_thumb_url(character[:thumb_url], "t")
+            
+            node.css("table tr").each do |seiyuu_node|
+              info_nodes = seiyuu_node.css("td")
+              if info_nodes.length > 0
+                seiyuu_node = info_nodes[0]
+                seiyuu_thumb_node = info_nodes[1]
+                seiyuu = Hash.new
+                seiyuu[:id] = id_from_url(seiyuu_node.at("a")["href"])
+                seiyuu[:nation] = seiyuu_node.at("small").text
+                seiyuu[:name] = seiyuu_node.at("a").text
+                seiyuu[:thumb_url] = seiyuu_thumb_node.at("a img")["src"]
+                seiyuu[:image_url] = image_from_thumb_url(seiyuu[:thumb_url], "v")
+                seiyuu_list.push seiyuu
+              end
+            end
+            character[:seiyuu] = seiyuu_list
+            character_list.push character
+          else
+            node.css("tr").each do |row|
+              nodes = row.css("td")
+              staff = Hash.new
+              staff[:name] = nodes[1].at("a").text
+              staff[:role] = nodes[1].at("small").text
+              staff[:thumb_url] = nodes[0].at("img")["src"]
+              staff[:image_url] = image_from_thumb_url(staff[:thumb_url], "v")
+              staff[:id] = id_from_url(nodes[0].at("a")["href"])
+              staff_list.push staff
             end
           end
-          character_list.push Hash(:name => name, :id => id, :char_role => char_role, :thumb_url => thumb_url, :image_url => image_url, :seiyuu => seiyuu )
-          characters_row = characters_row.next
         end
-        puts character_list
-        character_list
+        [character_list, staff_list]
+      end
+
+      def self.id_from_url(url)
+        split = url.split("/")
+        split[split.length-2].to_i
       end
 
       def self.image_from_thumb_url(url, char)
