@@ -1045,7 +1045,7 @@ module MyAnimeList
       def self.image_from_thumb_url(url, char)
         thumb_url = String::new(url)
         t_pos = thumb_url.rindex(".")
-        if thumb_url[t_pos- 1] == char
+        if thumb_url[t_pos - 1] == char
           thumb_url[t_pos - 1] = ""
         end
         thumb_url

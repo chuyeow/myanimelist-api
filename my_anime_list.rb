@@ -7,6 +7,7 @@ require './my_anime_list/anime'
 require './my_anime_list/anime_list'
 require './my_anime_list/manga'
 require './my_anime_list/manga_list'
+require './my_anime_list/character'
 
 module MyAnimeList
 

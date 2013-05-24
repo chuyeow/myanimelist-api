@@ -141,6 +141,31 @@ class App < Sinatra::Base
     end
   end
 
+  get '/character/:id' do
+    pass unless params[:id] =~ /^\d+$/
+
+    if params[:mine] == '1'
+      authenticate unless session['cookie_string']
+      character = MyAnimeList::Character.scrape_character(params[:id], session['cookie_string'])
+    else
+      character = MyAnimeList::Character.scrape_character(params[:id])
+
+      # Caching.
+      expires 3600, :public, :must_revalidate
+      last_modified Time.now
+      etag "character/#{character.id}"
+    end
+
+    case params[:format]
+    when 'xml'
+      # TO DO
+      character.to_xml
+    else
+      params[:callback].nil? ? character.to_json : "#{params[:callback]}(#{character.to_json})"
+    end
+  end
+
+
 
   # POST /animelist/anime
   # Adds an anime to a user's anime list.
