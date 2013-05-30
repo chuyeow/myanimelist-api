@@ -8,8 +8,6 @@ require 'builder'
 require 'json'
 require './my_anime_list'
 
-set :cache, Dalli::Client.new
-
 class App < Sinatra::Base
 
   configure do
