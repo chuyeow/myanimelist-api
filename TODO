@@ -1,0 +1,6 @@
+- Add to_xml methods to character and people
+- Update the to_xml method for anime
+- Add character attribute to manga results
+- Add staff attribute to manga
+- Interface to search for manga serialisation and anime producer
+- Cleaner interface to returning full list of search results.
