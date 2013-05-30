@@ -79,26 +79,26 @@ module MyAnimeList
         image_node = content.at('img')
         person.image_url = image_node['src']
 
-        given_name_node = content.at('span[text()="Given name:"]').next
+        given_name_node = content.at('span[text()="Given name:"]')
         if given_name_node != nil
-          person.given_name = given_name_node.text
+          person.given_name = given_name_node.next.text
         end
 
         
-        family_name_node = content.at('span[text()="Family name:"]').next
+        family_name_node = content.at('span[text()="Family name:"]')
         if family_name_node != nil
-          person.family_name = family_name_node.text
+          person.family_name = family_name_node.next.text
         end
 
 
-        birthday_node = content.at('span[text()="Birthday:"]').next
+        birthday_node = content.at('span[text()="Birthday:"]')
         if birthday_node != nil
-          person.birthday = birthday_node.text
+          person.birthday = birthday_node.next.text
         end
 
-        website_node = content.at('span[text()="Website:"]').next.next
+        website_node = content.at('span[text()="Website:"]')
         if website_node != nil
-          person.website = website_node["href"]
+          person.website = website_node.next.next["href"]
         end
 
         more_node = content.at('span[text()="More:"]').parent.next
@@ -126,10 +126,10 @@ module MyAnimeList
             char_info_node = nodes[2]
             char_image_node = nodes[3]
 
-            seiyuu[:thumb_url] = image_node.at('img')['src']
-            seiyuu[:image_url] = image_from_thumb_url(seiyuu[:thumb_url], "v")
             seiyuu[:id] = id_from_url(info_node.at('a')['href'])
             seiyuu[:name] = info_node.at('a').text
+            seiyuu[:thumb_url] = image_node.at('img')['src']
+            seiyuu[:image_url] = image_from_thumb_url(seiyuu[:thumb_url], "v")
             character[:id] = id_from_url(char_info_node.at('a')['href'])
             character[:name] = char_info_node.at('a').text
             character[:role] = char_info_node.at('div').text
@@ -151,11 +151,11 @@ module MyAnimeList
             nodes = cells.css("td") 
             image_node = nodes[0]
             info_node = nodes[1]
-            anime[:thumb_url] = image_node.at('img')['src'] #thumb
-            anime[:image_url] = image_from_thumb_url(anime[:thumb_url], "v")
             anime[:id] = id_from_url( info_node.at('a')['href']) #id
             anime[:name] = info_node.at('a').text #name
             anime[:role] = info_node.at("small").text + info_node.at("small").next.text #role description - may be null
+            anime[:thumb_url] = image_node.at('img')['src'] #thumb
+            anime[:image_url] = image_from_thumb_url(anime[:thumb_url], "v")
             anime_staff_roles.push anime
           end
         end
@@ -171,10 +171,11 @@ module MyAnimeList
             nodes = cells.css("td") 
             image_node = nodes[0]
             info_node = nodes[1]
-            manga[:thumb_url] = image_node.at('img')['src'] #thumb
             manga[:id] = id_from_url(info_node.at('a')['href'])
             manga[:name] = info_node.at('a').text #name
             manga[:role] = info_node.at("small").text #role
+            manga[:thumb_url] = image_node.at('img')['src'] #thumb
+            manga[:image_url] = image_from_thumb_url(manga[:thumb_url], "v")
             published_manga.push manga
           end
         end
