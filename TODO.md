@@ -1,3 +1,4 @@
+- Update the documentation!
 - Add to_xml methods to character and people
 - Update the to_xml method for anime
 - Add character attribute to manga results
