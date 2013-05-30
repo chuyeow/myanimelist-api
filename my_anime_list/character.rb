@@ -38,7 +38,7 @@ module MyAnimeList
     end
 
     def bio
-      @bio ||= []
+      @bio ||= ""
     end
 
     def attributes
@@ -130,6 +130,7 @@ module MyAnimeList
           bio.push bio_div.to_s
           bio_div = bio_div.next
         end
+        character.bio = bio.join("")
 
         seiyuu_list = []
         va_div = va_div.next.next

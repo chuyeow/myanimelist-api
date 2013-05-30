@@ -141,6 +141,8 @@ class App < Sinatra::Base
     end
   end
 
+  # GET /character/#{character_id}
+
   get '/character/:id' do
     pass unless params[:id] =~ /^\d+$/
 
@@ -165,7 +167,31 @@ class App < Sinatra::Base
     end
   end
 
+  # GET /people/#{person_id}
 
+  get '/people/:id' do
+    pass unless params[:id] =~ /^\d+$/
+
+    if params[:mine] == '1'
+      authenticate unless session['cookie_string']
+      person = MyAnimeList::People.scrape_person(params[:id], session['cookie_string'])
+    else
+      person = MyAnimeList::People.scrape_person(params[:id])
+
+      # Caching.
+      expires 3600, :public, :must_revalidate
+      last_modified Time.now
+      etag "people/#{person.id}"
+    end
+
+    case params[:format]
+    when 'xml'
+      # TO DO
+      person.to_xml
+    else
+      params[:callback].nil? ? person.to_json : "#{params[:callback]}(#{person.to_json})"
+    end
+  end
 
   # POST /animelist/anime
   # Adds an anime to a user's anime list.
