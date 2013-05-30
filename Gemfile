@@ -13,6 +13,11 @@ gem 'dalli'
 gem 'json'
 gem 'nokogiri'
 
+gem 'capistrano'
+gem 'capistrano-ext'
+gem 'thin'
+
+
 group :development do
   gem 'capistrano'
   gem 'capistrano-ext'
