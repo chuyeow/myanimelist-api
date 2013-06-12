@@ -246,12 +246,12 @@ module MyAnimeList
         type = stats[0]
         episodes = stats[1].gsub!(/\D/, '')
         episodes = if episodes.size > 0 then episodes.to_i else nil end
-        score = stats[2].match(/\d+(\.\d+)?/).to_s.to_f
+        members_score = stats[2].match(/\d+(\.\d+)?/).to_s.to_f
 
         anime.type = type
         anime.episodes = episodes
         anime.members_count = members
-        anime.score = score
+        anime.members_score = members_score
 
         if image_node = results_row.at('td a img')
           anime.image_url = image_node['src']
