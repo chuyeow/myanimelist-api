@@ -478,7 +478,6 @@ module MyAnimeList
       attributes.to_json(*args)
     end
 
-    # TODO update XML with added attributes
 
     def to_xml(options = {})
       xml = Builder::XmlMarkup.new(:indent => 2)
@@ -491,6 +490,7 @@ module MyAnimeList
         xml.rank rank
         xml.popularity_rank popularity_rank
         xml.image_url image_url
+        xml.thumb_url thumb_url
         xml.episodes episodes
         xml.status status.to_s
         xml.start_date start_date
@@ -513,6 +513,13 @@ module MyAnimeList
         other_titles[:japanese].each do |title|
           xml.japanese_title title
         end if other_titles[:japanese]
+
+        producers.each do |producer|
+          xml.producer do |xml|
+            xml.id producer[:id]
+            xml.name producer[:name]
+          end
+        end
 
         genres.each do |genre|
           xml.genre genre
@@ -588,6 +595,35 @@ module MyAnimeList
             xml.anime_id  o[:anime_id]
             xml.title     o[:title]
             xml.url       o[:url]
+          end
+        end
+
+        characters.each do |o|
+          xml.characters do |xml|
+            xml.id o[:id]
+            xml.name o[:name]
+            xml.role o[:role]
+            xml.thumb_url o[:thumb_url]
+            xml.image_url o[:image_url]
+            o[:seiyuu].each do |seiyuu|
+              xml.seiyuu do |xml|
+                xml.id seiyuu[:id]
+                xml.name seiyuu[:name]
+                xml.nation seiyuu[:nation]
+                xml.image_url seiyuu[:image_url]
+                xml.thumb_url seiyuu[:thumb_url]
+              end
+            end
+          end
+        end
+
+        staff.each do |o|
+          xml.staff do |xml|
+            xml.id o[:id]
+            xml.name o[:name]
+            xml.role o[:role]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
           end
         end
       end
@@ -686,6 +722,16 @@ module MyAnimeList
         
         # NEW - Producers of the anime
         #
+        #<div><span class="dark_text">Producers:</span>
+        # <a href="http://myanimelist.net/anime.php?p=2">Kyoto Animation</a>, 
+        # <a href="http://myanimelist.net/anime.php?p=144">Pony Canyon</a>, 
+        # <a href="http://myanimelist.net/anime.php?p=145">TBS</a>, 
+        # <a href="http://myanimelist.net/anime.php?p=166">Movic</a>, 
+        # <a href="http://myanimelist.net/anime.php?p=376">Sentai Filmworks</a><sup><small>L</small></sup>, 
+        # <a href="http://myanimelist.net/anime.php?p=929">Animation Do</a>
+        # </div>
+        #
+        
         if (node = left_column_nodeset.at('//span[text()="Producers:"]')) && node.next
           node.parent.search('a').each do |a|
           producer = Hash.new
@@ -883,7 +929,10 @@ module MyAnimeList
         end
 
         # parse characters and staff
-        # should add the html above
+        #
+        # <h2><div class="floatRightHeader"><a href="http://myanimelist.net/anime/2167/Clannad/characters" style="font-weight: normal;">More characters</a></>
+        #
+        # Finds link and downloads it via cURL in the following method
 
         characters_link = right_column_nodeset.at('//a[text()="More characters"]')
         if characters_link
@@ -938,6 +987,8 @@ module MyAnimeList
         anime
       end
 
+      # reads the URL and returns a response
+
       def self.read_characters_url(url, cookie_string = nil)
 
 #        begin
@@ -989,6 +1040,57 @@ module MyAnimeList
         character_list = []
         staff_list = []
 
+        # Parses the characters and staff list
+        #
+        # <h2>....Characters & Voice Actors</h2>
+        # <table border="0" cellpadding="0" cellspacing="0">
+        # <table border="0" cellpadding="0" cellspacing="0" width="100%"><tr>
+        # <td valign="top" width="27" class="borderClass bgColor2" align="center">
+        # <div class="picSurround"><a href=class"http://myanimelist.net/character/4605/Kyou_Fujibayashi" style="font-weight: normal;"><img src="http://cdn.myanimelist.net/images/characters/16/70221t.jpg" alt="Fujibayashi, Kyou" vspace="4" hspace="8" border="0"></a></div>
+        # </td>
+        # <td valign="top" class="borderClass bgColor2">
+        # <a href="http://myinfo_updateInfoanimelist.net/character/4605/Kyou_Fujibayashi">Fujibayashi, Kyou</a>
+        # <div class="spaceit_pad"><small>Main</small></div>
+        # </td>
+        # <td aligngn="right" valign="top" class="borderClass bgColor2">
+        # <table borderClass="0" cellpadding="0" cellspacing="0" class="space_table">
+        # <tr>
+        # <td valign="top" align="right" style="padding: 0 4px;" nowrap>
+        # <a href="http://myanimelist.net/peoplele/111/Ryou_Hirohashi">Hirohashi, Ryou</a><br><small>Japanese</small>
+        # </td>
+        # <td valign="top">
+        # <div class="picSurround"><a href="http://myanimelist.net/people/111/Ryou_Hirohashiohashi"><img src="http://cdn.myanimelist.net/images/voiceactors/2/17269v.jpg" alt="Hirohashi, Ryou" border="0"></a></div>
+        # </td>
+        # </tr>
+        # <tr>
+        # <td valign="top" align="right" style="padding: 0 4px;" nowrap>
+        # <a Higurashi_no_Naku_Koro_ni_Kai_DVD_Specialsref="http://myanimelist.net/people/193/Shelley_Calene-Black">Calene-Black, Shelley</a><br><small>English</small>
+        # </td>
+        # <td valign="top">
+        # <div class="picSurround"><a href="http://myanimelist.net/people/193/Shelley_Calene-Black"><img src="http://cdn.myanimelist.net/images/voiceactors/1/23747v.jpg" alt="Calene-Black, Shelley" border="0"></a></div>
+        # </td>
+        # </tr>
+        # <tr>
+        # <td valign="top" align="right" style="padding: 0 4px;" nowrap>
+        # <a href="http://myanimelist.net/people/15593/Mun_Ja_Choi">Choi, Mun       Ja</a><br><small>Korean</small>
+        # </td>
+        # <td valign="top">
+        # <div                    class="picSurround"><a href="http://myanimelist.net/people/15593/Mun_Ja_Choi"><img src="http://cdn.myanimelist.net/images/voiceactors/3/16929v.jpg" alt="Choi, Mun Ja" border="0"></a></div>
+        # </td>
+        # </tr>
+        # <tr></tr>
+        # </table>
+        # </td>
+        # </tr>
+        # </table>
+        #
+        # each table contains a single character, with a nested table of their seiyuu
+        #
+        # seiyuu tables do not contain the nested table
+        #
+        #
+        #
+
         nodes = doc.at('//table[preceding-sibling::h2[text()="Characters & Voice Actors"]]').parent.xpath("table")
         
         nodes.each do |node|
@@ -1038,8 +1140,9 @@ module MyAnimeList
       end
 
       def self.id_from_url(url)
-        split = url.split("/")
-        split[split.length-2].to_i
+#        split = url.split("/")
+#        split[split.length-2].to_i
+        url[%r{http://myanimelist.net/(\w+)/(\d+)/.*?}, 2].to_i
       end
 
       def self.image_from_thumb_url(url, char)

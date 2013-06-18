@@ -71,6 +71,8 @@
         <li><a href="#read_manga_list">/mangalist - Read a manga list</a></li>
         <li><a href="#read_manga">/manga - Read a manga's details</a></li>
         <li><a href="#read_search_manga">/manga/search - Search manga</a></li>
+        <li><a href="#read_character">/character - Read a character's details</a></li>
+        <li><a href="#read_people">/people - Read a person's details</a></li>
       </ul>
     </li>
     <li>
@@ -180,6 +182,18 @@
           <td><a href="#read_search_manga">/manga/search</a></td>
           <td>Search for manga matching a query.</td>
           <td><a href="http://mal-api.com/manga/search?q=berserk">http://mal-api.com/manga/search?q=berserk</a></td>
+        </tr>
+
+        <tr>
+          <td><a href="#read_character">/character/<strong>character_id</strong></a></td>
+          <td>Fetch a character's details</td>
+          <td><a href="http://mal-api.com/character/4605">http://mal-api.com/character/4605</a></td>
+        </tr>
+
+        <tr>
+          <td><a href="#read_people">/people/<strong>person_id</strong></a></td>
+          <td>Fetch a person's details</td>
+          <td><a href="http://mal-api.com/people/185">http://mal-api.com/people/185</a></td>
         </tr>
 
       </tbody>
@@ -305,7 +319,8 @@
       </li>
       <li><code>rank</code> - Global rank of this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>popularity_rank</code> - Rank of this anime based on its popularity, i.e. number of users that have added this anime. <em>Not available in <code>/animelist</code> requests.</em></li>
-      <li><code>image_url</code> - URL to an image for this anime.</li>
+      <li><code>image_url</code> - URL to the full-sized image for this anime.</li>
+      <li><code>thumb_url</code> - URL to the thumbnail of the <code>image_url</code> for this anime.</li>
       <li><code>type</code> - Type of anime. Possible values: <code>TV</code>, <code>Movie</code>, <code>OVA</code>, <code>ONA</code>, <code>Special</code>, <code>Music</code>.</li>
       <li><code>episodes</code> - Number of episodes. <code>null</code> is returned if the number of episodes is unknown.</li>
       <li><code>status</code> - Airing status of this anime. Possible values: <code>finished airing</code>, <code>currently airing</code>, <code>not yet aired</code>.</li>
@@ -318,6 +333,12 @@
       <li><code>synopsis</code> - Text describing the anime. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>genres</code> - A list of genres for this anime, e.g. <code>["Action", "Comedy", "Shounen"]</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
       <li><code>tags</code> - A list of popular tags for this anime, e.g. <code>["supernatural", "comedy"]</code>. <em>Not available in <code>/animelist</code> requests.</em></li>
+      <li><code>producers</code> - A list of the anime's producers, e.g. <code></code>. <em>Not available in <code</animelist</code> requests.</em>
+       <ul>
+         <li><code>id</code> - ID of this producer. e.g. <code>2</code>. <em>Not available in <code</animelist</code> requests.</em> </li>
+         <li><code>name</code> - Name of this producer, e.g. <code>Kyoto Animation</code>. <em>Not available in <code</animelist</code> requests.</em></li>
+       </ul>
+      </li>
       <li>
         <code>manga_adaptations</code> - A list of manga adaptations of this anime (or conversely, manga from which this anime is adapted). <em>Not available in <code>/animelist</code> requests.</em>
         <ul>
@@ -388,6 +409,34 @@
           <li><code>anime_id</code> - ID of the anime.</li>
           <li><code>title</code> - Title of the anime.</li>
           <li><code>url</code> - URL to the anime on the MyAnimeList website.</li>
+        </ul>
+      </li>
+      <li>
+        <code>characters</code> - A list of characters from this anime. <em>Not available in <code>/animelist</code> requests.</em>
+        <ul>
+          <li><code>id</code> - ID of this character, e.g. <code>2167</code>. </li>
+          <li><code>name</code> - Name of this character, e.g,<code>Fujibayashi, Kyou</code>.</li>
+          <li><code>role</code> - The role this character plays, e.g. <code>Main</code>.</li>
+          <li><code>image_url</code> - URL to a full-sized image of this character.</li>
+          <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of this character.</li>
+          <li><code>seiyuu</code> - A list of seiyuu that voiced this character.</li>
+          <ul>
+            <li><code>id</code> - ID of this seiyuu, e.g. <code>185</code>.</li>
+            <li><code>name</code> - Name of this seiyuu, e.g. <code>Hanazawa, Kana</code>.</li>
+            <li><code>role</code> - The nationality of this seiyuu, e.g. <code>Japanese</code>.</li>
+            <li><code>image_url</code> - URL to a full-sized image of this seiyuu.</li>
+            <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of this seiyuu.</li>
+          </ul>
+        </ul>
+      </li>
+      <li>
+        <code>staff</code> - A list of the staff who worked on this anime. <em>Not available in <code>/animelist</code> requests.</em>
+        <ul>
+          <li><code>id</code> - ID of this person, e.g. <code>2347</code>. </li>
+          <li><code>name</code> - Name of this person, e.g,<code>Maeda, Jun</code>.</li>
+          <li><code>role</code> - The role this person undertook.</li>
+          <li><code>image_url</code> - URL to a full-sized image of this character.</li>
+          <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of this character.</li>
         </ul>
       </li>
     </ul>
@@ -471,6 +520,80 @@
       <li><code>chapters_read</code> - Number of chapters already read by the user.</li>
       <li><code>volumes_read</code> - Number of volumes already read by the user.</li>
       <li><code>score</code> - User's score for the manga, from 1 to 10.</li>
+    </ul>
+
+    <h4 id="type_character">Character</h4>
+    <ul>
+      <li><code>id</code> - ID of this character, e.g. <code>2167</code>. </li>
+      <li><code>name</code> - Name of this character, e.g. <code>Fujibayashi, Kyou</code>.</li>
+      <li><code>eng_name</code> - Name of this character in English, e.g. <code></code>.</li>
+      <li><code>jp_name</code> - Name of this character in Japanese, e.g. <code>藤林 杏</code>.</li>
+      <li><code>image_url</code> - URL to a full-sized image of this character.</li>
+      <li><code>thumb_url</code> - URL to the thumbnail the image_url of this character.</li>
+      <li><code>anime</code> - A list of anime this character appears in.</li>
+      <ul>
+        <li><code>id</code> - ID of this anime, e.g. <code>4605</code>. </li>
+        <li><code>name</code> - Name of this anime, e.g,<code>Clannad</code>.</li>
+        <li><code>role</code> - The role this character plays, e.g. <code>Main</code>.</li>
+        <li><code>image_url</code> - URL to a full-sized image of the anime.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the image_url of the anime.</li>
+      </ul>
+      <li><code>manga</code> - A list of manga this character appears in.</li>
+      <ul>
+        <li><code>id</code> - ID of this manga, e.g. <code>2598</code>. </li>
+        <li><code>name</code> - Name of this manga, e.g,<code>Clannad</code>.</li>
+        <li><code>role</code> - The role this character plays, e.g. <code>Main</code>.</li>
+        <li><code>image_url</code> - URL to a full-sized image of the manga.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of the manga.</li>
+      </ul>
+      <li><code>bio</code> - This character's biography, in HTML.</li>
+      <li><code>seiyuu</code> - A list of seiyuu that voiced this character.</li>
+      <ul>
+        <li><code>id</code> - ID of this seiyuu, e.g. <code>185</code>.</li>
+        <li><code>name</code> - Name of this seiyuu, e.g. <code>Hanazawa, Kana</code>.</li>
+        <li><code>role</code> - The nationality of this seiyuu, e.g. <code>Japanese</code>.</li>
+        <li><code>image_url</code> - URL to a full-sized image of this seiyuu.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the image_url of this seiyuu.</li>
+      </ul>
+    </ul>
+
+    <h4 id="type_people">Person</h4>
+    <ul>
+      <li><code>id</code> - ID of this person, e.g. <code>185</code>. </li>
+      <li><code>name</code> - Name of this person, e.g. <code>Hanazawa, Kana</code>.</li>
+      <li><code>given_name</code> - Given name of this person, e.g. <code>香菜</code>.</li>
+      <li><code>family_name</code> - Family name of this person, e.g. <code>花澤</code>.</li>
+      <li><code>image_url</code> - URL to a full-sized image of this character.</li>
+      <li><code>thumb_url</code> - URL to the thumbnail the image_url of this character.</li>
+      <li<code>birthday</code> - The birthday of this person, as a string.</li>
+      <li><code>website</code> - The URL of the website of this person.</li>
+      <li><code>more</code> - This person's <code>more</code> field, as appears on MAL.</li>
+      <li><code>seiyuu_roles</code> - a list of anime this person has voiced characters in.</li>
+      <ul>
+        <li><code>id</code> - ID of this anime, e.g. <code>4605</code>. </li>
+        <li><code>title</code> - Title of this anime, e.g,<code>Clannad</code>.</li>
+        <li><code>role</code> - The role this character plays, e.g. <code>main</code>.</li>
+        <li><code>image_url</code> - URL to a full-sized image of the anime.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of the anime.</li>
+      </ul>
+      <li><code>anime_staff_roles</code> - a list of anime this person has worked on as staff.</li>
+      <ul>
+        <li><code>id</code> - ID of this anime, e.g. <code>4605</code>. </li>
+        <li><code>title</code> - Title of this anime, e.g,<code>Clannad</code>.</li>
+        <li><code>role</code> - The role this person had as staff.</li>
+        <li><code>image_url</code> - URL to a full-sized image of the anime.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of the anime.</li>
+      </ul>
+      <li><code>published_manga</code> - A list of manga this person has published.</li>
+      <ul>
+        <li><code>id</code> - ID of this manga, e.g. <code>2598</code>. </li>
+        <li><code>title</code> - Title of this manga, e.g,<code>Clannad</code>.</li>
+        <li><code>role</code> - The role this person had in the publishing.</li>
+        <li><code>image_url</code> - URL to a full-sized image of the manga.</li>
+        <li><code>thumb_url</code> - URL to the thumbnail the <code>image_url</code> of the manga.</li>
+      </ul>
+      <li><code>bio</code> - This character's biography, in HTML.</li>
+
     </ul>
 
 
@@ -784,6 +907,36 @@
 
     <p>The response is a list of <a href="#type_manga">manga</a>. Only the following manga properties are available: <code>id</code>, <code>title</code>, <code>chapters</code>, <code>volumes</code>, <code>type</code>, <code>synopsis</code>, <code>image_url</code>, <code>members_score</code></p>
   </div>
+
+  <div class="section">
+    <h3 id="read_character">/character - Read a character's details</h3>
+
+    <p>Retrieve details for the character with the given character id:</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/character/<strong>character_id</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/character/4605">http://mal-api.com/character/4605</a></p>
+    </blockquote>
+
+    <p>The response is a <a href="#type_character">character</a>.</p>
+  </div>
+
+  <div class="section">
+    <h3 id="read_people">/people - Read a person's details</h3>
+
+    <p>Retrieve details for the person with the given person id:</p>
+
+    <blockquote>
+      <p><code>http://mal-api.com/manga/<strong>manga_id</strong></code></p>
+
+      <p>Example: <a href="http://mal-api.com/people/104">http://mal-api.com/people/185</a></p>
+    </blockquote>
+
+    <p>The response is a <a href="#type_people">person</a>.</p>
+  </div>
+
+
 
 
   <h2 id="write_methods">Writing data to MyAnimeList</h2>

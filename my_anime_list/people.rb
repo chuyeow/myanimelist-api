@@ -46,6 +46,7 @@ module MyAnimeList
         :id => id,
         :name => name,
         :image_url => image_url,
+        :thumb_url => thumb_url,
         :given_name => given_name,
         :family_name => family_name,
         :birthday => birthday,
@@ -55,6 +56,56 @@ module MyAnimeList
         :anime_staff_roles => anime_staff_roles,
         :published_manga => published_manga
       }
+    end
+
+    def to_xml(options = {})
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct! unless options[:skip_instruct]
+      xml.person do |xml|
+        xml.id id
+        xml.name name
+        xml.given_name given_name
+        xml.family_name family_name
+        xml.image_url image_url
+        xml.thumb_url thumb_url
+        xml.birthday birthday
+        xml.website website
+        xml.more more
+        seiyuu_roles.each do |o|
+          xml.seiyuu_roles do |xml|
+            xml.id o[:id]
+            xml.title o[:title]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+            xml.character do |xml|
+              xml.id o[:character][:id]
+              xml.name o[:character][:name]
+              xml.role o[:character][:role]
+              xml.image_url o[:character][:image_url]
+              xml.thumb_url o[:character][:thumb_url]
+            end
+          end
+        end
+        anime_staff_roles.each do |o|
+          xml.anime_staff_roles do |xml|
+            xml.id o[:id]
+            xml.title o[:title]
+            xml.role o[:role]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+          end
+        end
+        published_manga.each do |o|
+          xml.published_manga do |xml|
+            xml.id o[:id]
+            xml.title o[:title]
+            xml.role o[:role]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+          end
+        end
+
+      end
     end
 
     def to_json(*args)
@@ -118,7 +169,7 @@ module MyAnimeList
         if not va_list.next.text.match('No voice acting roles have been added yet')
           table = va_list.next
           table.css("tr").each do |cells|
-            seiyuu = Hash.new
+            anime = Hash.new
             character = Hash.new
             nodes = cells.css("td")
             image_node = nodes[0]
@@ -126,17 +177,17 @@ module MyAnimeList
             char_info_node = nodes[2]
             char_image_node = nodes[3]
 
-            seiyuu[:id] = id_from_url(info_node.at('a')['href'])
-            seiyuu[:name] = info_node.at('a').text
-            seiyuu[:thumb_url] = image_node.at('img')['src']
-            seiyuu[:image_url] = image_from_thumb_url(seiyuu[:thumb_url], "v")
+            anime[:id] = id_from_url(info_node.at('a')['href'])
+            anime[:title] = info_node.at('a').text
+            anime[:thumb_url] = image_node.at('img')['src']
+            anime[:image_url] = image_from_thumb_url(anime[:thumb_url], "v")
             character[:id] = id_from_url(char_info_node.at('a')['href'])
             character[:name] = char_info_node.at('a').text
             character[:role] = char_info_node.at('div').text
             character[:thumb_url] = char_image_node.at('img')['src']
             character[:image_url] = image_from_thumb_url(character[:thumb_url], "t")
-            seiyuu[:character] = character
-            seiyuu_roles.push seiyuu
+            anime[:character] = character
+            seiyuu_roles.push anime
           end
         end
 
@@ -152,7 +203,7 @@ module MyAnimeList
             image_node = nodes[0]
             info_node = nodes[1]
             anime[:id] = id_from_url( info_node.at('a')['href']) #id
-            anime[:name] = info_node.at('a').text #name
+            anime[:title] = info_node.at('a').text #name
             anime[:role] = info_node.at("small").text + info_node.at("small").next.text #role description - may be null
             anime[:thumb_url] = image_node.at('img')['src'] #thumb
             anime[:image_url] = image_from_thumb_url(anime[:thumb_url], "v")
@@ -172,7 +223,7 @@ module MyAnimeList
             image_node = nodes[0]
             info_node = nodes[1]
             manga[:id] = id_from_url(info_node.at('a')['href'])
-            manga[:name] = info_node.at('a').text #name
+            manga[:title] = info_node.at('a').text #name
             manga[:role] = info_node.at("small").text #role
             manga[:thumb_url] = image_node.at('img')['src'] #thumb
             manga[:image_url] = image_from_thumb_url(manga[:thumb_url], "v")
@@ -184,8 +235,9 @@ module MyAnimeList
       end
 
       def self.id_from_url(url)
-        split = url.split("/")
-        split[split.length-2].to_i
+        url[%r{http://myanimelist.net/(\w+)/(\d+)/.*?}, 2].to_i
+       # split = url.split("/")
+       # split[split.length-2].to_i
       end
 
       def self.image_from_thumb_url(url, char)

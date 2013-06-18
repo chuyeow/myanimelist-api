@@ -1,6 +1,6 @@
 module MyAnimeList
   class Character
-    attr_accessor :id, :name, :image_url, :anime, :manga, :bio, :seiyuu, :eng_name, :jp_name
+    attr_accessor :id, :name, :image_url, :thumb_url, :anime, :manga, :bio, :seiyuu, :eng_name, :jp_name
 
     def self.scrape_character(id, cookie_string = nil)
       curl = Curl::Easy.new("http://myanimelist.net/character/#{id}")
@@ -48,6 +48,7 @@ module MyAnimeList
         :eng_name => eng_name,
         :jp_name => jp_name,
         :image_url => image_url,
+        :thumb_url => thumb_url,
         :anime => anime,
         :manga => manga,
         :bio => bio,
@@ -57,6 +58,49 @@ module MyAnimeList
 
     def to_json(*args)
       attributes.to_json(*args)
+    end
+
+    def to_xml(options = {})
+      xml = Builder::XmlMarkup.new(:indent => 2)
+      xml.instruct! unless options[:skip_instruct]
+      xml.character do |xml|
+        xml.id id
+        xml.name name
+        xml.eng_name eng_name
+        xml.jp_name jp_name
+        xml.image_url image_url
+        xml.thumb_url thumb_url
+        xml.bio bio
+
+        anime.each do |o|
+          xml.anime do |xml|
+            xml.id o[:id]
+            xml.title o[:title]
+            xml.role o[:role]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+          end
+        end
+        manga.each do |o|
+          xml.manga do |xml|
+            xml.id o[:id]
+            xml.title o[:title]
+            xml.role o[:role]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+          end
+        end
+        seiyuu.each do |o|
+          xml.seiyuu do |xml|
+            xml.id o[:id]
+            xml.name o[:name]
+            xml.nation o[:nation]
+            xml.image_url o[:image_url]
+            xml.thumb_url o[:thumb_url]
+          end
+        end
+
+      end
     end
 
     private
@@ -154,8 +198,9 @@ module MyAnimeList
       end
 
       def self.id_from_url(url)
-        split = url.split("/")
-        split[split.length-2].to_i
+#        split = url.split("/")
+#        split[split.length-2].to_i
+        url[%r{http://myanimelist.net/(\w+)/(\d+)/.*?}, 2].to_i
       end
 
       def self.image_from_thumb_url(url, char)
