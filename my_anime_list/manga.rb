@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 module MyAnimeList
   class Manga
     attr_accessor :id, :title, :rank, :image_url, :popularity_rank, :volumes, :chapters,
