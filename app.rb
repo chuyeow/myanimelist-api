@@ -344,7 +344,7 @@ class App < Sinatra::Base
   get '/anime/just_added' do
     anime = MyAnimeList::Anime.just_added(
         :page => params[:page],
-        :per_page => params[:per_page],
+        :per_page => params[:per_page]
     )
 
     case params[:format]
