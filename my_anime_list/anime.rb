@@ -15,7 +15,7 @@ module MyAnimeList
     # Scrape anime details page on MyAnimeList.net. Very fragile!
     def self.scrape_anime(id, cookie_string = nil)
       curl = Curl::Easy.new("http://myanimelist.net/anime/#{id}")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string if cookie_string
       begin
         curl.perform
@@ -71,7 +71,7 @@ module MyAnimeList
       url = options[:new] ? 'http://myanimelist.net/includes/ajax.inc.php?t=61' : 'http://myanimelist.net/includes/ajax.inc.php?t=62'
 
       curl = Curl::Easy.new(url)
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string
       params = [
         Curl::PostField.content('aid', id),
@@ -105,7 +105,7 @@ module MyAnimeList
       anime = scrape_anime(id, cookie_string)
 
       curl = Curl::Easy.new("http://myanimelist.net/panel.php?go=edit&id=#{anime.listed_anime_id}")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string
 
       begin
@@ -160,7 +160,7 @@ module MyAnimeList
       type = options[:type].to_s.downcase
 
       curl = Curl::Easy.new("http://myanimelist.net/topanime.php?type=#{type}&limit=#{limit}")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       begin
         curl.perform
       rescue Exception => e

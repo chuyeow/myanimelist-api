@@ -23,7 +23,7 @@ module MyAnimeList
       def authenticate_with_mal(username, password)
 
         curl = Curl::Easy.new('http://myanimelist.net/login.php')
-        curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+        curl.headers['User-Agent'] = ENV['USER_AGENT']
 
         authenticated = false
         cookies = []
