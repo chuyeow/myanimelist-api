@@ -4,7 +4,7 @@ module MyAnimeList
 
     def self.anime_list_of(username)
       curl = Curl::Easy.new("http://myanimelist.net/malappinfo.php?u=#{username}&status=all&type=anime")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       begin
         curl.perform
       rescue Exception => e

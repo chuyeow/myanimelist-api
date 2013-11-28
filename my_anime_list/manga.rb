@@ -13,7 +13,7 @@ module MyAnimeList
     # Scrape manga details page on MyAnimeList.net.
     def self.scrape_manga(id, cookie_string = nil)
       curl = Curl::Easy.new("http://myanimelist.net/manga/#{id}")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string if cookie_string
       begin
         curl.perform
@@ -69,7 +69,7 @@ module MyAnimeList
       url = options[:new] ? 'http://myanimelist.net/includes/ajax.inc.php?t=49' : 'http://myanimelist.net/includes/ajax.inc.php?t=34'
 
       curl = Curl::Easy.new(url)
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string
       params = [
         Curl::PostField.content('mid', id),
@@ -104,7 +104,7 @@ module MyAnimeList
       manga = scrape_manga(id, cookie_string)
 
       curl = Curl::Easy.new("http://myanimelist.net/panel.php?go=editmanga&id=#{manga.listed_manga_id}")
-      curl.headers['User-Agent'] = 'MyAnimeList Unofficial API (http://mal-api.com/)'
+      curl.headers['User-Agent'] = ENV['USER_AGENT']
       curl.cookies = cookie_string
 
       begin
@@ -129,7 +129,7 @@ module MyAnimeList
 
       begin
         response = Net::HTTP.start('myanimelist.net', 80) do |http|
-          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}")
+          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}", {'User-Agent' => ENV['USER_AGENT']})
         end
 
         case response
@@ -141,7 +141,7 @@ module MyAnimeList
           redirect_url = response['location'].sub(%r{(http://myanimelist.net/manga/\d+)/?.*}, '\1')
 
           response = Net::HTTP.start('myanimelist.net', 80) do |http|
-            http.get(redirect_url)
+            http.get(redirect_url, {'User-Agent' => ENV['USER_AGENT']})
           end
         end
 
