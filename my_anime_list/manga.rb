@@ -129,7 +129,7 @@ module MyAnimeList
 
       begin
         response = Net::HTTP.start('myanimelist.net', 80) do |http|
-          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}")
+          http.get("/manga.php?c[]=a&c[]=b&c[]=c&c[]=d&c[]=e&c[]=f&c[]=g&q=#{Curl::Easy.new.escape(query)}", {'User-Agent' => ENV['USER_AGENT']})
         end
 
         case response
@@ -141,7 +141,7 @@ module MyAnimeList
           redirect_url = response['location'].sub(%r{(http://myanimelist.net/manga/\d+)/?.*}, '\1')
 
           response = Net::HTTP.start('myanimelist.net', 80) do |http|
-            http.get(redirect_url)
+            http.get(redirect_url, {'User-Agent' => ENV['USER_AGENT']})
           end
         end
 

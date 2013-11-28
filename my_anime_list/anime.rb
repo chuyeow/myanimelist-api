@@ -464,7 +464,7 @@ module MyAnimeList
       def self.perform_search(url)
         begin
           response = Net::HTTP.start('myanimelist.net', 80) do |http|
-            http.get(url)
+            http.get(url, {'User-Agent' => ENV['USER_AGENT']})
           end
 
           case response
@@ -476,7 +476,7 @@ module MyAnimeList
               redirect_url = response['location'].sub(%r{(http://myanimelist.net/anime/\d+)/?.*}, '\1')
 
               response = Net::HTTP.start('myanimelist.net', 80) do |http|
-                http.get(redirect_url)
+                http.get(redirect_url, {'User-Agent' => ENV['USER_AGENT']})
               end
           end
 
