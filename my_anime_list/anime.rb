@@ -502,7 +502,7 @@ module MyAnimeList
             anime_title_node = results_row.at('td a strong')
             next unless anime_title_node
             url = anime_title_node.parent['href']
-            next unless url.match %r{http://myanimelist.net/anime/(\d+)/?.*}
+            next unless url.match %r{/anime/(\d+)/?.*}
 
             anime = Anime.new
             anime.id = $1.to_i
