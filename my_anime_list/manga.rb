@@ -168,7 +168,7 @@ module MyAnimeList
           manga_title_node = results_row.at('td a strong')
           next unless manga_title_node
           url = manga_title_node.parent['href']
-          next unless url.match %r{http://myanimelist.net/manga/(\d+)/?.*}
+          next unless url.match %r{/manga/(\d+)/?.*}
 
           manga = Manga.new
           manga.id = $1.to_i
