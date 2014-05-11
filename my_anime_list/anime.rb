@@ -864,7 +864,11 @@ module MyAnimeList
           date_string = text.split(/\s+to\s+/).first
           return nil if !date_string
 
-          Chronic.parse(date_string)
+          if date_string =~ /^\d{4}$/
+            return date_string.strip
+          else
+            Chronic.parse(date_string)
+          end
         end
       end
 
@@ -882,7 +886,11 @@ module MyAnimeList
           date_string = text.split(/\s+to\s+/).last
           return nil if !date_string
 
-          Chronic.parse(date_string)
+          if date_string =~ /^\d{4}$/
+            return date_string.strip
+          else
+            Chronic.parse(date_string)
+          end
         end
       end
 
