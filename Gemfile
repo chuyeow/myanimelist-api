@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'rack', '~> 1.4'
+gem 'rack', '~> 1.6'
 gem 'rack-cache'
 gem 'rack-cors', :require => 'rack/cors'
 gem 'sinatra'
