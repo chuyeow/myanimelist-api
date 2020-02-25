@@ -28,7 +28,7 @@ GEM
       net-ssh (>= 2.6.5)
     nokogiri (1.10.8)
       mini_portile2 (~> 2.4.0)
-    rack (1.6.11)
+    rack (1.6.12)
     rack-cache (1.2)
       rack (>= 0.4)
     rack-cors (1.0.5)
